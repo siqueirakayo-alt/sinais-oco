@@ -2,8 +2,11 @@
 <html lang="pt-BR">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Sinais OCO BTC/USDT</title>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Sinais OCO">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Sinais OCO BTC/BRL</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
 <script src="https://unpkg.com/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
@@ -18,7 +21,7 @@
 }
 *{box-sizing:border-box}
 html,body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--sans);font-size:15px}
-.wrap{max-width:540px;margin:0 auto;padding-block:14px 40px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:14px}
+.wrap{max-width:540px;margin:0 auto;padding-top:max(14px,env(safe-area-inset-top,0px));padding-bottom:40px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:14px}
 header{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
 .par{font-weight:700;font-size:1.15rem;letter-spacing:.01em}
 .par small{color:var(--muted);font-weight:500;font-size:.8rem;margin-left:6px}
@@ -38,6 +41,10 @@ header{display:flex;align-items:center;justify-content:space-between;gap:10px;fl
 .sinal[data-tone="warn"] .estado{color:var(--warn)}
 .sinal[data-tone="info"] .estado{color:var(--info)}
 .instr{color:var(--muted);margin:6px 0 0;line-height:1.45}
+.hoje{margin-top:10px;font-size:.82rem;color:var(--muted)}
+.hoje b{color:var(--fg);font-family:var(--mono)}
+.entrada{margin-top:12px;display:flex;flex-direction:column;gap:4px}
+.entrada input{max-width:160px;font-size:1.1rem}
 .grade{display:grid;grid-template-columns:1fr auto;gap:6px 12px;margin-top:12px;align-items:baseline}
 .grade dt{color:var(--muted);font-size:.86rem}
 .grade dd{margin:0;font-family:var(--mono);font-variant-numeric:tabular-nums;text-align:right;font-size:1.02rem}
@@ -49,7 +56,8 @@ header{display:flex;align-items:center;justify-content:space-between;gap:10px;fl
 .ctx .card{padding:12px}
 .ctx .val{font-family:var(--mono);font-size:1.25rem;font-weight:600;margin-top:4px}
 .ctx .zona{font-size:.82rem;color:var(--muted);margin-top:2px}
-.ctx .fonte{font-size:.7rem;color:var(--muted);margin-top:6px}
+.ctx .fonte{font-size:.7rem;color:var(--muted);margin-top:6px;line-height:1.4}
+.ctx a{color:var(--info)}
 .bloq{color:var(--warn)}
 #grafico{height:300px;width:100%}
 table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
@@ -60,13 +68,16 @@ tr.atual td{background:rgba(90,169,230,.08)}
 .pos{color:var(--buy)} .neg{color:var(--sell)}
 .mono{font-family:var(--mono)}
 .nota{color:var(--muted);font-size:.8rem;line-height:1.45;margin:8px 0 0}
+.aviso{color:var(--warn)}
 details summary{cursor:pointer;font-weight:600;list-style:none}
 details summary::-webkit-details-marker{display:none}
 details summary::after{content:"+";float:right;color:var(--muted)}
 details[open] summary::after{content:"–"}
 .campos{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
 label{display:flex;flex-direction:column;gap:4px;font-size:.78rem;color:var(--muted)}
-input,select{background:var(--bg);color:var(--fg);border:1px solid var(--line);border-radius:6px;padding:8px;font-family:var(--mono);font-size:.95rem;width:100%}
+label.check{flex-direction:row;align-items:center;gap:8px;grid-column:1/-1;font-size:.85rem}
+label.check input{width:auto}
+input,select{background:var(--bg);color:var(--fg);border:1px solid var(--line);border-radius:6px;padding:8px;font-family:var(--mono);font-size:16px;width:100%}
 input:focus,select:focus,button:focus-visible{outline:2px solid var(--info);outline-offset:1px}
 .botoes{display:flex;gap:8px;flex-wrap:wrap}
 button{background:#1d242b;color:var(--fg);border:1px solid var(--line);border-radius:6px;padding:8px 12px;font-family:var(--sans);font-size:.85rem;cursor:pointer}
@@ -82,7 +93,7 @@ footer{color:var(--muted);font-size:.75rem;line-height:1.5}
 
 <header>
   <div>
-    <div class="par">BTC/USDT <small>Binance · 5 min</small></div>
+    <div class="par">BTC/BRL <small>Binance · 5 min</small></div>
     <div class="conn"><span class="dot" id="dot"></span><span id="connTxt">Conectando…</span></div>
   </div>
   <div class="preco" id="preco">—</div>
@@ -91,19 +102,25 @@ footer{color:var(--muted);font-size:.75rem;line-height:1.5}
 <section class="card sinal" id="sinal" data-tone="info" aria-live="polite">
   <div class="estado" id="estado">CARREGANDO</div>
   <p class="instr" id="instr">Baixando o histórico de candles da Binance.</p>
+  <div class="hoje" id="hoje">—</div>
+  <div class="entrada">
+    <label for="valorEntrada">Valor da entrada (R$)<input id="valorEntrada" type="number" step="1" min="12" inputmode="decimal"></label>
+    <p class="nota" id="arred">—</p>
+  </div>
   <div id="detalhe" hidden>
     <dl class="grade">
       <dt>Entrada (referência)</dt><dd id="dEntrada">—</dd>
       <dt>Quantia (BTC)</dt><dd id="dQtd">—</dd>
-      <dt>Total (USDT)</dt><dd id="dTotal">—</dd>
+      <dt>Total (BRL)</dt><dd id="dTotal">—</dd>
       <dt>Tempo restante</dt><dd class="relogio" id="dTempo">—</dd>
     </dl>
     <div class="oco">
       <div class="rot">OCO de venda (aba Vender → OCO)</div>
       <dl class="grade">
-        <dt>Limite TP (USDT)</dt><dd class="tp" id="dTP">—</dd>
-        <dt>Ativação SL (USDT)</dt><dd class="sl" id="dSL">—</dd>
-        <dt>Limite de SL (USDT)</dt><dd class="sl" id="dSLL">—</dd>
+        <dt>Limite TP (BRL)</dt><dd class="tp" id="dTP">—</dd>
+        <dt>Ativação SL (BRL)</dt><dd class="sl" id="dSL">—</dd>
+        <dt>Limite de SL (BRL)</dt><dd class="sl" id="dSLL">—</dd>
+        <dt>Quantia (BTC)</dt><dd id="dQtdOco">—</dd>
         <dt>Ganho se bater TP</dt><dd class="tp" id="dGanho">—</dd>
         <dt>Perda se bater SL</dt><dd class="sl" id="dPerda">—</dd>
       </dl>
@@ -113,17 +130,18 @@ footer{color:var(--muted);font-size:.75rem;line-height:1.5}
 
 <details class="card" id="ajusteCompra">
   <summary>Ajustar a OCO ao preço que eu paguei</summary>
-  <p class="nota">Digite o preço médio e a quantia que aparecem na sua ordem executada. A Binance desconta 0,1% de taxa do BTC recebido, então a quantia da OCO fica um pouco menor.</p>
+  <p class="nota">Já vem preenchido com o sinal. Troque pelo preço médio e pela quantia da sua compra executada (em Ordens → Histórico) e use estes números na OCO.</p>
   <div class="campos">
-    <label for="pago">Preço pago (USDT)<input id="pago" type="number" step="0.01" inputmode="decimal"></label>
+    <label for="pago">Preço pago (BRL)<input id="pago" type="number" step="1" inputmode="decimal"></label>
     <label for="qtdComprada">Quantia comprada (BTC)<input id="qtdComprada" type="number" step="0.00001" inputmode="decimal"></label>
   </div>
-  <dl class="grade" id="ajusteRes">
+  <dl class="grade">
     <dt>Quantia da OCO (BTC)</dt><dd id="aQtd">—</dd>
     <dt>Limite TP</dt><dd class="tp" id="aTP">—</dd>
     <dt>Ativação SL</dt><dd class="sl" id="aSL">—</dd>
     <dt>Limite de SL</dt><dd class="sl" id="aSLL">—</dd>
   </dl>
+  <p class="nota aviso" id="aAviso" hidden></p>
 </details>
 
 <div class="ctx">
@@ -131,32 +149,32 @@ footer{color:var(--muted);font-size:.75rem;line-height:1.5}
     <div class="rot">MVRV</div>
     <div class="val" id="mvrvVal">—</div>
     <div class="zona" id="mvrvZona">carregando</div>
-    <div class="fonte" id="mvrvFonte"></div>
+    <div class="fonte"><span id="mvrvFonte"></span><br><a href="https://charts.checkonchain.com/btconchain/pricing/pricing_mvrv_bands/pricing_mvrv_bands_light.html" target="_blank" rel="noopener">Abrir checkonchain</a></div>
   </div>
   <div class="card">
     <div class="rot">Medo e Ganância</div>
     <div class="val" id="fgVal">—</div>
     <div class="zona" id="fgZona">carregando</div>
-    <div class="fonte" id="fgFonte"></div>
+    <div class="fonte"><span id="fgFonte"></span><br><a href="https://coinmarketcap.com/pt-br/charts/fear-and-greed-index/" target="_blank" rel="noopener">Abrir CoinMarketCap</a></div>
   </div>
 </div>
 
 <section class="card">
   <div class="rot" style="margin-bottom:8px">Gráfico · médias 9, 21 e 200 · setas = sinais</div>
   <div id="grafico"></div>
-  <p class="nota" id="semGrafico" hidden>O gráfico não carregou (sem acesso à biblioteca). Os sinais continuam funcionando.</p>
+  <p class="nota" id="semGrafico" hidden>O gráfico não carregou. Os sinais continuam funcionando.</p>
 </section>
 
 <section class="card">
-  <div class="rot">Backtest com as mesmas regras e 0,2% de taxa por operação</div>
+  <div class="rot">Backtest com as suas regras e 0,2% de taxa por operação</div>
   <p class="nota" id="periodo">—</p>
   <div class="scroll">
     <table>
-      <thead><tr><th>Alvo</th><th>Ops</th><th>Acerto</th><th>Resultado</th><th>US$</th></tr></thead>
+      <thead><tr><th>Alvo</th><th>Ops</th><th>Acerto</th><th>Resultado</th><th>R$</th></tr></thead>
       <tbody id="bt"></tbody>
     </table>
   </div>
-  <p class="nota">Use o alvo que fecha positivo. Poucos dias de histórico dizem pouco: acompanhe por uma ou duas semanas antes de confiar. MVRV e Medo e Ganância não entram no backtest porque só temos o valor de hoje.</p>
+  <p class="nota">Considera só o horário e o limite de operações por dia dos Ajustes. Use o alvo que fecha positivo. Poucos dias de histórico dizem pouco: acompanhe uma ou duas semanas antes de confiar. MVRV e Medo e Ganância não entram no backtest porque só temos o valor de hoje.</p>
 </section>
 
 <section class="card">
@@ -172,18 +190,21 @@ footer{color:var(--muted);font-size:.75rem;line-height:1.5}
 <details class="card" id="ajustes">
   <summary>Ajustes</summary>
   <div class="campos">
-    <label for="capital">Capital (USDT)<input id="capital" type="number" step="1" min="5"></label>
-    <label for="risco">Risco por operação (%)<input id="risco" type="number" step="0.1" min="0.1"></label>
+    <label for="banca">Banca na Binance (R$)<input id="banca" type="number" step="1" min="10"></label>
+    <label for="horaIni">Operar a partir de (h)<input id="horaIni" type="number" step="1" min="0" max="23"></label>
+    <label for="horaFim">Parar às (h)<input id="horaFim" type="number" step="1" min="1" max="24"></label>
+    <label for="maxDia">Máximo de operações por dia<input id="maxDia" type="number" step="1" min="1"></label>
     <label for="rr">Alvo (× o risco)<select id="rr"><option value="1">1×</option><option value="1.5">1,5×</option><option value="2">2×</option></select></label>
     <label for="tempo">Tempo máximo (min)<input id="tempo" type="number" step="5" min="5"></label>
-    <label for="atrMult">Stop (× ATR)<input id="atrMult" type="number" step="0.1" min="0.5"></label>
     <label for="minStop">Stop mínimo (%)<input id="minStop" type="number" step="0.05" min="0.1"></label>
+    <label for="atrMult">Stop (× ATR)<input id="atrMult" type="number" step="0.1" min="0.5"></label>
     <label for="mvrvMax">Bloquear com MVRV acima de<input id="mvrvMax" type="number" step="0.1"></label>
     <label for="fgMax">Bloquear com índice a partir de<input id="fgMax" type="number" step="1" min="50" max="100"></label>
     <label for="mvrvMan">MVRV manual (0 = automático)<input id="mvrvMan" type="number" step="0.01" min="0"></label>
     <label for="fgMan">Medo e Ganância manual (0 = automático)<input id="fgMan" type="number" step="1" min="0" max="100"></label>
+    <label class="check" for="taxaBnb"><input id="taxaBnb" type="checkbox"> Pago as taxas com BNB</label>
   </div>
-  <p class="nota">O índice automático vem do alternative.me. Para usar o valor do CoinMarketCap, digite-o no campo manual uma vez por dia.</p>
+  <p class="nota">Se a leitura automática do checkonchain ou do CoinMarketCap falhar, abra o link no cartão, veja o valor do dia e digite aqui. O valor manual vale até você zerar o campo.</p>
 </details>
 
 <div class="botoes">
@@ -202,28 +223,38 @@ footer{color:var(--muted);font-size:.75rem;line-height:1.5}
 "use strict";
 const $ = id => document.getElementById(id);
 const TF_MS = 5*60*1000;
-const TAXA = 0.2; // % ida e volta
+const TAXA = 0.2;            // % ida e volta
+const MIN_ORDEM = 10;        // mínimo da Binance em BTC/BRL (R$)
+const PASSO = 0.00001;       // menor fração de BTC aceita
+const SIMB = "BTCBRL";
 const REST = ["https://data-api.binance.vision","https://api.binance.com","https://api1.binance.com"];
-const WS   = ["wss://data-stream.binance.vision/ws/btcusdt@kline_5m","wss://stream.binance.com:9443/ws/btcusdt@kline_5m"];
+const WS   = ["wss://data-stream.binance.vision/ws/btcbrl@kline_5m","wss://stream.binance.com:9443/ws/btcbrl@kline_5m"];
+const URL_MVRV = "https://charts.checkonchain.com/btconchain/pricing/pricing_mvrv_bands/pricing_mvrv_bands_light.html";
 
 /* ---------- ajustes ---------- */
-const PADRAO = {capital:100, risco:1, rr:1.5, tempo:60, atrMult:1.5, minStop:0.4, mvrvMax:3, fgMax:80, mvrvMan:0, fgMan:0};
+const PADRAO = {valorEntrada:15, banca:100, horaIni:8, horaFim:17, maxDia:3, rr:1.5, tempo:60, atrMult:1.5, minStop:0.4, mvrvMax:3, fgMax:80, mvrvMan:0, fgMan:0, taxaBnb:true};
 let cfg = Object.assign({}, PADRAO);
-try{ const s = JSON.parse(localStorage.getItem("sinaisOCO.cfg")||"null"); if(s) Object.assign(cfg, s); }catch(e){}
-const CAMPOS = Object.keys(PADRAO);
-CAMPOS.forEach(k => { const el=$(k); el.value = cfg[k]; el.addEventListener("change", () => {
-  const v = parseFloat(String(el.value).replace(",", "."));
-  cfg[k] = isFinite(v) ? v : PADRAO[k];
-  try{ localStorage.setItem("sinaisOCO.cfg", JSON.stringify(cfg)); }catch(e){}
-  recalcular(true);
-});});
+try{ const s = JSON.parse(localStorage.getItem("sinaisOCO.brl")||"null"); if(s) Object.assign(cfg, s); }catch(e){}
+Object.keys(PADRAO).forEach(k => {
+  const el=$(k);
+  if(el.type==="checkbox") el.checked = !!cfg[k]; else el.value = cfg[k];
+  el.addEventListener("change", () => {
+    if(el.type==="checkbox") cfg[k]=el.checked;
+    else { const v = parseFloat(String(el.value).replace(",", ".")); cfg[k] = isFinite(v) ? v : PADRAO[k]; }
+    try{ localStorage.setItem("sinaisOCO.brl", JSON.stringify(cfg)); }catch(e){}
+    recalcular(true);
+  });
+});
 
 /* ---------- formatação ---------- */
-const fP = x => isFinite(x) ? x.toLocaleString("pt-BR",{minimumFractionDigits:2,maximumFractionDigits:2}) : "—";
+const fP = x => isFinite(x) ? Math.round(x).toLocaleString("pt-BR") : "—";
+const fR = x => isFinite(x) ? x.toLocaleString("pt-BR",{minimumFractionDigits:2,maximumFractionDigits:2}) : "—";
 const fQ = x => isFinite(x) ? x.toLocaleString("pt-BR",{minimumFractionDigits:5,maximumFractionDigits:5}) : "—";
 const fPct = x => (x>=0?"+":"") + x.toLocaleString("pt-BR",{minimumFractionDigits:1,maximumFractionDigits:1}) + "%";
 const fHora = ms => new Date(ms).toLocaleString("pt-BR",{day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"});
-const floor5 = x => Math.floor(x*1e5)/1e5;
+const passoBaixo = x => Math.floor(x/PASSO + 1e-9)*PASSO;
+const passoCima  = x => Math.ceil(x/PASSO - 1e-9)*PASSO;
+const diaDe = ms => new Date(ms).toDateString();
 
 /* ---------- indicadores ---------- */
 function ema(v,n){ const o=new Array(v.length).fill(NaN); if(v.length<n) return o;
@@ -240,7 +271,7 @@ function atr(c,n){ const o=new Array(c.length).fill(NaN); if(c.length<=n) return
   for(let i=n+1;i<c.length;i++) o[i]=(o[i-1]*(n-1)+tr[i])/n; return o; }
 
 /* ---------- estado ---------- */
-let velas = [];          // {t,T,o,h,l,c,closed}
+let velas = [];
 let ind = {e9:[],e21:[],e200:[],sig:[],sd:[]};
 let ctx = {mvrv:NaN, mvrvFonte:"", fg:NaN, fgFonte:""};
 let ultimoAviso = null, carregado = false, somOn = false, audio = null;
@@ -260,19 +291,29 @@ function contextoOK(){
   const m = mvrvAtual(), f = fgAtual();
   return { mvrv: !(isFinite(m) && m >= cfg.mvrvMax), fg: !(isFinite(f) && f >= cfg.fgMax) };
 }
+function noHorario(ms){ const h = new Date(ms).getHours(); return h >= cfg.horaIni && h < cfg.horaFim; }
 
-function tamanho(entrada, sd){
-  const q = Math.min(cfg.capital*cfg.risco/100/sd, cfg.capital/entrada*0.998);
-  return floor5(q);
+/* Monta os preços da OCO a partir da entrada e da distância do stop. */
+function niveis(entrada, sd, rr){
+  const sl = Math.round(entrada - sd);
+  const slLim = Math.floor(sl*(1-0.001));
+  const tp = Math.round(entrada + sd*rr);
+  // quantia: o passo de 0,00001 BTC mais perto do valor escolhido,
+  // nunca abaixo do que garante R$ 10 também na venda pelo Limite de SL
+  const minimo = passoCima(MIN_ORDEM*1.02 / slLim);
+  const qtd = Math.max(minimo, Math.round(cfg.valorEntrada / entrada / PASSO) * PASSO);
+  const qtdOco = cfg.taxaBnb ? qtd : passoBaixo(qtd*0.999);
+  return {entrada, sd, sl, slLim, tp, qtd, qtdOco};
 }
 
-/* Simula as operações: entrada no fechamento do candle do sinal, OCO com TP e SL, saída por tempo. */
+/* Simula: entrada no fechamento do candle do sinal, OCO com TP e SL, saída por tempo,
+   só dentro do horário e até o máximo de operações por dia. */
 function simular(rr, usaFiltro, incluiAberta){
   const trades=[]; let ab=null; const agora=Date.now();
   const barsMax = Math.max(1, Math.round(cfg.tempo*60000/TF_MS));
   const ok = contextoOK(); const filtroOK = !usaFiltro || (ok.mvrv && ok.fg);
-  const n = velas.length;
-  for(let i=201;i<n;i++){
+  const porDia = {};
+  for(let i=201;i<velas.length;i++){
     const k=velas[i];
     if(!k.closed && !incluiAberta) break;
     if(ab){
@@ -283,19 +324,22 @@ function simular(rr, usaFiltro, incluiAberta){
           const saida = bSL? ab.sl : bTP? ab.tp : k.c;
           const motivo = bSL? "SL" : bTP? "TP" : "Tempo";
           const pct = (saida-ab.entrada)/ab.entrada*100 - TAXA;
-          const usd = ab.qtd*(saida-ab.entrada) - ab.qtd*ab.entrada*TAXA/100;
-          trades.push(Object.assign({}, ab, {saida, motivo, pct, usd, saidaT: k.closed? k.T+1 : agora}));
+          const brl = ab.qtd*(saida-ab.entrada) - ab.qtd*ab.entrada*TAXA/100;
+          trades.push(Object.assign({}, ab, {saida, motivo, pct, brl, saidaT: k.closed? k.T+1 : agora}));
           ab=null;
         }
       }
       continue;
     }
-    if(k.closed && ind.sig[i] && filtroOK){
-      const sd=ind.sd[i], e=k.c, sl=e-sd;
-      ab={i, T:k.T+1, entrada:e, sd, sl, tp:e+sd*rr, slLim: sl*(1-0.001), qtd: tamanho(e,sd)};
+    if(k.closed && ind.sig[i] && filtroOK && noHorario(k.T+1)){
+      const d = diaDe(k.T+1);
+      if((porDia[d]||0) < cfg.maxDia){
+        porDia[d] = (porDia[d]||0) + 1;
+        ab = Object.assign({i, T:k.T+1}, niveis(k.c, ind.sd[i], rr));
+      }
     }
   }
-  return {trades, aberta: ab};
+  return {trades, aberta: ab, porDia};
 }
 
 /* ---------- tela ---------- */
@@ -306,24 +350,32 @@ function mostrar(tone, estado, instr, op){
     const total = op.qtd*op.entrada;
     $("dEntrada").textContent = fP(op.entrada);
     $("dQtd").textContent = fQ(op.qtd);
-    $("dTotal").textContent = fP(total) + (total<5 ? " (mínimo 5)" : "");
+    $("dTotal").textContent = "R$ " + fR(total);
     $("dTP").textContent = fP(op.tp); $("dSL").textContent = fP(op.sl); $("dSLL").textContent = fP(op.slLim);
-    $("dGanho").textContent = "+" + fP(op.qtd*(op.tp-op.entrada) - total*TAXA/100) + " USDT";
-    $("dPerda").textContent = "−" + fP(op.qtd*(op.entrada-op.slLim) + total*TAXA/100) + " USDT";
+    $("dQtdOco").textContent = fQ(op.qtdOco);
+    $("dGanho").textContent = "+R$ " + fR(op.qtd*(op.tp-op.entrada) - total*TAXA/100);
+    $("dPerda").textContent = "−R$ " + fR(op.qtd*(op.entrada-op.slLim) + total*TAXA/100);
   }
 }
 
 let opAtual = null;
 function atualizarSinal(){
   if(!carregado) return;
-  const {trades, aberta} = simular(cfg.rr, true, true);
+  const {trades, aberta, porDia} = simular(cfg.rr, true, true);
   const agora = Date.now(); const ok = contextoOK();
+  const hojeN = porDia[diaDe(agora)] || 0;
+  const resHoje = trades.filter(t=>diaDe(t.T)===diaDe(agora)).reduce((a,t)=>a+t.brl,0);
+  $("hoje").innerHTML = `Hoje: <b>${hojeN}</b> de <b>${cfg.maxDia}</b> operações · resultado <b>${resHoje>=0?"+":"−"}R$ ${fR(Math.abs(resHoje))}</b> · horário ${cfg.horaIni}h às ${cfg.horaFim}h`;
+  const ref = aberta || (velas.length ? niveis(velas[velas.length-1].c, ind.sd[ind.sd.length-1] || velas[velas.length-1].c*cfg.minStop/100, cfg.rr) : null);
+  if(ref) $("arred").textContent = "Vai comprar " + fQ(ref.qtd) + " BTC ≈ R$ " + fR(ref.qtd*ref.entrada) + (aberta ? " neste sinal." : " no preço atual.") +
+    " A Binance só aceita múltiplos de 0,00001 BTC (≈ R$ " + fR(PASSO*ref.entrada) + "), por isso o valor é arredondado.";
+  if(aberta && (!opAtual || opAtual.T !== aberta.T)){ $("pago").value = Math.round(aberta.entrada); $("qtdComprada").value = aberta.qtd.toFixed(5); }
   opAtual = aberta;
   let chave = null;
   if(aberta){
     const resta = aberta.T + cfg.tempo*60000 - agora;
     if(agora - aberta.T < TF_MS){
-      mostrar("buy","COMPRAR AGORA","Compre a mercado no app. Depois vá em Vender → OCO e preencha os três preços abaixo com a quantia que entrou na conta.", aberta);
+      mostrar("buy","COMPRAR AGORA","Compre a mercado no app a quantia indicada. Depois vá em Vender → OCO e preencha os três preços e a quantia da OCO.", aberta);
       chave = "c"+aberta.T;
     } else {
       mostrar("info","EM OPERAÇÃO","A OCO deve estar ativa. Se o tempo acabar sem TP nem SL, cancele a OCO e venda a mercado.", aberta);
@@ -338,6 +390,10 @@ function atualizarSinal(){
       chave = "s"+u.T+u.motivo;
     } else if(!(ok.mvrv && ok.fg)){
       mostrar("warn","BLOQUEADO PELO CONTEXTO", (!ok.mvrv ? "MVRV acima do limite. " : "") + (!ok.fg ? "Medo e Ganância acima do limite. " : "") + "Nenhuma compra até o contexto melhorar.", null);
+    } else if(hojeN >= cfg.maxDia){
+      mostrar("warn","LIMITE DO DIA ATINGIDO","Você já fez as "+cfg.maxDia+" operações de hoje. Volte amanhã às "+cfg.horaIni+"h.", null);
+    } else if(!noHorario(agora)){
+      mostrar("info","FORA DO HORÁRIO","Os sinais valem das "+cfg.horaIni+"h às "+cfg.horaFim+"h. Fora disso, nada a fazer.", null);
     } else {
       mostrar("info","AGUARDANDO SINAL","Nenhuma operação aberta. Quando aparecer um sinal, este quadro fica verde e mostra os preços da OCO.", null);
     }
@@ -350,23 +406,30 @@ function atualizarSinal(){
 function ajustarCompra(){
   const p = parseFloat($("pago").value), q = parseFloat($("qtdComprada").value);
   const sd = opAtual ? opAtual.sd : NaN;
+  let slLim = NaN;
   if(isFinite(p) && isFinite(sd)){
-    const sl=p-sd; $("aSL").textContent=fP(sl); $("aSLL").textContent=fP(sl*(1-0.001)); $("aTP").textContent=fP(p+sd*cfg.rr);
+    const sl=Math.round(p-sd); slLim=Math.floor(sl*(1-0.001));
+    $("aSL").textContent=fP(sl); $("aSLL").textContent=fP(slLim); $("aTP").textContent=fP(p+sd*cfg.rr);
   } else { ["aSL","aSLL","aTP"].forEach(id=>$(id).textContent= opAtual?"—":"sem operação aberta"); }
-  $("aQtd").textContent = isFinite(q) ? fQ(floor5(q*0.999)) : "—";
+  const qo = isFinite(q) ? (cfg.taxaBnb ? passoBaixo(q) : passoBaixo(q*0.999)) : NaN;
+  $("aQtd").textContent = fQ(qo);
+  const av = $("aAviso");
+  if(isFinite(qo) && isFinite(slLim) && qo*slLim < MIN_ORDEM){
+    av.hidden=false; av.textContent = "Atenção: essa quantia vale menos de R$ 10 no preço do stop e a Binance pode recusar a OCO. Compre um pouco mais ou pague a taxa com BNB.";
+  } else av.hidden=true;
 }
 $("pago").addEventListener("input", ajustarCompra);
 $("qtdComprada").addEventListener("input", ajustarCompra);
 
 function atualizarBacktest(){
   const fechadas = velas.filter(k=>k.closed);
-  if(fechadas.length>201) $("periodo").textContent = "Período: " + fHora(fechadas[201].t) + " até " + fHora(fechadas[fechadas.length-1].T+1) + " (candles de 5 min, alvo destacado = o escolhido nos ajustes).";
+  if(fechadas.length>201) $("periodo").textContent = "Período: " + fHora(fechadas[201].t) + " até " + fHora(fechadas[fechadas.length-1].T+1) + ". Linha destacada = alvo escolhido nos Ajustes.";
   const linhas = [1,1.5,2].map(rr=>{
     const {trades} = simular(rr,false,false);
     const n=trades.length, w=trades.filter(t=>t.pct>0).length;
-    const soma=trades.reduce((a,t)=>a+t.pct,0), usd=trades.reduce((a,t)=>a+t.usd,0);
+    const soma=trades.reduce((a,t)=>a+t.pct,0), brl=trades.reduce((a,t)=>a+t.brl,0);
     const cls = soma>=0?"pos":"neg";
-    return `<tr class="${rr===cfg.rr?"atual":""}"><td>${String(rr).replace(".",",")}×</td><td class="mono">${n}</td><td class="mono">${n?Math.round(w/n*100)+"%":"—"}</td><td class="mono ${cls}">${n?fPct(soma):"—"}</td><td class="mono ${cls}">${n?fP(usd):"—"}</td></tr>`;
+    return `<tr class="${rr===cfg.rr?"atual":""}"><td>${String(rr).replace(".",",")}×</td><td class="mono">${n}</td><td class="mono">${n?Math.round(w/n*100)+"%":"—"}</td><td class="mono ${cls}">${n?fPct(soma):"—"}</td><td class="mono ${cls}">${n?fR(brl):"—"}</td></tr>`;
   });
   $("bt").innerHTML = linhas.join("");
   const {trades} = simular(cfg.rr,false,false);
@@ -380,12 +443,12 @@ function atualizarContexto(){
   const m=mvrvAtual(), f=fgAtual(), ok=contextoOK();
   $("mvrvVal").textContent = isFinite(m) ? m.toLocaleString("pt-BR",{minimumFractionDigits:2,maximumFractionDigits:2}) : "—";
   $("mvrvVal").className = "val" + (ok.mvrv?"":" bloq");
-  $("mvrvZona").textContent = !isFinite(m) ? "indisponível: digite em Ajustes" : m<1 ? "abaixo do custo (barato)" : m<2.4 ? "neutro" : m<3.5 ? "aquecido" : "euforia";
-  $("mvrvFonte").textContent = cfg.mvrvMan>0 ? "valor manual" : (ctx.mvrvFonte || "");
+  $("mvrvZona").textContent = !isFinite(m) ? "não leu: digite em Ajustes" : m<1 ? "abaixo do custo (barato)" : m<2.4 ? "neutro" : m<3.5 ? "aquecido" : "euforia";
+  $("mvrvFonte").textContent = cfg.mvrvMan>0 ? "valor digitado" : (ctx.mvrvFonte || "");
   $("fgVal").textContent = isFinite(f) ? String(Math.round(f)) : "—";
   $("fgVal").className = "val" + (ok.fg?"":" bloq");
-  $("fgZona").textContent = !isFinite(f) ? "indisponível: digite em Ajustes" : f<25 ? "medo extremo" : f<45 ? "medo" : f<55 ? "neutro" : f<75 ? "ganância" : "ganância extrema";
-  $("fgFonte").textContent = cfg.fgMan>0 ? "valor manual" : (ctx.fgFonte || "");
+  $("fgZona").textContent = !isFinite(f) ? "não leu: digite em Ajustes" : f<25 ? "medo extremo" : f<45 ? "medo" : f<55 ? "neutro" : f<75 ? "ganância" : "ganância extrema";
+  $("fgFonte").textContent = cfg.fgMan>0 ? "valor digitado" : (ctx.fgFonte || "");
 }
 
 /* ---------- gráfico ---------- */
@@ -399,7 +462,7 @@ function criarGrafico(){
     layout:{background:{type:"solid",color:"#151a1f"}, textColor:"#8b96a1", fontFamily:"IBM Plex Mono, monospace"},
     grid:{vertLines:{color:"rgba(255,255,255,0.04)"}, horzLines:{color:"rgba(255,255,255,0.04)"}},
     rightPriceScale:{borderColor:"#232b33"}, timeScale:{borderColor:"#232b33", timeVisible:true, secondsVisible:false},
-    crosshair:{mode:0}
+    crosshair:{mode:0}, localization:{priceFormatter: p => Math.round(p).toLocaleString("pt-BR")}
   });
   sC = chart.addCandlestickSeries({upColor:"#2ebd85",downColor:"#ef5d6a",wickUpColor:"#2ebd85",wickDownColor:"#ef5d6a",borderVisible:false});
   const lo = c => ({color:c,lineWidth:1,priceLineVisible:false,lastValueVisible:false,crosshairMarkerVisible:false});
@@ -433,7 +496,6 @@ function desenharGrafico(trades){
   }
 }
 
-/* ---------- recálculo ---------- */
 function recalcular(completo){
   if(!carregado) return;
   if(completo) calcIndicadores();
@@ -452,8 +514,8 @@ async function getJSON(urls){
 function paraVela(r){ return {t:+r[0], o:+r[1], h:+r[2], l:+r[3], c:+r[4], T:+r[6], closed: +r[6] < Date.now()}; }
 async function carregarHistorico(){
   let todas=[], fim=null;
-  for(let p=0;p<3;p++){
-    const q = "/api/v3/klines?symbol=BTCUSDT&interval=5m&limit=1000" + (fim?("&endTime="+fim):"");
+  for(let p=0;p<4;p++){
+    const q = "/api/v3/klines?symbol="+SIMB+"&interval=5m&limit=1000" + (fim?("&endTime="+fim):"");
     const r = await getJSON(REST.map(b=>b+q));
     if(!r.length) break;
     todas = r.map(paraVela).concat(todas);
@@ -461,15 +523,47 @@ async function carregarHistorico(){
   }
   const vistos = new Set(); velas = todas.filter(k=> !vistos.has(k.t) && vistos.add(k.t)).sort((a,b)=>a.t-b.t);
 }
+
+/* Medo e Ganância do CoinMarketCap (mesmos dados da página do link). */
+async function lerFG(){
+  const fim = Math.floor(Date.now()/1000), ini = fim - 10*86400;
+  const j = await getJSON([
+    "https://api.coinmarketcap.com/data-api/v3/fear-greed/chart?start="+ini+"&end="+fim,
+    "https://api.coinmarketcap.com/data-api/v3/fear-greed/latest"
+  ]);
+  const d = j && j.data;
+  let lista = d && (d.dataList || d.historicalValues || d.list);
+  let item = Array.isArray(lista) ? lista.slice().sort((a,b)=> +(a.timestamp||0) - +(b.timestamp||0)).pop() : (d && (d.now || d));
+  const v = parseFloat(item && (item.score ?? item.value));
+  if(!isFinite(v)) throw new Error("formato");
+  return v;
+}
+
+/* MVRV do checkonchain: lê o preço realizado do gráfico e divide pelo preço do BTC em dólar. */
+async function lerMVRV(){
+  const r = await fetch(URL_MVRV, {cache:"no-store"});
+  if(!r.ok) throw new Error("HTTP "+r.status);
+  const txt = await r.text();
+  const ultimoY = re => {
+    const m = re.exec(txt); if(!m) return NaN;
+    const resto = txt.slice(m.index, m.index + 3e6);
+    const y = /"y"\s*:\s*\[([^\]]*)\]/.exec(resto); if(!y) return NaN;
+    const nums = y[1].split(",").map(s=>parseFloat(s)).filter(isFinite);
+    return nums.length ? nums[nums.length-1] : NaN;
+  };
+  const direto = ultimoY(/"name"\s*:\s*"[^"]*MVRV Ratio[^"]*"/i);
+  if(isFinite(direto) && direto>0 && direto<20) return direto;
+  const realizado = ultimoY(/"name"\s*:\s*"[^"]*Reali[sz]ed Price[^"]*"/i);
+  if(!isFinite(realizado) || realizado<=0) throw new Error("formato");
+  const p = await getJSON(REST.map(b=>b+"/api/v3/ticker/price?symbol=BTCUSDT"));
+  return parseFloat(p.price)/realizado;
+}
+
 async function carregarContexto(){
-  try{
-    const j = await getJSON(["https://api.alternative.me/fng/?limit=1"]);
-    ctx.fg = parseFloat(j.data[0].value); ctx.fgFonte = "alternative.me";
-  }catch(e){ ctx.fg = NaN; ctx.fgFonte = "não carregou"; }
-  try{
-    const j = await getJSON(["https://community-api.coinmetrics.io/v4/timeseries/asset-metrics?assets=btc&metrics=CapMVRVCur&frequency=1d&page_size=1&paging_from=end"]);
-    const d = j.data[j.data.length-1]; ctx.mvrv = parseFloat(d.CapMVRVCur); ctx.mvrvFonte = "Coin Metrics · " + new Date(d.time).toLocaleDateString("pt-BR");
-  }catch(e){ ctx.mvrv = NaN; ctx.mvrvFonte = "não carregou"; }
+  try{ ctx.fg = await lerFG(); ctx.fgFonte = "CoinMarketCap · automático"; }
+  catch(e){ ctx.fg = NaN; ctx.fgFonte = "não consegui ler o CoinMarketCap"; }
+  try{ ctx.mvrv = await lerMVRV(); ctx.mvrvFonte = "checkonchain · automático"; }
+  catch(e){ ctx.mvrv = NaN; ctx.mvrvFonte = "não consegui ler o checkonchain"; }
   recalcular(false);
 }
 
@@ -485,7 +579,7 @@ function conectar(){
     const u = velas[velas.length-1];
     let novaFechada = false;
     if(u && u.t===v.t){ velas[velas.length-1]=v; novaFechada = v.closed && !u.closed; }
-    else if(!u || v.t>u.t){ if(u && !u.closed){ u.closed=true; novaFechada=true; } velas.push(v); if(velas.length>3500) velas.shift(); novaFechada = novaFechada || v.closed; }
+    else if(!u || v.t>u.t){ if(u && !u.closed){ u.closed=true; novaFechada=true; } velas.push(v); if(velas.length>4500) velas.shift(); novaFechada = novaFechada || v.closed; }
     $("preco").textContent = fP(v.c);
     if(novaFechada){ recalcular(true); }
     else { atualizarSinal(); if(sC) sC.update({time:tsec(v.t),open:v.o,high:v.h,low:v.l,close:v.c}); }
@@ -497,6 +591,7 @@ function reconectar(){
   $("dot").className="dot"; $("connTxt").textContent="Reconectando…";
   wsIdx++; setTimeout(conectar, espera); espera=Math.min(espera*2, 30000);
 }
+document.addEventListener("visibilitychange", ()=>{ if(!document.hidden && ws && ws.readyState>1) conectar(); });
 
 /* ---------- avisos ---------- */
 function bip(){
@@ -506,31 +601,29 @@ function bip(){
 }
 function avisar(titulo, corpo){
   bip();
-  try{ if("Notification" in window && Notification.permission==="granted") new Notification("BTC/USDT: "+titulo,{body:corpo}); }catch(e){}
+  try{ if("Notification" in window && Notification.permission==="granted") new Notification("BTC/BRL: "+titulo,{body:corpo}); }catch(e){}
   document.title = "● " + titulo + " · Sinais OCO";
-  setTimeout(()=>{ document.title="Sinais OCO BTC/USDT"; }, 60000);
+  setTimeout(()=>{ document.title="Sinais OCO BTC/BRL"; }, 60000);
 }
 $("btnSom").addEventListener("click", ()=>{
   try{ audio = audio || new (window.AudioContext||window.webkitAudioContext)(); audio.resume(); somOn=true; bip(); $("btnSom").textContent="Som ativado"; }
   catch(e){ $("btnSom").textContent="Som indisponível neste navegador"; }
 });
 $("btnNotif").addEventListener("click", async ()=>{
-  if(!("Notification" in window)){ $("btnNotif").textContent="Notificações indisponíveis"; return; }
+  if(!("Notification" in window)){ $("btnNotif").textContent="Notificações indisponíveis aqui"; return; }
   try{ const p = await Notification.requestPermission(); $("btnNotif").textContent = p==="granted" ? "Notificações ativadas" : "Notificações bloqueadas pelo navegador"; }
-  catch(e){ $("btnNotif").textContent="Notificações indisponíveis"; }
+  catch(e){ $("btnNotif").textContent="Notificações indisponíveis aqui"; }
 });
 
 setInterval(()=>{ if(carregado) atualizarSinal(); }, 1000);
 setInterval(carregarContexto, 30*60000);
 
-/* ---------- início ---------- */
 (async function(){
   criarGrafico();
-  try{
-    await carregarHistorico();
-  }catch(e){
+  try{ await carregarHistorico(); }
+  catch(e){
     $("dot").className="dot err"; $("connTxt").textContent="Sem conexão";
-    mostrar("sell","SEM DADOS DA BINANCE","Não consegui baixar os candles. Confira a internet e recarregue a página. Se persistir, a Binance pode estar bloqueando o acesso nesta rede.", null);
+    mostrar("sell","SEM DADOS DA BINANCE","Não consegui baixar os candles. Confira a internet e recarregue a página.", null);
     return;
   }
   carregado = true;
