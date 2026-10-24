@@ -1,0 +1,545 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Sinais OCO BTC/USDT</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
+<script src="https://unpkg.com/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
+<style>
+/* Layout: uma coluna estreita para ficar ao lado do app da Binance. Visual de terminal escuro. */
+:root{
+  --bg:#0e1215; --panel:#151a1f; --line:#232b33; --fg:#e7eaed; --muted:#8b96a1;
+  --buy:#2ebd85; --sell:#ef5d6a; --warn:#e8a33d; --info:#5aa9e6;
+  --sans:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,Consolas,monospace;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--sans);font-size:15px}
+.wrap{max-width:540px;margin:0 auto;padding-block:14px 40px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:14px}
+header{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+.par{font-weight:700;font-size:1.15rem;letter-spacing:.01em}
+.par small{color:var(--muted);font-weight:500;font-size:.8rem;margin-left:6px}
+.preco{font-family:var(--mono);font-size:1.35rem;font-weight:600;font-variant-numeric:tabular-nums}
+.conn{display:flex;align-items:center;gap:6px;color:var(--muted);font-size:.78rem}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--warn)}
+.dot.ok{background:var(--buy)} .dot.err{background:var(--sell)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px}
+.sinal{border-left:4px solid var(--muted)}
+.sinal[data-tone="buy"]{border-left-color:var(--buy)}
+.sinal[data-tone="sell"]{border-left-color:var(--sell)}
+.sinal[data-tone="warn"]{border-left-color:var(--warn)}
+.sinal[data-tone="info"]{border-left-color:var(--info)}
+.estado{font-size:1.5rem;font-weight:700;letter-spacing:.02em;line-height:1.15;text-wrap:balance}
+.sinal[data-tone="buy"] .estado{color:var(--buy)}
+.sinal[data-tone="sell"] .estado{color:var(--sell)}
+.sinal[data-tone="warn"] .estado{color:var(--warn)}
+.sinal[data-tone="info"] .estado{color:var(--info)}
+.instr{color:var(--muted);margin:6px 0 0;line-height:1.45}
+.grade{display:grid;grid-template-columns:1fr auto;gap:6px 12px;margin-top:12px;align-items:baseline}
+.grade dt{color:var(--muted);font-size:.86rem}
+.grade dd{margin:0;font-family:var(--mono);font-variant-numeric:tabular-nums;text-align:right;font-size:1.02rem}
+.oco{margin-top:12px;border-top:1px dashed var(--line);padding-top:10px}
+.rot{font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:600}
+.tp{color:var(--buy)} .sl{color:var(--sell)}
+.relogio{font-family:var(--mono);font-size:1.05rem}
+.ctx{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.ctx .card{padding:12px}
+.ctx .val{font-family:var(--mono);font-size:1.25rem;font-weight:600;margin-top:4px}
+.ctx .zona{font-size:.82rem;color:var(--muted);margin-top:2px}
+.ctx .fonte{font-size:.7rem;color:var(--muted);margin-top:6px}
+.bloq{color:var(--warn)}
+#grafico{height:300px;width:100%}
+table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
+th,td{padding:7px 6px;text-align:right;border-bottom:1px solid var(--line);font-size:.88rem}
+th:first-child,td:first-child{text-align:left}
+th{color:var(--muted);font-weight:500;font-size:.75rem;text-transform:uppercase;letter-spacing:.05em}
+tr.atual td{background:rgba(90,169,230,.08)}
+.pos{color:var(--buy)} .neg{color:var(--sell)}
+.mono{font-family:var(--mono)}
+.nota{color:var(--muted);font-size:.8rem;line-height:1.45;margin:8px 0 0}
+details summary{cursor:pointer;font-weight:600;list-style:none}
+details summary::-webkit-details-marker{display:none}
+details summary::after{content:"+";float:right;color:var(--muted)}
+details[open] summary::after{content:"–"}
+.campos{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+label{display:flex;flex-direction:column;gap:4px;font-size:.78rem;color:var(--muted)}
+input,select{background:var(--bg);color:var(--fg);border:1px solid var(--line);border-radius:6px;padding:8px;font-family:var(--mono);font-size:.95rem;width:100%}
+input:focus,select:focus,button:focus-visible{outline:2px solid var(--info);outline-offset:1px}
+.botoes{display:flex;gap:8px;flex-wrap:wrap}
+button{background:#1d242b;color:var(--fg);border:1px solid var(--line);border-radius:6px;padding:8px 12px;font-family:var(--sans);font-size:.85rem;cursor:pointer}
+button:hover{border-color:var(--muted)}
+.scroll{overflow-x:auto}
+footer{color:var(--muted);font-size:.75rem;line-height:1.5}
+@media (max-width:380px){.ctx{grid-template-columns:1fr}.campos{grid-template-columns:1fr}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div>
+    <div class="par">BTC/USDT <small>Binance · 5 min</small></div>
+    <div class="conn"><span class="dot" id="dot"></span><span id="connTxt">Conectando…</span></div>
+  </div>
+  <div class="preco" id="preco">—</div>
+</header>
+
+<section class="card sinal" id="sinal" data-tone="info" aria-live="polite">
+  <div class="estado" id="estado">CARREGANDO</div>
+  <p class="instr" id="instr">Baixando o histórico de candles da Binance.</p>
+  <div id="detalhe" hidden>
+    <dl class="grade">
+      <dt>Entrada (referência)</dt><dd id="dEntrada">—</dd>
+      <dt>Quantia (BTC)</dt><dd id="dQtd">—</dd>
+      <dt>Total (USDT)</dt><dd id="dTotal">—</dd>
+      <dt>Tempo restante</dt><dd class="relogio" id="dTempo">—</dd>
+    </dl>
+    <div class="oco">
+      <div class="rot">OCO de venda (aba Vender → OCO)</div>
+      <dl class="grade">
+        <dt>Limite TP (USDT)</dt><dd class="tp" id="dTP">—</dd>
+        <dt>Ativação SL (USDT)</dt><dd class="sl" id="dSL">—</dd>
+        <dt>Limite de SL (USDT)</dt><dd class="sl" id="dSLL">—</dd>
+        <dt>Ganho se bater TP</dt><dd class="tp" id="dGanho">—</dd>
+        <dt>Perda se bater SL</dt><dd class="sl" id="dPerda">—</dd>
+      </dl>
+    </div>
+  </div>
+</section>
+
+<details class="card" id="ajusteCompra">
+  <summary>Ajustar a OCO ao preço que eu paguei</summary>
+  <p class="nota">Digite o preço médio e a quantia que aparecem na sua ordem executada. A Binance desconta 0,1% de taxa do BTC recebido, então a quantia da OCO fica um pouco menor.</p>
+  <div class="campos">
+    <label for="pago">Preço pago (USDT)<input id="pago" type="number" step="0.01" inputmode="decimal"></label>
+    <label for="qtdComprada">Quantia comprada (BTC)<input id="qtdComprada" type="number" step="0.00001" inputmode="decimal"></label>
+  </div>
+  <dl class="grade" id="ajusteRes">
+    <dt>Quantia da OCO (BTC)</dt><dd id="aQtd">—</dd>
+    <dt>Limite TP</dt><dd class="tp" id="aTP">—</dd>
+    <dt>Ativação SL</dt><dd class="sl" id="aSL">—</dd>
+    <dt>Limite de SL</dt><dd class="sl" id="aSLL">—</dd>
+  </dl>
+</details>
+
+<div class="ctx">
+  <div class="card">
+    <div class="rot">MVRV</div>
+    <div class="val" id="mvrvVal">—</div>
+    <div class="zona" id="mvrvZona">carregando</div>
+    <div class="fonte" id="mvrvFonte"></div>
+  </div>
+  <div class="card">
+    <div class="rot">Medo e Ganância</div>
+    <div class="val" id="fgVal">—</div>
+    <div class="zona" id="fgZona">carregando</div>
+    <div class="fonte" id="fgFonte"></div>
+  </div>
+</div>
+
+<section class="card">
+  <div class="rot" style="margin-bottom:8px">Gráfico · médias 9, 21 e 200 · setas = sinais</div>
+  <div id="grafico"></div>
+  <p class="nota" id="semGrafico" hidden>O gráfico não carregou (sem acesso à biblioteca). Os sinais continuam funcionando.</p>
+</section>
+
+<section class="card">
+  <div class="rot">Backtest com as mesmas regras e 0,2% de taxa por operação</div>
+  <p class="nota" id="periodo">—</p>
+  <div class="scroll">
+    <table>
+      <thead><tr><th>Alvo</th><th>Ops</th><th>Acerto</th><th>Resultado</th><th>US$</th></tr></thead>
+      <tbody id="bt"></tbody>
+    </table>
+  </div>
+  <p class="nota">Use o alvo que fecha positivo. Poucos dias de histórico dizem pouco: acompanhe por uma ou duas semanas antes de confiar. MVRV e Medo e Ganância não entram no backtest porque só temos o valor de hoje.</p>
+</section>
+
+<section class="card">
+  <div class="rot">Últimas operações do alvo escolhido</div>
+  <div class="scroll">
+    <table>
+      <thead><tr><th>Entrada</th><th>Preço</th><th>Saída</th><th>Motivo</th><th>Result.</th></tr></thead>
+      <tbody id="ultimas"></tbody>
+    </table>
+  </div>
+</section>
+
+<details class="card" id="ajustes">
+  <summary>Ajustes</summary>
+  <div class="campos">
+    <label for="capital">Capital (USDT)<input id="capital" type="number" step="1" min="5"></label>
+    <label for="risco">Risco por operação (%)<input id="risco" type="number" step="0.1" min="0.1"></label>
+    <label for="rr">Alvo (× o risco)<select id="rr"><option value="1">1×</option><option value="1.5">1,5×</option><option value="2">2×</option></select></label>
+    <label for="tempo">Tempo máximo (min)<input id="tempo" type="number" step="5" min="5"></label>
+    <label for="atrMult">Stop (× ATR)<input id="atrMult" type="number" step="0.1" min="0.5"></label>
+    <label for="minStop">Stop mínimo (%)<input id="minStop" type="number" step="0.05" min="0.1"></label>
+    <label for="mvrvMax">Bloquear com MVRV acima de<input id="mvrvMax" type="number" step="0.1"></label>
+    <label for="fgMax">Bloquear com índice a partir de<input id="fgMax" type="number" step="1" min="50" max="100"></label>
+    <label for="mvrvMan">MVRV manual (0 = automático)<input id="mvrvMan" type="number" step="0.01" min="0"></label>
+    <label for="fgMan">Medo e Ganância manual (0 = automático)<input id="fgMan" type="number" step="1" min="0" max="100"></label>
+  </div>
+  <p class="nota">O índice automático vem do alternative.me. Para usar o valor do CoinMarketCap, digite-o no campo manual uma vez por dia.</p>
+</details>
+
+<div class="botoes">
+  <button id="btnSom" type="button">Ativar som dos sinais</button>
+  <button id="btnNotif" type="button">Ativar notificações</button>
+</div>
+
+<footer>
+  Sinal = média 9 cruza a 21 para cima, preço acima da média 200 e RSI entre 50 e 70, em candles fechados de 5 min. Só compra, no spot.
+  Ferramenta de estudo, não é recomendação de investimento. Você pode perder dinheiro. Confira os preços no app antes de enviar a ordem.
+</footer>
+</div>
+
+<script>
+(function(){
+"use strict";
+const $ = id => document.getElementById(id);
+const TF_MS = 5*60*1000;
+const TAXA = 0.2; // % ida e volta
+const REST = ["https://data-api.binance.vision","https://api.binance.com","https://api1.binance.com"];
+const WS   = ["wss://data-stream.binance.vision/ws/btcusdt@kline_5m","wss://stream.binance.com:9443/ws/btcusdt@kline_5m"];
+
+/* ---------- ajustes ---------- */
+const PADRAO = {capital:100, risco:1, rr:1.5, tempo:60, atrMult:1.5, minStop:0.4, mvrvMax:3, fgMax:80, mvrvMan:0, fgMan:0};
+let cfg = Object.assign({}, PADRAO);
+try{ const s = JSON.parse(localStorage.getItem("sinaisOCO.cfg")||"null"); if(s) Object.assign(cfg, s); }catch(e){}
+const CAMPOS = Object.keys(PADRAO);
+CAMPOS.forEach(k => { const el=$(k); el.value = cfg[k]; el.addEventListener("change", () => {
+  const v = parseFloat(String(el.value).replace(",", "."));
+  cfg[k] = isFinite(v) ? v : PADRAO[k];
+  try{ localStorage.setItem("sinaisOCO.cfg", JSON.stringify(cfg)); }catch(e){}
+  recalcular(true);
+});});
+
+/* ---------- formatação ---------- */
+const fP = x => isFinite(x) ? x.toLocaleString("pt-BR",{minimumFractionDigits:2,maximumFractionDigits:2}) : "—";
+const fQ = x => isFinite(x) ? x.toLocaleString("pt-BR",{minimumFractionDigits:5,maximumFractionDigits:5}) : "—";
+const fPct = x => (x>=0?"+":"") + x.toLocaleString("pt-BR",{minimumFractionDigits:1,maximumFractionDigits:1}) + "%";
+const fHora = ms => new Date(ms).toLocaleString("pt-BR",{day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"});
+const floor5 = x => Math.floor(x*1e5)/1e5;
+
+/* ---------- indicadores ---------- */
+function ema(v,n){ const o=new Array(v.length).fill(NaN); if(v.length<n) return o;
+  let s=0; for(let i=0;i<n;i++) s+=v[i]; o[n-1]=s/n; const k=2/(n+1);
+  for(let i=n;i<v.length;i++) o[i]=v[i]*k+o[i-1]*(1-k); return o; }
+function rsi(v,n){ const o=new Array(v.length).fill(NaN); if(v.length<=n) return o;
+  let g=0,l=0; for(let i=1;i<=n;i++){ const d=v[i]-v[i-1]; if(d>0) g+=d; else l-=d; }
+  g/=n; l/=n; o[n]= l===0?100:100-100/(1+g/l);
+  for(let i=n+1;i<v.length;i++){ const d=v[i]-v[i-1]; g=(g*(n-1)+Math.max(d,0))/n; l=(l*(n-1)+Math.max(-d,0))/n; o[i]= l===0?100:100-100/(1+g/l); }
+  return o; }
+function atr(c,n){ const o=new Array(c.length).fill(NaN); if(c.length<=n) return o;
+  const tr=c.map((k,i)=> i===0? k.h-k.l : Math.max(k.h-k.l, Math.abs(k.h-c[i-1].c), Math.abs(k.l-c[i-1].c)));
+  let s=0; for(let i=1;i<=n;i++) s+=tr[i]; o[n]=s/n;
+  for(let i=n+1;i<c.length;i++) o[i]=(o[i-1]*(n-1)+tr[i])/n; return o; }
+
+/* ---------- estado ---------- */
+let velas = [];          // {t,T,o,h,l,c,closed}
+let ind = {e9:[],e21:[],e200:[],sig:[],sd:[]};
+let ctx = {mvrv:NaN, mvrvFonte:"", fg:NaN, fgFonte:""};
+let ultimoAviso = null, carregado = false, somOn = false, audio = null;
+
+function calcIndicadores(){
+  const cl = velas.map(k=>k.c);
+  ind.e9 = ema(cl,9); ind.e21 = ema(cl,21); ind.e200 = ema(cl,200);
+  const r = rsi(cl,14), a = atr(velas,14);
+  ind.sig = velas.map((k,i)=> i>200 && k.closed &&
+    ind.e9[i-1] <= ind.e21[i-1] && ind.e9[i] > ind.e21[i] && k.c > ind.e200[i] && r[i] > 50 && r[i] < 70);
+  ind.sd = velas.map((k,i)=> Math.max((a[i]||0)*cfg.atrMult, k.c*cfg.minStop/100));
+}
+
+function mvrvAtual(){ return cfg.mvrvMan>0 ? cfg.mvrvMan : ctx.mvrv; }
+function fgAtual(){ return cfg.fgMan>0 ? cfg.fgMan : ctx.fg; }
+function contextoOK(){
+  const m = mvrvAtual(), f = fgAtual();
+  return { mvrv: !(isFinite(m) && m >= cfg.mvrvMax), fg: !(isFinite(f) && f >= cfg.fgMax) };
+}
+
+function tamanho(entrada, sd){
+  const q = Math.min(cfg.capital*cfg.risco/100/sd, cfg.capital/entrada*0.998);
+  return floor5(q);
+}
+
+/* Simula as operações: entrada no fechamento do candle do sinal, OCO com TP e SL, saída por tempo. */
+function simular(rr, usaFiltro, incluiAberta){
+  const trades=[]; let ab=null; const agora=Date.now();
+  const barsMax = Math.max(1, Math.round(cfg.tempo*60000/TF_MS));
+  const ok = contextoOK(); const filtroOK = !usaFiltro || (ok.mvrv && ok.fg);
+  const n = velas.length;
+  for(let i=201;i<n;i++){
+    const k=velas[i];
+    if(!k.closed && !incluiAberta) break;
+    if(ab){
+      if(i>ab.i){
+        const bSL = k.l<=ab.sl, bTP = k.h>=ab.tp;
+        const bT = k.closed ? (i-ab.i)>=barsMax : agora >= ab.T + cfg.tempo*60000;
+        if(bSL||bTP||bT){
+          const saida = bSL? ab.sl : bTP? ab.tp : k.c;
+          const motivo = bSL? "SL" : bTP? "TP" : "Tempo";
+          const pct = (saida-ab.entrada)/ab.entrada*100 - TAXA;
+          const usd = ab.qtd*(saida-ab.entrada) - ab.qtd*ab.entrada*TAXA/100;
+          trades.push(Object.assign({}, ab, {saida, motivo, pct, usd, saidaT: k.closed? k.T+1 : agora}));
+          ab=null;
+        }
+      }
+      continue;
+    }
+    if(k.closed && ind.sig[i] && filtroOK){
+      const sd=ind.sd[i], e=k.c, sl=e-sd;
+      ab={i, T:k.T+1, entrada:e, sd, sl, tp:e+sd*rr, slLim: sl*(1-0.001), qtd: tamanho(e,sd)};
+    }
+  }
+  return {trades, aberta: ab};
+}
+
+/* ---------- tela ---------- */
+function mostrar(tone, estado, instr, op){
+  $("sinal").dataset.tone = tone; $("estado").textContent = estado; $("instr").textContent = instr;
+  $("detalhe").hidden = !op;
+  if(op){
+    const total = op.qtd*op.entrada;
+    $("dEntrada").textContent = fP(op.entrada);
+    $("dQtd").textContent = fQ(op.qtd);
+    $("dTotal").textContent = fP(total) + (total<5 ? " (mínimo 5)" : "");
+    $("dTP").textContent = fP(op.tp); $("dSL").textContent = fP(op.sl); $("dSLL").textContent = fP(op.slLim);
+    $("dGanho").textContent = "+" + fP(op.qtd*(op.tp-op.entrada) - total*TAXA/100) + " USDT";
+    $("dPerda").textContent = "−" + fP(op.qtd*(op.entrada-op.slLim) + total*TAXA/100) + " USDT";
+  }
+}
+
+let opAtual = null;
+function atualizarSinal(){
+  if(!carregado) return;
+  const {trades, aberta} = simular(cfg.rr, true, true);
+  const agora = Date.now(); const ok = contextoOK();
+  opAtual = aberta;
+  let chave = null;
+  if(aberta){
+    const resta = aberta.T + cfg.tempo*60000 - agora;
+    if(agora - aberta.T < TF_MS){
+      mostrar("buy","COMPRAR AGORA","Compre a mercado no app. Depois vá em Vender → OCO e preencha os três preços abaixo com a quantia que entrou na conta.", aberta);
+      chave = "c"+aberta.T;
+    } else {
+      mostrar("info","EM OPERAÇÃO","A OCO deve estar ativa. Se o tempo acabar sem TP nem SL, cancele a OCO e venda a mercado.", aberta);
+    }
+    $("dTempo").textContent = resta>0 ? Math.floor(resta/60000)+" min "+String(Math.floor(resta/1000)%60).padStart(2,"0")+" s" : "0 min";
+  } else {
+    const u = trades[trades.length-1];
+    if(u && agora - u.saidaT < 15*60000){
+      if(u.motivo==="TP") mostrar("buy","TP ATINGIDO","O preço chegou ao alvo. A OCO deve ter vendido com lucro. Confira no app.", null);
+      else if(u.motivo==="SL") mostrar("sell","SL ATINGIDO","O preço chegou ao stop. A OCO deve ter vendido. Confira no app se a ordem executou.", null);
+      else mostrar("warn","SAIR A MERCADO","Acabou o tempo sem TP nem SL. Cancele a OCO e venda o BTC a mercado agora.", null);
+      chave = "s"+u.T+u.motivo;
+    } else if(!(ok.mvrv && ok.fg)){
+      mostrar("warn","BLOQUEADO PELO CONTEXTO", (!ok.mvrv ? "MVRV acima do limite. " : "") + (!ok.fg ? "Medo e Ganância acima do limite. " : "") + "Nenhuma compra até o contexto melhorar.", null);
+    } else {
+      mostrar("info","AGUARDANDO SINAL","Nenhuma operação aberta. Quando aparecer um sinal, este quadro fica verde e mostra os preços da OCO.", null);
+    }
+  }
+  if(chave && chave!==ultimoAviso){ if(ultimoAviso!==null) avisar($("estado").textContent, $("instr").textContent); ultimoAviso=chave; }
+  if(ultimoAviso===null) ultimoAviso = "inicio";
+  ajustarCompra();
+}
+
+function ajustarCompra(){
+  const p = parseFloat($("pago").value), q = parseFloat($("qtdComprada").value);
+  const sd = opAtual ? opAtual.sd : NaN;
+  if(isFinite(p) && isFinite(sd)){
+    const sl=p-sd; $("aSL").textContent=fP(sl); $("aSLL").textContent=fP(sl*(1-0.001)); $("aTP").textContent=fP(p+sd*cfg.rr);
+  } else { ["aSL","aSLL","aTP"].forEach(id=>$(id).textContent= opAtual?"—":"sem operação aberta"); }
+  $("aQtd").textContent = isFinite(q) ? fQ(floor5(q*0.999)) : "—";
+}
+$("pago").addEventListener("input", ajustarCompra);
+$("qtdComprada").addEventListener("input", ajustarCompra);
+
+function atualizarBacktest(){
+  const fechadas = velas.filter(k=>k.closed);
+  if(fechadas.length>201) $("periodo").textContent = "Período: " + fHora(fechadas[201].t) + " até " + fHora(fechadas[fechadas.length-1].T+1) + " (candles de 5 min, alvo destacado = o escolhido nos ajustes).";
+  const linhas = [1,1.5,2].map(rr=>{
+    const {trades} = simular(rr,false,false);
+    const n=trades.length, w=trades.filter(t=>t.pct>0).length;
+    const soma=trades.reduce((a,t)=>a+t.pct,0), usd=trades.reduce((a,t)=>a+t.usd,0);
+    const cls = soma>=0?"pos":"neg";
+    return `<tr class="${rr===cfg.rr?"atual":""}"><td>${String(rr).replace(".",",")}×</td><td class="mono">${n}</td><td class="mono">${n?Math.round(w/n*100)+"%":"—"}</td><td class="mono ${cls}">${n?fPct(soma):"—"}</td><td class="mono ${cls}">${n?fP(usd):"—"}</td></tr>`;
+  });
+  $("bt").innerHTML = linhas.join("");
+  const {trades} = simular(cfg.rr,false,false);
+  const ult = trades.slice(-8).reverse();
+  $("ultimas").innerHTML = ult.length ? ult.map(t=>`<tr><td>${fHora(t.T)}</td><td class="mono">${fP(t.entrada)}</td><td class="mono">${fP(t.saida)}</td><td>${t.motivo}</td><td class="mono ${t.pct>=0?"pos":"neg"}">${fPct(t.pct)}</td></tr>`).join("")
+    : `<tr><td colspan="5" style="text-align:left;color:var(--muted)">Nenhuma operação no período.</td></tr>`;
+  return trades;
+}
+
+function atualizarContexto(){
+  const m=mvrvAtual(), f=fgAtual(), ok=contextoOK();
+  $("mvrvVal").textContent = isFinite(m) ? m.toLocaleString("pt-BR",{minimumFractionDigits:2,maximumFractionDigits:2}) : "—";
+  $("mvrvVal").className = "val" + (ok.mvrv?"":" bloq");
+  $("mvrvZona").textContent = !isFinite(m) ? "indisponível: digite em Ajustes" : m<1 ? "abaixo do custo (barato)" : m<2.4 ? "neutro" : m<3.5 ? "aquecido" : "euforia";
+  $("mvrvFonte").textContent = cfg.mvrvMan>0 ? "valor manual" : (ctx.mvrvFonte || "");
+  $("fgVal").textContent = isFinite(f) ? String(Math.round(f)) : "—";
+  $("fgVal").className = "val" + (ok.fg?"":" bloq");
+  $("fgZona").textContent = !isFinite(f) ? "indisponível: digite em Ajustes" : f<25 ? "medo extremo" : f<45 ? "medo" : f<55 ? "neutro" : f<75 ? "ganância" : "ganância extrema";
+  $("fgFonte").textContent = cfg.fgMan>0 ? "valor manual" : (ctx.fgFonte || "");
+}
+
+/* ---------- gráfico ---------- */
+let chart=null, sC=null, s9=null, s21=null, s200=null, linhasPreco=[];
+const tz = -new Date().getTimezoneOffset()*60;
+const tsec = ms => Math.floor(ms/1000)+tz;
+function criarGrafico(){
+  if(!window.LightweightCharts){ $("semGrafico").hidden=false; $("grafico").hidden=true; return; }
+  chart = LightweightCharts.createChart($("grafico"), {
+    autoSize:true,
+    layout:{background:{type:"solid",color:"#151a1f"}, textColor:"#8b96a1", fontFamily:"IBM Plex Mono, monospace"},
+    grid:{vertLines:{color:"rgba(255,255,255,0.04)"}, horzLines:{color:"rgba(255,255,255,0.04)"}},
+    rightPriceScale:{borderColor:"#232b33"}, timeScale:{borderColor:"#232b33", timeVisible:true, secondsVisible:false},
+    crosshair:{mode:0}
+  });
+  sC = chart.addCandlestickSeries({upColor:"#2ebd85",downColor:"#ef5d6a",wickUpColor:"#2ebd85",wickDownColor:"#ef5d6a",borderVisible:false});
+  const lo = c => ({color:c,lineWidth:1,priceLineVisible:false,lastValueVisible:false,crosshairMarkerVisible:false});
+  s9=chart.addLineSeries(lo("#5aa9e6")); s21=chart.addLineSeries(lo("#e8a33d")); s200=chart.addLineSeries(Object.assign(lo("#8b96a1"),{lineWidth:2}));
+}
+function desenharGrafico(trades){
+  if(!chart) return;
+  const ini = Math.max(0, velas.length-288);
+  const v = velas.slice(ini);
+  sC.setData(v.map(k=>({time:tsec(k.t),open:k.o,high:k.h,low:k.l,close:k.c})));
+  const linha = arr => v.map((k,j)=>({time:tsec(k.t), value:arr[ini+j]})).filter(p=>isFinite(p.value));
+  s9.setData(linha(ind.e9)); s21.setData(linha(ind.e21)); s200.setData(linha(ind.e200));
+  const t0 = v.length ? v[0].t : 0;
+  const mk = [];
+  const {aberta} = simular(cfg.rr,true,true);
+  trades.concat(aberta?[aberta]:[]).forEach(t=>{
+    const ve = velas[t.i]; if(!ve || ve.t < t0) return;
+    mk.push({time:tsec(ve.t), position:"belowBar", color:"#2ebd85", shape:"arrowUp", text:"C"});
+  });
+  trades.forEach(t=>{
+    if(t.saidaT - TF_MS < t0) return;
+    const ve = velas.find(k=> k.T+1 >= t.saidaT - 1000 && k.t <= t.saidaT); if(!ve) return;
+    mk.push({time:tsec(ve.t), position:"aboveBar", color: t.motivo==="TP"?"#2ebd85":t.motivo==="SL"?"#ef5d6a":"#e8a33d", shape:"circle", text:t.motivo==="Tempo"?"T":t.motivo});
+  });
+  mk.sort((a,b)=>a.time-b.time);
+  try{ sC.setMarkers(mk); }catch(e){}
+  linhasPreco.forEach(l=>sC.removePriceLine(l)); linhasPreco=[];
+  if(aberta){
+    linhasPreco.push(sC.createPriceLine({price:aberta.tp,color:"#2ebd85",lineWidth:1,lineStyle:2,axisLabelVisible:true,title:"TP"}));
+    linhasPreco.push(sC.createPriceLine({price:aberta.sl,color:"#ef5d6a",lineWidth:1,lineStyle:2,axisLabelVisible:true,title:"SL"}));
+  }
+}
+
+/* ---------- recálculo ---------- */
+function recalcular(completo){
+  if(!carregado) return;
+  if(completo) calcIndicadores();
+  atualizarContexto();
+  const trades = atualizarBacktest();
+  atualizarSinal();
+  desenharGrafico(trades);
+}
+
+/* ---------- dados ---------- */
+async function getJSON(urls){
+  let erro;
+  for(const u of urls){ try{ const r = await fetch(u,{cache:"no-store"}); if(r.ok) return await r.json(); erro=new Error("HTTP "+r.status); }catch(e){ erro=e; } }
+  throw erro || new Error("falhou");
+}
+function paraVela(r){ return {t:+r[0], o:+r[1], h:+r[2], l:+r[3], c:+r[4], T:+r[6], closed: +r[6] < Date.now()}; }
+async function carregarHistorico(){
+  let todas=[], fim=null;
+  for(let p=0;p<3;p++){
+    const q = "/api/v3/klines?symbol=BTCUSDT&interval=5m&limit=1000" + (fim?("&endTime="+fim):"");
+    const r = await getJSON(REST.map(b=>b+q));
+    if(!r.length) break;
+    todas = r.map(paraVela).concat(todas);
+    fim = +r[0][0]-1;
+  }
+  const vistos = new Set(); velas = todas.filter(k=> !vistos.has(k.t) && vistos.add(k.t)).sort((a,b)=>a.t-b.t);
+}
+async function carregarContexto(){
+  try{
+    const j = await getJSON(["https://api.alternative.me/fng/?limit=1"]);
+    ctx.fg = parseFloat(j.data[0].value); ctx.fgFonte = "alternative.me";
+  }catch(e){ ctx.fg = NaN; ctx.fgFonte = "não carregou"; }
+  try{
+    const j = await getJSON(["https://community-api.coinmetrics.io/v4/timeseries/asset-metrics?assets=btc&metrics=CapMVRVCur&frequency=1d&page_size=1&paging_from=end"]);
+    const d = j.data[j.data.length-1]; ctx.mvrv = parseFloat(d.CapMVRVCur); ctx.mvrvFonte = "Coin Metrics · " + new Date(d.time).toLocaleDateString("pt-BR");
+  }catch(e){ ctx.mvrv = NaN; ctx.mvrvFonte = "não carregou"; }
+  recalcular(false);
+}
+
+let ws=null, wsIdx=0, espera=1000;
+function conectar(){
+  const url = WS[wsIdx % WS.length];
+  try{ ws = new WebSocket(url); }catch(e){ return reconectar(); }
+  ws.onopen = () => { espera=1000; $("dot").className="dot ok"; $("connTxt").textContent="Ao vivo"; };
+  ws.onmessage = ev => {
+    let m; try{ m = JSON.parse(ev.data); }catch(e){ return; }
+    const k = m.k; if(!k) return;
+    const v = {t:+k.t, o:+k.o, h:+k.h, l:+k.l, c:+k.c, T:+k.T, closed:!!k.x};
+    const u = velas[velas.length-1];
+    let novaFechada = false;
+    if(u && u.t===v.t){ velas[velas.length-1]=v; novaFechada = v.closed && !u.closed; }
+    else if(!u || v.t>u.t){ if(u && !u.closed){ u.closed=true; novaFechada=true; } velas.push(v); if(velas.length>3500) velas.shift(); novaFechada = novaFechada || v.closed; }
+    $("preco").textContent = fP(v.c);
+    if(novaFechada){ recalcular(true); }
+    else { atualizarSinal(); if(sC) sC.update({time:tsec(v.t),open:v.o,high:v.h,low:v.l,close:v.c}); }
+  };
+  ws.onerror = () => {};
+  ws.onclose = () => reconectar();
+}
+function reconectar(){
+  $("dot").className="dot"; $("connTxt").textContent="Reconectando…";
+  wsIdx++; setTimeout(conectar, espera); espera=Math.min(espera*2, 30000);
+}
+
+/* ---------- avisos ---------- */
+function bip(){
+  if(!somOn || !audio) return;
+  const t=audio.currentTime;
+  [0,0.25].forEach(d=>{ const o=audio.createOscillator(), g=audio.createGain(); o.frequency.value=880; g.gain.setValueAtTime(0.0001,t+d); g.gain.exponentialRampToValueAtTime(0.3,t+d+0.02); g.gain.exponentialRampToValueAtTime(0.0001,t+d+0.18); o.connect(g).connect(audio.destination); o.start(t+d); o.stop(t+d+0.2); });
+}
+function avisar(titulo, corpo){
+  bip();
+  try{ if("Notification" in window && Notification.permission==="granted") new Notification("BTC/USDT: "+titulo,{body:corpo}); }catch(e){}
+  document.title = "● " + titulo + " · Sinais OCO";
+  setTimeout(()=>{ document.title="Sinais OCO BTC/USDT"; }, 60000);
+}
+$("btnSom").addEventListener("click", ()=>{
+  try{ audio = audio || new (window.AudioContext||window.webkitAudioContext)(); audio.resume(); somOn=true; bip(); $("btnSom").textContent="Som ativado"; }
+  catch(e){ $("btnSom").textContent="Som indisponível neste navegador"; }
+});
+$("btnNotif").addEventListener("click", async ()=>{
+  if(!("Notification" in window)){ $("btnNotif").textContent="Notificações indisponíveis"; return; }
+  try{ const p = await Notification.requestPermission(); $("btnNotif").textContent = p==="granted" ? "Notificações ativadas" : "Notificações bloqueadas pelo navegador"; }
+  catch(e){ $("btnNotif").textContent="Notificações indisponíveis"; }
+});
+
+setInterval(()=>{ if(carregado) atualizarSinal(); }, 1000);
+setInterval(carregarContexto, 30*60000);
+
+/* ---------- início ---------- */
+(async function(){
+  criarGrafico();
+  try{
+    await carregarHistorico();
+  }catch(e){
+    $("dot").className="dot err"; $("connTxt").textContent="Sem conexão";
+    mostrar("sell","SEM DADOS DA BINANCE","Não consegui baixar os candles. Confira a internet e recarregue a página. Se persistir, a Binance pode estar bloqueando o acesso nesta rede.", null);
+    return;
+  }
+  carregado = true;
+  if(velas.length) $("preco").textContent = fP(velas[velas.length-1].c);
+  recalcular(true);
+  carregarContexto();
+  conectar();
+})();
+})();
+</script>
+</body>
+</html>
