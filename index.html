@@ -98,7 +98,7 @@ footer{color:var(--muted);font-size:.75rem;line-height:1.5}
 
 <header>
   <div>
-    <div class="par">BTC/BRL <small>Binance · 5 min</small></div>
+    <div class="par">BTC/BRL <small id="tfLbl">Binance · diário</small></div>
     <div class="conn"><span class="dot" id="dot"></span><span id="connTxt">Conectando…</span></div>
   </div>
   <div class="preco" id="preco">—</div>
@@ -198,6 +198,7 @@ footer{color:var(--muted);font-size:.75rem;line-height:1.5}
   <summary>Ajustes</summary>
   <div class="campos">
     <label for="banca">Banca na Binance (R$)<input id="banca" type="number" step="1" min="10"></label>
+    <label for="tf">Tempo do candle<select id="tf"><option value="5m">5 min (day trade)</option><option value="15m">15 min</option><option value="1h">1 hora</option><option value="4h">4 horas</option><option value="1d">Diário (semanal)</option></select></label>
     <label for="rr">Alvo (× o risco)<select id="rr"><option value="1">1×</option><option value="1.5">1,5×</option><option value="2">2×</option></select></label>
     <label for="tempo">Tempo máximo (min)<input id="tempo" type="number" step="5" min="5"></label>
     <label for="minStop">Stop mínimo (%)<input id="minStop" type="number" step="0.05" min="0.1"></label>
@@ -217,7 +218,7 @@ footer{color:var(--muted);font-size:.75rem;line-height:1.5}
 </div>
 
 <footer>
-  Sinal = média 9 cruza a 21 para cima, preço acima da média 200 e RSI entre 50 e 70, em candles fechados de 5 min. Só compra, no spot.
+  Sinal = média 9 cruza a 21 para cima, preço acima da média 200 e RSI entre 50 e 70, em candles fechados do tempo gráfico escolhido nos Ajustes (padrão: diário, que fecha às 21h de Brasília). Só compra, no spot.
   Ferramenta de estudo, não é recomendação de investimento. Você pode perder dinheiro. Confira os preços no app antes de enviar a ordem.
 </footer>
 </div>
@@ -226,27 +227,42 @@ footer{color:var(--muted);font-size:.75rem;line-height:1.5}
 (function(){
 "use strict";
 const $ = id => document.getElementById(id);
-const TF_MS = 5*60*1000;
+const TFS = {"5m":{ms:5*60000, nome:"5 min", paginas:4, tempo:1440}, "15m":{ms:15*60000, nome:"15 min", paginas:4, tempo:1440},
+  "1h":{ms:3600000, nome:"1 hora", paginas:9, tempo:2880}, "4h":{ms:4*3600000, nome:"4 horas", paginas:3, tempo:10080},
+  "1d":{ms:86400000, nome:"diário", paginas:1, tempo:10080}};
+let TF_MS = 86400000;
 const TAXA = 0.2;            // % ida e volta
 const MIN_ORDEM = 10;        // mínimo da Binance em BTC/BRL (R$)
 const PASSO = 0.00001;       // menor fração de BTC aceita
 const SIMB = "BTCBRL";
 const REST = ["https://data-api.binance.vision","https://api.binance.com","https://api1.binance.com"];
-const WS   = ["wss://data-stream.binance.vision/ws/btcbrl@kline_5m","wss://stream.binance.com:9443/ws/btcbrl@kline_5m"];
+const wsUrls = () => ["wss://data-stream.binance.vision/ws/btcbrl@kline_"+cfg.tf, "wss://stream.binance.com:9443/ws/btcbrl@kline_"+cfg.tf];
 
 /* ---------- ajustes ---------- */
-const PADRAO = {valorEntrada:15, banca:100, rr:1.5, tempo:30, atrMult:1.5, minStop:0.4, mvrvMax:3, fgMax:80, mvrvMan:0, fgMan:0, taxaBnb:true};
+const PADRAO = {valorEntrada:15, banca:100, rr:1.5, tempo:10080, atrMult:1.5, minStop:1, mvrvMax:3, fgMax:80, mvrvMan:0, fgMan:0, taxaBnb:true};
 let cfg = Object.assign({}, PADRAO);
-try{ const s = JSON.parse(localStorage.getItem("sinaisOCO.brl2")||"null"); if(s) Object.assign(cfg, s); }catch(e){}
+cfg.tf = "1d";
+try{ const s = JSON.parse(localStorage.getItem("sinaisOCO.brl3")||"null"); if(s) Object.assign(cfg, s); }catch(e){}
+if(!TFS[cfg.tf]) cfg.tf = "1d";
+TF_MS = TFS[cfg.tf].ms;
+function salvar(){ try{ localStorage.setItem("sinaisOCO.brl3", JSON.stringify(cfg)); }catch(e){} }
 Object.keys(PADRAO).forEach(k => {
   const el=$(k);
   if(el.type==="checkbox") el.checked = !!cfg[k]; else el.value = cfg[k];
   el.addEventListener("change", () => {
     if(el.type==="checkbox") cfg[k]=el.checked;
     else { const v = parseFloat(String(el.value).replace(",", ".")); cfg[k] = isFinite(v) ? v : PADRAO[k]; }
-    try{ localStorage.setItem("sinaisOCO.brl2", JSON.stringify(cfg)); }catch(e){}
+    salvar();
     recalcular(true);
   });
+});
+$("tf").value = cfg.tf;
+$("tfLbl").textContent = "Binance · " + TFS[cfg.tf].nome;
+$("tf").addEventListener("change", () => {
+  cfg.tf = $("tf").value; TF_MS = TFS[cfg.tf].ms;
+  cfg.tempo = TFS[cfg.tf].tempo; $("tempo").value = cfg.tempo;
+  $("tfLbl").textContent = "Binance · " + TFS[cfg.tf].nome;
+  salvar(); reiniciar();
 });
 
 /* ---------- formatação ---------- */
@@ -309,7 +325,7 @@ function niveis(entrada, sd, rr){
 }
 
 /* Simula: entrada no fechamento do candle do sinal, OCO com TP e SL, saída por tempo. */
-function simular(rr, usaFiltro, incluiAberta){
+function simular(rr, usaFiltro, incluiAberta, desdeT){
   const trades=[]; let ab=null; const agora=Date.now();
   const barsMax = Math.max(1, Math.round(cfg.tempo*60000/TF_MS));
   const ok = contextoOK(); const filtroOK = !usaFiltro || (ok.mvrv && ok.fg);
@@ -332,7 +348,7 @@ function simular(rr, usaFiltro, incluiAberta){
       }
       continue;
     }
-    if(k.closed && ind.sig[i] && filtroOK){
+    if(k.closed && ind.sig[i] && filtroOK && (!desdeT || k.t >= desdeT)){
       const d = diaDe(k.T+1);
       porDia[d] = (porDia[d]||0) + 1;
       ab = Object.assign({i, T:k.T+1}, niveis(k.c, ind.sd[i], rr));
@@ -422,17 +438,19 @@ $("qtdComprada").addEventListener("input", ajustarCompra);
 
 function atualizarBacktest(){
   const fechadas = velas.filter(k=>k.closed);
-  if(fechadas.length>201) $("periodo").textContent = "Período: " + fHora(fechadas[201].t) + " até " + fHora(fechadas[fechadas.length-1].T+1) + ". Linha destacada = alvo escolhido nos Ajustes.";
+  const umAno = Date.now() - 365*86400000;
+  const iniT = fechadas.length>201 ? Math.max(fechadas[201].t, umAno) : 0;
+  if(fechadas.length>201) $("periodo").textContent = "Período: " + new Date(iniT).toLocaleDateString("pt-BR") + " até " + new Date(fechadas[fechadas.length-1].T+1).toLocaleDateString("pt-BR") + " (máximo de 1 ano, tempo do candle: " + TFS[cfg.tf].nome + "). Linha destacada = alvo escolhido nos Ajustes.";
   const linhas = [1,1.5,2].map(rr=>{
-    const {trades} = simular(rr,false,false);
+    const {trades} = simular(rr,false,false,iniT);
     const n=trades.length, w=trades.filter(t=>t.pct>0).length;
     const soma=trades.reduce((a,t)=>a+t.pct,0), brl=trades.reduce((a,t)=>a+t.brl,0);
     const cls = soma>=0?"pos":"neg";
     return `<tr class="${rr===cfg.rr?"atual":""}"><td>${String(rr).replace(".",",")}×</td><td class="mono">${n}</td><td class="mono">${n?Math.round(w/n*100)+"%":"—"}</td><td class="mono ${cls}">${n?fPct(soma):"—"}</td><td class="mono ${cls}">${n?fR(brl):"—"}</td></tr>`;
   });
   $("bt").innerHTML = linhas.join("");
-  const {trades} = simular(cfg.rr,false,false);
-  const ult = trades.slice(-8).reverse();
+  const {trades} = simular(cfg.rr,false,false,iniT);
+  const ult = trades.slice(-10).reverse();
   $("ultimas").innerHTML = ult.length ? ult.map(t=>`<tr><td>${fHora(t.T)}</td><td class="mono">${fP(t.entrada)}</td><td class="mono">${fP(t.saida)}</td><td>${t.motivo}</td><td class="mono ${t.pct>=0?"pos":"neg"}">${fPct(t.pct)}</td></tr>`).join("")
     : `<tr><td colspan="5" style="text-align:left;color:var(--muted)">Nenhuma operação no período.</td></tr>`;
   return trades;
@@ -513,8 +531,8 @@ async function getJSON(urls){
 function paraVela(r){ return {t:+r[0], o:+r[1], h:+r[2], l:+r[3], c:+r[4], T:+r[6], closed: +r[6] < Date.now()}; }
 async function carregarHistorico(){
   let todas=[], fim=null;
-  for(let p=0;p<4;p++){
-    const q = "/api/v3/klines?symbol="+SIMB+"&interval=5m&limit=1000" + (fim?("&endTime="+fim):"");
+  for(let p=0;p<TFS[cfg.tf].paginas;p++){
+    const q = "/api/v3/klines?symbol="+SIMB+"&interval="+cfg.tf+"&limit=1000" + (fim?("&endTime="+fim):"");
     const r = await getJSON(REST.map(b=>b+q));
     if(!r.length) break;
     todas = r.map(paraVela).concat(todas);
@@ -537,7 +555,7 @@ async function carregarContexto(){
 
 let ws=null, wsIdx=0, espera=1000;
 function conectar(){
-  const url = WS[wsIdx % WS.length];
+  const WS = wsUrls(); const url = WS[wsIdx % WS.length];
   try{ ws = new WebSocket(url); }catch(e){ return reconectar(); }
   ws.onopen = () => { espera=1000; $("dot").className="dot ok"; $("connTxt").textContent="Ao vivo"; };
   ws.onmessage = ev => {
@@ -547,7 +565,7 @@ function conectar(){
     const u = velas[velas.length-1];
     let novaFechada = false;
     if(u && u.t===v.t){ velas[velas.length-1]=v; novaFechada = v.closed && !u.closed; }
-    else if(!u || v.t>u.t){ if(u && !u.closed){ u.closed=true; novaFechada=true; } velas.push(v); if(velas.length>4500) velas.shift(); novaFechada = novaFechada || v.closed; }
+    else if(!u || v.t>u.t){ if(u && !u.closed){ u.closed=true; novaFechada=true; } velas.push(v); if(velas.length>9500) velas.shift(); novaFechada = novaFechada || v.closed; }
     $("preco").textContent = fP(v.c);
     if(novaFechada){ recalcular(true); }
     else { atualizarSinal(); if(sC) sC.update({time:tsec(v.t),open:v.o,high:v.h,low:v.l,close:v.c}); }
@@ -555,6 +573,7 @@ function conectar(){
   ws.onerror = () => {};
   ws.onclose = () => reconectar();
 }
+function fecharWS(){ if(ws){ ws.onclose=null; ws.onmessage=null; try{ ws.close(); }catch(e){} ws=null; } }
 function reconectar(){
   $("dot").className="dot"; $("connTxt").textContent="Reconectando…";
   wsIdx++; setTimeout(conectar, espera); espera=Math.min(espera*2, 30000);
@@ -586,19 +605,26 @@ $("btnNotif").addEventListener("click", async ()=>{
 setInterval(()=>{ if(carregado) atualizarSinal(); }, 1000);
 setInterval(carregarContexto, 30*60000);
 
-(async function(){
-  criarGrafico();
+async function iniciarDados(){
+  $("dot").className="dot"; $("connTxt").textContent="Carregando…";
+  mostrar("info","CARREGANDO","Baixando o histórico de candles da Binance.", null);
   try{ await carregarHistorico(); }
   catch(e){
     $("dot").className="dot err"; $("connTxt").textContent="Sem conexão";
     mostrar("sell","SEM DADOS DA BINANCE","Não consegui baixar os candles. Confira a internet e recarregue a página.", null);
     return;
   }
-  carregado = true;
+  carregado = true; ultimoAviso = null; opAtual = null;
   if(velas.length) $("preco").textContent = fP(velas[velas.length-1].c);
   recalcular(true);
-  carregarContexto();
+  if(chart) chart.timeScale().fitContent();
   conectar();
+}
+function reiniciar(){ fecharWS(); carregado=false; velas=[]; wsIdx=0; espera=1000; iniciarDados(); }
+(async function(){
+  criarGrafico();
+  await iniciarDados();
+  carregarContexto();
 })();
 })();
 </script>
