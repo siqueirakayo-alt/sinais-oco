@@ -138,6 +138,32 @@ td.melhor{font-weight:700;text-decoration:underline;text-underline-offset:3px}
 footer{color:var(--muted);font-size:.72rem;line-height:1.5}
 @media (max-width:370px){.spot{grid-template-columns:1fr}.regua{min-height:250px}.campos{grid-template-columns:1fr}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+.seg2{display:flex;background:var(--panel2);border-radius:8px;padding:3px;gap:3px;margin-top:4px}
+.seg2 button{flex:1;border:0;background:transparent;color:var(--muted);font-weight:600;font-size:.8rem;padding:7px 4px;border-radius:6px}
+.seg2 button.on{background:#2d3640;color:var(--fg)}
+.seg2 button.on.g{background:var(--buy);color:#06140e} .seg2 button.on.r{background:var(--sell);color:#fff}
+.calc{background:var(--panel2);border-radius:8px;padding:10px;margin-top:10px}
+.calc .grade{margin:0}
+.alerta{border:1px solid var(--warn);background:rgba(232,163,61,.10);color:var(--warn);border-radius:8px;padding:8px 10px;font-size:.8rem;line-height:1.4;margin-top:10px}
+.alerta b{color:var(--fg)}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.chips button{border:1px solid var(--line);background:var(--panel2);color:var(--muted);border-radius:999px;padding:6px 10px;font-size:.78rem}
+.chips button.on{border-color:var(--info);color:var(--fg);background:rgba(90,169,230,.15)}
+.subtit{font-size:1.1rem;font-weight:700;margin:2px 0 2px}
+.big2{font-family:var(--mono);font-size:1.5rem;font-weight:700}
+.kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:10px}
+.kpi{background:var(--panel2);border-radius:8px;padding:8px}
+.kpi span{display:block;font-size:.64rem;color:var(--muted);text-transform:uppercase;letter-spacing:.05em}
+.kpi b{font-family:var(--mono);font-size:1rem;font-variant-numeric:tabular-nums}
+.comp{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:8px}
+.comp div{background:var(--panel2);border-radius:8px;padding:8px;font-size:.76rem;color:var(--muted)}
+.comp b{display:block;font-family:var(--mono);font-size:.92rem}
+.tag{display:inline-block;font-size:.62rem;border-radius:4px;padding:1px 5px;margin-top:2px}
+.tag.s{background:rgba(46,189,133,.15);color:var(--buy)} .tag.n{background:rgba(232,163,61,.15);color:var(--warn)}
+#tabDiario tr{cursor:pointer}
+#formDiario{margin-top:10px;border-top:1px dashed var(--line);padding-top:10px}
+textarea{width:100%;min-height:90px;background:var(--bg);color:var(--fg);border:1px solid var(--line);border-radius:6px;font-family:var(--mono);font-size:12px;padding:8px}
+@media (max-width:370px){.kpis{grid-template-columns:1fr 1fr}.comp{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -198,17 +224,43 @@ footer{color:var(--muted);font-size:.72rem;line-height:1.5}
   </div>
 
   <div class="posbox" id="boxEntrei">
-    <div class="rot">Já comprei</div>
-    <p class="nota" style="margin-top:4px">Informe o que executou no app (Ordens → Histórico) e o painel acompanha a sua operação.</p>
+    <div class="rot">Minha operação</div>
+    <div class="subtit">Registrar entrada</div>
+    <p class="nota" style="margin-top:0">Copie de <b>Ordens → Histórico de ordens</b>. No sinal, os campos já vêm preenchidos; ajuste para o que executou.</p>
     <div class="campos">
       <label for="pago">Preço pago (BRL)<input id="pago" type="number" step="1" inputmode="decimal"></label>
       <label for="qtdPaga">Quantia comprada (BTC)<input id="qtdPaga" type="number" step="any" inputmode="decimal"></label>
+      <label for="horaCompra">Hora da compra<input id="horaCompra" type="time"></label>
+      <label for="horaTrailNovo">Trailing colocado às<input id="horaTrailNovo" type="time"></label>
+      <label for="tdNovo">T/D usado no app (%)<input id="tdNovo" type="number" step="0.1" min="0.1" inputmode="decimal"></label>
+      <label for="sobraIni">BTC que já estava na conta<input id="sobraIni" type="number" step="any" min="0" inputmode="decimal"></label>
+      <div class="larga" style="grid-column:1/-1"><span class="rot" style="font-size:.64rem">Entrou num sinal do painel?</span>
+        <div class="seg2" id="segSinal" data-v="nao"><button class="g" data-v="sim" type="button">Sim</button><button class="r on" data-v="nao" type="button">Não (teste/manual)</button></div></div>
     </div>
+    <div class="calc"><dl class="grade" id="calcEntrada"></dl></div>
+    <div class="alerta" id="alertaEntrada" hidden></div>
     <div class="botoes" style="margin-top:10px"><button class="prim" id="btnEntrei" type="button">Entrei</button></div>
   </div>
   <div class="posbox" id="boxEncerrar" hidden>
-    <div class="botoes"><button class="perigo" id="btnEncerrei" type="button">Encerrei a operação</button></div>
-    <p class="nota">Toque quando a venda tiver executado no app (pelo trailing ou a mercado).</p>
+    <div class="campos" style="margin-top:0">
+      <label for="horaTrail">Trailing colocado às<input id="horaTrail" type="time"></label>
+      <label for="tdPos">T/D usado no app (%)<input id="tdPos" type="number" step="0.1" min="0.1" inputmode="decimal"></label>
+    </div>
+    <p class="nota">A hora do trailing está em Ordens abertas. O painel conta o topo a partir dela, minuto a minuto, como a Binance.</p>
+    <div class="rot" style="margin-top:12px">Minha operação</div>
+    <div class="subtit">Registrar saída</div>
+    <p class="nota" style="margin-top:0">Quando a venda executar, confira no Histórico de ordens. O painel sugere os valores pelo gatilho estimado.</p>
+    <div class="campos">
+      <label for="vendaPreco">Preço de venda (BRL)<input id="vendaPreco" type="number" step="1" inputmode="decimal"></label>
+      <label for="vendaQtd">Quantia vendida (BTC)<input id="vendaQtd" type="number" step="any" inputmode="decimal"></label>
+      <label for="vendaHora">Hora da venda<input id="vendaHora" type="time"></label>
+      <label for="sobraFim">Sobra de BTC (fica na conta)<input id="sobraFim" type="number" step="any" min="0" inputmode="decimal"></label>
+      <div style="grid-column:1/-1"><span class="rot" style="font-size:.64rem">Por que saiu?</span>
+        <div class="chips" id="chipsMotivo" data-v="Manual"><button data-v="Trailing (stop)" type="button">Trailing (stop)</button><button data-v="Trailing (gain)" type="button">Trailing (gain)</button><button data-v="Sinal de saída" type="button">Sinal de saída</button><button data-v="Fim do horário" type="button">Fim do horário</button><button data-v="Manual" type="button" class="on">Manual</button></div></div>
+      <label for="vendaNota" style="grid-column:1/-1">Anotação (opcional)<input id="vendaNota" type="text" style="font-family:var(--sans)"></label>
+    </div>
+    <div class="calc"><dl class="grade" id="calcSaida"></dl></div>
+    <div class="botoes" style="margin-top:10px"><button class="perigo" id="btnEncerrei" type="button" style="background:var(--sell);color:#fff;font-weight:700">Encerrar e salvar no diário</button><button id="btnEncerrarSem" type="button">Encerrar sem salvar</button></div>
   </div>
   <div class="linhaCtx" id="contexto">—</div>
 </section>
@@ -238,6 +290,42 @@ footer{color:var(--muted);font-size:.72rem;line-height:1.5}
   <p class="nota" id="semGrafico" hidden>O gráfico não carregou. Os sinais continuam funcionando.</p>
 </section>
 
+<!-- Meu diário -->
+<details id="caixaDiario" open>
+  <summary><span class="rot">Meu diário · operações reais</span><span class="sum" id="sumDiario">—</span></summary>
+  <div style="display:flex;justify-content:space-between;align-items:baseline;margin-top:8px"><span class="nota" style="margin:0">Resultado acumulado</span><span class="big2" id="dAcum">—</span></div>
+  <div class="kpis" id="dKpis"></div>
+  <div class="comp" id="dComp"></div>
+  <p class="nota" id="dMeta">—</p>
+  <div id="dGraf"></div>
+  <div class="scroll"><table>
+    <thead><tr><th>Data</th><th>Entrada → Saída</th><th>Motivo</th><th>Result.</th></tr></thead>
+    <tbody id="tabDiario"></tbody>
+  </table></div>
+  <p class="nota">Toque numa linha para editar ou apagar. O diário fica salvo neste aparelho; use "Copiar diário" para guardar um backup numa planilha.</p>
+  <div class="botoes" style="margin-top:10px"><button id="btnAddDiario" type="button">+ Adicionar operação antiga</button><button id="btnCopiarDiario" type="button">Copiar diário (planilha)</button></div>
+  <textarea id="txtDiario" hidden readonly aria-label="Diário em texto"></textarea>
+  <div id="formDiario" hidden>
+    <div class="subtit" id="fdTit">Adicionar operação</div>
+    <div class="campos">
+      <label for="fdData">Data<input id="fdData" type="date"></label>
+      <label for="fdSinal">Entrou num sinal?<select id="fdSinal"><option value="nao">Não (teste/manual)</option><option value="sim">Sim</option></select></label>
+      <label for="fdHoraIn">Hora da compra<input id="fdHoraIn" type="time"></label>
+      <label for="fdHoraOut">Hora da venda<input id="fdHoraOut" type="time"></label>
+      <label for="fdEntrada">Preço pago (BRL)<input id="fdEntrada" type="number" step="1"></label>
+      <label for="fdQtd">Quantia comprada (BTC)<input id="fdQtd" type="number" step="any"></label>
+      <label for="fdSaida">Preço de venda (BRL)<input id="fdSaida" type="number" step="1"></label>
+      <label for="fdQtdV">Quantia vendida (BTC)<input id="fdQtdV" type="number" step="any"></label>
+      <label for="fdSobraIni">BTC que já estava na conta<input id="fdSobraIni" type="number" step="any" min="0"></label>
+      <label for="fdSobraFim">Sobra depois da venda<input id="fdSobraFim" type="number" step="any" min="0"></label>
+      <label for="fdMotivo">Motivo<select id="fdMotivo"><option>Trailing (stop)</option><option>Trailing (gain)</option><option>Sinal de saída</option><option>Fim do horário</option><option>Manual</option></select></label>
+      <label for="fdNota">Anotação<input id="fdNota" type="text" style="font-family:var(--sans)"></label>
+    </div>
+    <div class="calc"><dl class="grade" id="fdCalc"></dl></div>
+    <div class="botoes" style="margin-top:10px"><button class="prim" id="fdSalvar" type="button">Salvar</button><button class="perigo" id="fdApagar" type="button" hidden>Apagar</button><button id="fdCancelar" type="button">Cancelar</button></div>
+  </div>
+</details>
+
 <!-- Recolhidos -->
 <details id="caixaUltimas">
   <summary><span class="rot">Últimas 10 operações</span><span class="sum" id="sumUlt">—</span></summary>
@@ -256,6 +344,7 @@ footer{color:var(--muted);font-size:.72rem;line-height:1.5}
     <tbody id="bt"></tbody>
   </table></div>
   <p class="nota" id="btEntrada">—</p>
+  <p class="nota" id="btDolar">—</p>
   <p class="nota">Resultado somado em %, com 0,2% de taxa por operação, só entradas no seu horário e saída no fim dele. Linha destacada = seus Ajustes; sublinhado = melhor da tabela. Resultado passado não garante o futuro.</p>
 </details>
 
@@ -271,6 +360,7 @@ footer{color:var(--muted);font-size:.72rem;line-height:1.5}
     <label for="horaFim">Meu horário: fim (h)<input id="horaFim" type="number" step="1" min="1" max="24"></label>
     <label for="mvrvMax">Bloquear com MVRV acima de<input id="mvrvMax" type="number" step="0.1"></label>
     <label for="fgMax">Bloquear com Medo e Ganância a partir de<input id="fgMax" type="number" step="1" min="50" max="100"></label>
+    <label class="check" for="filtroDolar"><input id="filtroDolar" type="checkbox"> Só comprar se o dólar (USDT/BRL) não estiver caindo: média 9 ≥ 21</label>
     <label class="check" for="filtro200"><input id="filtro200" type="checkbox"> Só comprar com o preço acima da média de 200</label>
   </div>
 </details>
@@ -281,7 +371,7 @@ footer{color:var(--muted);font-size:.72rem;line-height:1.5}
 </div>
 
 <footer>
-  Sinal de compra: no fechamento do candle de 15 min em que a média 9 cruza a 21 para cima, com RSI entre 50 e 70, preço acima da média 200, contexto ok e dentro do seu horário. Saída: trailing stop na Binance; média 9 cruzando a 21 para baixo; RSI voltando abaixo de 70; ou fim do seu horário.
+  Sinal de compra: no fechamento do candle de 15 min em que a média 9 cruza a 21 para cima, com RSI entre 50 e 70, preço acima da média 200, dólar sem queda, contexto ok e dentro do seu horário. Saída: trailing stop na Binance; média 9 cruzando a 21 para baixo; RSI voltando abaixo de 70; ou fim do seu horário.
   Ferramenta de estudo, não é recomendação de investimento. Você pode perder dinheiro. Confira os preços no app antes de enviar a ordem.
 </footer>
 </div>
@@ -297,7 +387,7 @@ const TDS = [0.5, 1, 1.5, 2, 0];        // 0 = automático
 let INFO = {tick:1, passo:0.00001, minimo:10};
 
 /* ---------- ajustes (mesma chave de antes: nada se perde ao atualizar) ---------- */
-const PADRAO = {valorEntrada:20, td:0, saida:"sinais", entrada:"mercado", repique:0.3, validade:4, horaIni:7, horaFim:22, mvrvMax:3, fgMax:80, filtro200:true};
+const PADRAO = {valorEntrada:20, td:0, saida:"sinais", entrada:"mercado", repique:0.3, validade:4, horaIni:7, horaFim:22, mvrvMax:3, fgMax:80, filtro200:true, filtroDolar:true};
 const TEXTO = ["saida","entrada"];
 let cfg = Object.assign({}, PADRAO);
 try{ const s = JSON.parse(localStorage.getItem("sinaisTS.v1")||"null"); if(s) Object.assign(cfg, s); }catch(e){}
@@ -314,6 +404,7 @@ Object.keys(PADRAO).forEach(k => {
 });
 let pos = null;
 try{ pos = JSON.parse(localStorage.getItem("sinaisTS.pos")||"null"); }catch(e){}
+if(pos){ if(pos.sobraIni === undefined) pos.sobraIni = 0; if(pos.btcTotal === undefined) pos.btcTotal = pos.qtd*0.999; if(pos.sinal === undefined) pos.sinal = false; }
 function salvarPos(){ try{ pos ? localStorage.setItem("sinaisTS.pos", JSON.stringify(pos)) : localStorage.removeItem("sinaisTS.pos"); }catch(e){} }
 
 /* ---------- formatação ---------- */
@@ -363,7 +454,16 @@ let ctx = {mvrv:NaN, fg:NaN};
 let mkt = {};
 let ultimoAviso = null, carregado = false, somOn = false, audio = null, abaManual = 0, ultimaChaveAba = "";
 
-function calcIndicadores(){ P = preparar(velas); sig = velas.map((k,i)=> i>200 && k.closed && condCompra(velas,P,i)); }
+/* Dólar (USDT/BRL) no mesmo candle de 15 min: filtro contra a queda do dólar puxando o BTC/BRL para baixo. */
+let velasUsd = [], Pd = null, usdMap = new Map(), sigBase = [];
+function prepUsd(){ Pd = preparar(velasUsd); usdMap = new Map(velasUsd.map((k,i)=>[k.t,i])); }
+const dolarBruto = t => { if(!Pd) return true; const i = usdMap.get(t); if(i === undefined || !isFinite(Pd.e21[i])) return true; return Pd.e9[i] >= Pd.e21[i]; };
+const dolarOK = t => !cfg.filtroDolar || dolarBruto(t);
+function calcIndicadores(){
+  P = preparar(velas);
+  sigBase = velas.map((k,i)=> i>200 && k.closed && condCompra(velas,P,i));
+  sig = sigBase.map((s,i)=> s && dolarOK(velas[i].t));
+}
 function contextoOK(){ return { mvrv: !(isFinite(ctx.mvrv) && ctx.mvrv >= cfg.mvrvMax), fg: !(isFinite(ctx.fg) && ctx.fg >= cfg.fgMax) }; }
 const tdAuto = i => { const a = P && P.atr[i], c = velas[i].c; return isFinite(a) ? Math.min(5, Math.max(0.3, Math.round(2*a/c*1000)/10)) : 1; };
 
@@ -373,6 +473,8 @@ function quantias(preco, td){
   while(ajusta(qtd*0.999, INFO.passo, "baixo")*stop < INFO.minimo*1.02 && g++ < 1000) qtd = ajusta(qtd + INFO.passo, INFO.passo);
   return {qtd, qtdVenda: ajusta(qtd*0.999, INFO.passo, "baixo")};
 }
+/* Quantia que o Trailing pode vender: o que entra (sem a taxa de 0,1%) mais a sobra que já está na conta. */
+const qtdVendaReal = qtd => ajusta(qtd*0.999 + (sobraConta||0), INFO.passo, "baixo");
 /* Preço a partir do qual o trailing já vende no lucro (cobrindo as taxas). */
 const lucroDe = (entrada, td) => entrada*(1+TAXA/100)/(1-td/100);
 
@@ -416,7 +518,7 @@ function simular(o){
         continue;
       }
     }
-    if(k.closed && sig[i] && ctxOK && naJanela(k.T+1) && (!o.desdeT || k.t >= o.desdeT)){
+    if(k.closed && (o.sigArr || sig)[i] && ctxOK && naJanela(k.T+1) && (!o.desdeT || k.t >= o.desdeT)){
       const td = o.td || tdAuto(i);
       if(o.entrada === "repique") pend = {i, T:k.T+1, expira:k.T+1+cfg.validade*TF_MS, fundo:k.c, td};
       else ab = Object.assign({i, T:k.T+1, fillT:k.T+1, entrada:k.c, topo:k.c, td}, quantias(k.c, td));
@@ -432,12 +534,18 @@ function resumo(trades){
 }
 
 /* Acompanha uma posição desde a compra: topo, nível do trailing e sinais de saída. */
-function acompanhar(p, desdeT){
+function acompanhar(p, desdeT, topoMin){
   const n = velas.length, preco = velas[n-1].c;
-  let topo = p.entrada, motivo = null;
+  let topo, motivo = null;
+  if(topoMin && topoMin.t === desdeT && isFinite(topoMin.topo)) topo = Math.max(topoMin.topo, preco);
+  else {
+    // sem dados de 1 minuto: ignora a máxima do candle em que o trailing começou (pode ser de antes dele)
+    topo = p.entrada;
+    for(let i=1;i<n;i++){ const k = velas[i]; if(k.t > desdeT) topo = Math.max(topo, k.h); }
+    topo = Math.max(topo, preco);
+  }
   for(let i=1;i<n;i++){
     const k = velas[i]; if(k.T < desdeT) continue;
-    topo = Math.max(topo, k.h);
     if(k.closed && cfg.saida === "sinais" && !motivo){
       if(saidaMedias(i)) motivo = "A média 9 cruzou para baixo da 21 às " + fHM(k.T+1) + ".";
       else if(saidaRsi(i)) motivo = "O RSI passou de 70 e voltou a cair às " + fHM(k.T+1) + ".";
@@ -447,6 +555,20 @@ function acompanhar(p, desdeT){
   if(preco <= nivel) motivo = "trailing";
   else if(!naJanela(Date.now()) && !motivo) motivo = "fim";
   return {topo, nivel, preco, motivo};
+}
+/* Topo desde a hora do trailing, com candles de 1 minuto (mesmo critério da Binance). */
+let topoPos = null;
+async function atualizarTopoPos(){
+  if(!pos) { topoPos = null; return; }
+  const t0 = pos.tTrail || pos.t, ini = Math.floor(t0/60000)*60000;
+  try{
+    const r = await getJSON(REST.map(b=>b+"/api/v3/klines?symbol="+SIMB+"&interval=1m&limit=1000&startTime="+ini));
+    if(!r.length) return;
+    let topo = +r[0][4];                       // preço no minuto em que o trailing foi colocado
+    for(let i=1;i<r.length;i++) topo = Math.max(topo, +r[i][2]);
+    topoPos = {t:t0, topo};
+    if(carregado){ atualizarSinal(); desenharLinhas(); }
+  }catch(e){}
 }
 
 /* ---------- condições ao vivo (candle atual) ---------- */
@@ -460,13 +582,16 @@ function condicoesAgora(){
     {t:"RSI entre 50 e 70", d:"RSI agora: " + fN(Qviva.rsi[j],0), ok: Qviva.rsi[j] > 50 && Qviva.rsi[j] < 70},
     {t:"Preço acima da média 200", d: cfg.filtro200 ? "200: " + fP(Qviva.e200[j]) : "filtro desligado", ok: !cfg.filtro200 || k.c > Qviva.e200[j]},
     {t:"Contexto ok", d:"MVRV " + (isFinite(ctx.mvrv)?fN(ctx.mvrv,2):"—") + " · Medo " + (isFinite(ctx.fg)?Math.round(ctx.fg):"—"), ok: ok.mvrv && ok.fg},
-    {t:"Seu horário (" + cfg.horaIni + "h–" + cfg.horaFim + "h)", d:"agora " + fHM(agora), ok: naJanela(agora), larga:true}
+    (()=>{ const n = velasUsd.length; if(!Pd || !n) return {t:"Dólar sem queda", d:"carregando…", ok:true};
+      const j2 = n-1; return {t:"Dólar sem queda", d: cfg.filtroDolar ? "9: " + fN(Pd.e9[j2],4) + " · 21: " + fN(Pd.e21[j2],4) : "filtro desligado", ok: !cfg.filtroDolar || Pd.e9[j2] >= Pd.e21[j2]}; })(),
+    {t:"Seu horário (" + cfg.horaIni + "h–" + cfg.horaFim + "h)", d:"agora " + fHM(agora), ok: naJanela(agora)}
   ];
 }
 function sinalFormando(){
   if(velas.length < 205 || velas[velas.length-1].closed) return false;
   condicoesAgora();
-  return condCompra(Vviva, Qviva, Vviva.length-1);
+  const n = velasUsd.length, dOk = !cfg.filtroDolar || !Pd || !n || Pd.e9[n-1] >= Pd.e21[n-1];
+  return condCompra(Vviva, Qviva, Vviva.length-1) && dOk;
 }
 
 /* ---------- tela: sinal, bilhete e régua ---------- */
@@ -500,7 +625,7 @@ function mostrarResultado(p, a, titulo, sub){
   const lado = Math.max(lucro, a.preco*1.0001), base = Math.min(a.nivel, a.preco*0.9999);
   const x = Math.min(100, Math.max(0, (a.preco - base)/(lado - base)*100));
   $("marca").style.left = x + "%";
-  $("legStop").innerHTML = "Trailing vende<br>" + fP(a.nivel);
+  $("legStop").innerHTML = "Trailing vende (estim.)<br>" + fP(a.nivel);
   $("legPreco").innerHTML = "Preço<br>" + fP(a.preco);
   $("legLucro").innerHTML = (a.nivel >= p.entrada*(1+TAXA/100) ? "Lucro garantido<br>" : "Lucro a partir de<br>") + fP(lucro);
 }
@@ -576,12 +701,12 @@ function atualizarSinal(){
     {t:"Trailing vende", p:a.nivel, c:"stop"}];
     if(a.topo > a.preco*1.0005 && a.topo > p.entrada*1.0005) l.push({t:"Topo", p:a.topo, c:"topo"});
     regua(l); };
-  const refBilhete = () => { const q = quantias(preco, tdAgora); setBilhete(bilheteCompra("mercado", preco, tdAgora), bilheteVenda(q.qtdVenda, tdAgora)); };
+  const refBilhete = () => { const q = quantias(preco, tdAgora); setBilhete(bilheteCompra("mercado", preco, tdAgora), bilheteVenda(qtdVendaReal(q.qtd), tdAgora)); };
 
   if(pos){
-    const a = acompanhar(pos, pos.t);
+    const a = acompanhar(pos, pos.tTrail || pos.t, topoPos);
     if(a.motivo === "trailing"){
-      quadro("saia","warn","TRAILING DEVE TER VENDIDO","O preço chegou a " + fP(a.nivel) + ". Confira no app se a venda executou e toque em \"Encerrei a operação\".");
+      quadro("saia","warn","TRAILING PODE TER VENDIDO","O preço chegou ao gatilho estimado (" + fP(a.nivel) + " = topo " + fP(a.topo) + " − " + fTd(pos.td) + "). Confira em Ordens abertas: se a ordem sumiu, a venda executou e você toca em \"Encerrei a operação\".");
       chave = "pt"+pos.t;
       setBilhete(bilheteCompra("mercado", preco, tdAgora), bilheteVenda(pos.qtdVenda, pos.td));
     } else if(a.motivo === "fim"){
@@ -591,23 +716,23 @@ function atualizarSinal(){
       quadro("saia","sell","SAIA AGORA", a.motivo + " A alta perdeu força: realize o resultado (aba Vender).");
       chave = "ps"+pos.t; setBilhete(bilheteCompra("mercado", preco, tdAgora), bilheteVenda(pos.qtdVenda, pos.td, true));
     } else {
-      quadro("operacao","info","EM OPERAÇÃO","O trailing stop protege você na Binance. O painel avisa se precisar sair antes.");
+      quadro("operacao","info","EM OPERAÇÃO","O trailing protege você na Binance. Gatilho estimado: " + fP(a.nivel) + " (topo " + fP(a.topo) + " desde " + fHM(pos.tTrail || pos.t) + " − " + fTd(pos.td) + "). Ainda falta cair " + fP(Math.max(0,a.preco - a.nivel)) + " (" + fN(Math.max(0,(a.preco - a.nivel)/a.preco*100),2) + "%) para ele vender.");
       setBilhete(bilheteCompra("mercado", preco, tdAgora), bilheteVenda(pos.qtdVenda, pos.td));
     }
-    mostrarResultado(pos, a); posRegua(pos, a); aba("v", true);
+    mostrarResultado(pos, a); posRegua(pos, a); aba("v", true); prefillSaida(a);
   } else if(r.pendente){
     quadro("compre","buy","COMPRE NO REPIQUE","Sinal às " + fHM(r.pendente.T) + ". Coloque a ordem da aba Comprar: ela só compra se o preço repicar " + fTd(cfg.repique) + " do fundo.");
     chave = "r"+r.pendente.T; mostrarCondicoes("var(--buy)");
     const q = quantias(preco, r.pendente.td);
-    setBilhete(bilheteCompra("repique", preco, r.pendente.td, r.pendente), bilheteVenda(q.qtdVenda, r.pendente.td));
+    setBilhete(bilheteCompra("repique", preco, r.pendente.td, r.pendente), bilheteVenda(qtdVendaReal(q.qtd), r.pendente.td));
     refRegua(); aba("c", true);
   } else if(r.aberta && agora - r.aberta.fillT < TF_MS){
     const a = r.aberta;
     quadro("compre","buy","COMPRE AGORA","Sinal às " + fHM(a.T) + " a cerca de " + fP(a.entrada) + ". Faça a compra (aba Comprar), logo em seguida a proteção (aba Vender) e toque em \"Entrei\".");
     chave = "c"+a.T; mostrarCondicoes("var(--buy)");
     const q = quantias(preco, a.td);
-    setBilhete(bilheteCompra("mercado", preco, a.td), bilheteVenda(q.qtdVenda, a.td));
-    if(!$("pago").value){ $("pago").value = Math.round(preco); $("qtdPaga").value = q.qtd; }
+    setBilhete(bilheteCompra("mercado", preco, a.td), bilheteVenda(qtdVendaReal(q.qtd), a.td));
+    if(!$("pago").value){ $("pago").value = Math.round(preco); $("qtdPaga").value = q.qtd; $("horaCompra").value = msParaHora(Date.now()); $("horaTrailNovo").value = msParaHora(Date.now()); $("tdNovo").value = a.td; setSeg("segSinal","sim"); calcEntrada(); }
     refRegua(); aba("c", true);
   } else if(r.aberta){
     const a = r.aberta, ac = acompanhar(a, a.fillT);
@@ -639,14 +764,189 @@ function atualizarSinal(){
   if(ultimoAviso === null) ultimoAviso = "inicio";
 }
 
+/* ---------- registro da operação e diário ---------- */
+let sobraConta = 0, diario = [];
+try{ sobraConta = +JSON.parse(localStorage.getItem("sinaisTS.sobra")||"0") || 0; }catch(e){}
+try{ diario = JSON.parse(localStorage.getItem("sinaisTS.diario")||"[]") || []; }catch(e){}
+function salvarDiario(){ try{ localStorage.setItem("sinaisTS.diario", JSON.stringify(diario)); localStorage.setItem("sinaisTS.sobra", JSON.stringify(sobraConta)); }catch(e){} }
+const num = id => parseFloat(String($(id).value).replace(",", "."));
+const f8 = x => isFinite(x) ? x.toLocaleString("pt-BR",{maximumFractionDigits:8}) : "—";
+function setSeg(id, v){ const g = $(id); g.dataset.v = v; g.querySelectorAll("button").forEach(b=>b.classList.toggle("on", b.dataset.v === v)); }
+["segSinal","chipsMotivo"].forEach(id => $(id).addEventListener("click", ev => { const b = ev.target.closest("button"); if(!b) return; setSeg(id, b.dataset.v); if(id==="chipsMotivo") motivoTocado = true; }));
+/* "15:09" → horário de hoje (ou de ontem, se ainda não chegou) */
+function horaParaMs(v, base){
+  const m = /^(\d{1,2}):(\d{2})/.exec(v||""); if(!m) return 0;
+  const d = base ? new Date(base) : new Date(); d.setHours(+m[1], +m[2], 0, 0);
+  if(!base && d.getTime() > Date.now() + 60000) d.setDate(d.getDate()-1);
+  return d.getTime();
+}
+const msParaHora = ms => { const d = new Date(ms); return String(d.getHours()).padStart(2,"0") + ":" + String(d.getMinutes()).padStart(2,"0"); };
+const msParaData = ms => { const d = new Date(ms); return d.getFullYear() + "-" + String(d.getMonth()+1).padStart(2,"0") + "-" + String(d.getDate()).padStart(2,"0"); };
+/* Conta de uma operação: o que entrou, o que saiu e a sobra (marcada a preço de mercado). */
+function contaOp(o){
+  const custo = o.entrada*o.qtd + (o.sobraIni||0)*o.entrada;
+  const recebido = o.saida*o.qtdV*0.999;
+  const res = recebido + (o.sobraFim||0)*o.saida - custo;
+  return {custo, recebido, res, pct: custo ? res/custo*100 : NaN, taxas: o.entrada*o.qtd*0.001 + o.saida*o.qtdV*0.001};
+}
+
+function calcEntrada(){
+  const p = num("pago"), q = num("qtdPaga"), s = num("sobraIni") || 0, td = num("tdNovo") || cfg.td || 1;
+  if(!(p > 0) || !(q > 0)){ $("calcEntrada").innerHTML = "<dt>Preencha o preço pago e a quantia</dt><dd>—</dd>"; $("alertaEntrada").hidden = true; return; }
+  const total = q*0.999 + s, venda = ajusta(total, INFO.passo, "baixo"), fora = total - venda;
+  $("calcEntrada").innerHTML = `<dt>Custo total</dt><dd>R$ ${fR(p*q)}</dd><dt>Taxa da compra (0,1% em BTC)</dt><dd>${f8(q*0.001)} BTC</dd>`
+    + `<dt>BTC que você tem agora</dt><dd>${f8(total)}</dd><dt>Quantia para o Trailing Stop</dt><dd class="pos">${fQ(venda)}</dd>`;
+  const al = $("alertaEntrada"); let txt = "";
+  if(venda*p*(1-td/100) < INFO.minimo) txt = `<b>A venda ficaria abaixo do mínimo de R$ ${fR(INFO.minimo)}</b> e a Binance recusaria o Trailing Stop. Compre um pouco mais.`;
+  else if(fora > 1e-9) txt = `<b>${f8(fora)} BTC (≈ R$ ${fR(fora*p)}) ficam sem proteção</b>, porque a taxa sai do BTC e o app só vende em múltiplos de ${fQ(INFO.passo)}. Essa sobra fica guardada e entra na próxima operação.`;
+  if($("segSinal").dataset.v === "nao") txt += (txt ? "<br>" : "") + "Entrada <b>fora do sinal</b>: vai para o diário separada das operações com sinal.";
+  al.innerHTML = txt; al.hidden = !txt;
+}
+["pago","qtdPaga","sobraIni","tdNovo"].forEach(id => $(id).addEventListener("input", calcEntrada));
+$("segSinal").addEventListener("click", calcEntrada);
+
 $("btnEntrei").addEventListener("click", ()=>{
-  const p = parseFloat(String($("pago").value).replace(",", ".")), q = parseFloat(String($("qtdPaga").value).replace(",", "."));
+  const p = num("pago"), q = num("qtdPaga"), s = num("sobraIni") || 0;
   if(!(p > 0) || !(q > 0)){ $("expl").textContent = "Preencha o preço pago e a quantia comprada para o painel acompanhar a sua operação."; return; }
-  const td = cfg.td || tdAuto(velas.length-1);
-  pos = {entrada:p, qtd:q, qtdVenda: ajusta(q*0.999, INFO.passo, "baixo"), td, t: Date.now()};
-  salvarPos(); ultimoAviso = null; abaManual = 0; atualizarSinal(); desenharLinhas();
+  const tdIn = num("tdNovo"), td = tdIn > 0 ? tdIn : (cfg.td || tdAuto(velas.length-1));
+  const total = q*0.999 + s;
+  const tIn = horaParaMs($("horaCompra").value) || Date.now();
+  pos = {entrada:p, qtd:q, sobraIni:s, btcTotal:total, qtdVenda: ajusta(total, INFO.passo, "baixo"), td, t: tIn, tTrail: horaParaMs($("horaTrailNovo").value) || tIn, sinal: $("segSinal").dataset.v === "sim"};
+  salvarPos(); ultimoAviso = null; abaManual = 0; topoPos = null; prefillKey = ""; preencherPos(); atualizarSinal(); desenharLinhas(); atualizarTopoPos();
 });
-$("btnEncerrei").addEventListener("click", ()=>{ pos = null; salvarPos(); $("pago").value = ""; $("qtdPaga").value = ""; ultimoAviso = null; abaManual = 0; atualizarSinal(); desenharLinhas(); });
+function preencherPos(){
+  if(pos){ $("horaTrail").value = msParaHora(pos.tTrail || pos.t); $("tdPos").value = pos.td; }
+  else {
+    $("horaCompra").value = msParaHora(Date.now()); $("horaTrailNovo").value = msParaHora(Date.now());
+    $("tdNovo").value = cfg.td || ""; $("sobraIni").value = sobraConta ? +sobraConta.toFixed(8) : 0; setSeg("segSinal","nao"); calcEntrada();
+  }
+}
+$("horaTrail").addEventListener("change", ()=>{ const t = horaParaMs($("horaTrail").value); if(pos && t){ pos.tTrail = t; salvarPos(); topoPos = null; ultimoAviso = null; atualizarTopoPos(); atualizarSinal(); desenharLinhas(); } });
+$("tdPos").addEventListener("change", ()=>{ const v = num("tdPos"); if(pos && v > 0){ pos.td = v; salvarPos(); ultimoAviso = null; atualizarSinal(); desenharLinhas(); } });
+
+/* saída: sugere valores pelo estado da operação, sem apagar o que você digitou */
+let prefillKey = "", motivoTocado = false;
+function prefillSaida(a){
+  const mot = a.motivo === "trailing" ? (a.nivel > pos.entrada*(1+TAXA/100) ? "Trailing (gain)" : "Trailing (stop)") : a.motivo === "fim" ? "Fim do horário" : a.motivo ? "Sinal de saída" : "Manual";
+  const key = pos.t + ":" + mot;
+  if(key === prefillKey) return;
+  prefillKey = key;
+  $("vendaPreco").value = Math.round(a.motivo === "trailing" ? a.nivel : a.preco);
+  if(!$("vendaQtd").value || !motivoTocado) $("vendaQtd").value = pos.qtdVenda || ajusta((pos.qtd||0)*0.999, INFO.passo, "baixo");
+  $("vendaHora").value = msParaHora(Date.now());
+  if(!motivoTocado) setSeg("chipsMotivo", mot);
+  calcSaida();
+}
+function calcSaida(){
+  if(!pos) return;
+  const pv = num("vendaPreco"), qv = num("vendaQtd");
+  const btcTotal = pos.btcTotal || (pos.qtd*0.999 + (pos.sobraIni||0));
+  if(document.activeElement !== $("sobraFim")) $("sobraFim").value = isFinite(qv) ? Math.max(0, +(btcTotal - qv).toFixed(8)) : "";
+  const sf = num("sobraFim") || 0;
+  if(!(pv > 0) || !(qv > 0)){ $("calcSaida").innerHTML = "<dt>Preencha o preço e a quantia vendida</dt><dd>—</dd>"; return; }
+  const c = contaOp({entrada:pos.entrada, qtd:pos.qtd, sobraIni:pos.sobraIni||0, saida:pv, qtdV:qv, sobraFim:sf});
+  const dur = (horaParaMs($("vendaHora").value) || Date.now()) - pos.t;
+  $("calcSaida").innerHTML = `<dt>Recebido na venda (já sem 0,1%)</dt><dd>R$ ${fR(c.recebido)}</dd><dt>Sobra a preço de mercado</dt><dd>R$ ${fR(sf*pv)}</dd>`
+    + `<dt>Custo da compra${pos.sobraIni ? " + sobra anterior" : ""}</dt><dd>R$ ${fR(c.custo)}</dd>`
+    + `<dt><b style="color:var(--fg)">Resultado</b></dt><dd class="${c.res>=0?"pos":"neg"}"><b>${fRs(c.res)} · ${fPct(c.pct)}</b></dd><dt>Duração</dt><dd>${tempoTexto(dur)}</dd>`;
+}
+["vendaPreco","vendaQtd","vendaHora","sobraFim"].forEach(id => $(id).addEventListener("input", calcSaida));
+function fecharPos(){ pos = null; topoPos = null; prefillKey = ""; motivoTocado = false; salvarPos(); ["pago","qtdPaga","vendaPreco","vendaQtd","sobraFim","vendaNota"].forEach(id=>$(id).value=""); preencherPos(); ultimoAviso = null; abaManual = 0; atualizarSinal(); desenharLinhas(); }
+$("btnEncerrei").addEventListener("click", ()=>{
+  const pv = num("vendaPreco"), qv = num("vendaQtd");
+  if(!(pv > 0) || !(qv > 0)){ $("expl").textContent = "Preencha o preço de venda e a quantia vendida para salvar no diário."; return; }
+  const sf = num("sobraFim") || 0, tOut = horaParaMs($("vendaHora").value) || Date.now();
+  const op = {id: Date.now(), tIn: pos.t, tOut, entrada: pos.entrada, qtd: pos.qtd, saida: pv, qtdV: qv, sobraIni: pos.sobraIni||0, sobraFim: sf,
+    motivo: $("chipsMotivo").dataset.v, sinal: !!pos.sinal, nota: $("vendaNota").value.trim(), td: pos.td};
+  diario.push(op); sobraConta = sf; salvarDiario(); fecharPos(); renderDiario();
+});
+$("btnEncerrarSem").addEventListener("click", fecharPos);
+
+/* diário */
+function renderDiario(){
+  const ops = diario.slice().sort((a,b)=>a.tIn-b.tIn), cs = ops.map(contaOp);
+  const n = ops.length, acum = cs.reduce((a,c)=>a+c.res,0), w = cs.filter(c=>c.res>0).length;
+  const ganhos = cs.filter(c=>c.res>0).map(c=>c.res), perdas = cs.filter(c=>c.res<0).map(c=>c.res);
+  const com = ops.map((o,i)=>[o,cs[i]]).filter(x=>x[0].sinal), sem = ops.map((o,i)=>[o,cs[i]]).filter(x=>!x[0].sinal);
+  const soma = arr => arr.reduce((a,x)=>a+x[1].res,0);
+  $("sumDiario").textContent = n ? fRs(acum) + " · " + n + (n>1?" ops":" op") : "vazio";
+  $("dAcum").textContent = n ? fRs(acum) : "R$ 0,00"; $("dAcum").className = "big2 " + (acum>0?"pos":acum<0?"neg":"");
+  const kpi = (t, v, cls) => `<div class="kpi"><span>${t}</span><b class="${cls||""}">${v}</b></div>`;
+  $("dKpis").innerHTML = kpi("Operações", n) + kpi("Acerto", n ? Math.round(w/n*100)+"%" : "—")
+    + kpi("Médio", n ? fPct(cs.reduce((a,c)=>a+c.pct,0)/n) : "—", n ? (acum>=0?"pos":"neg") : "")
+    + kpi("Maior ganho", ganhos.length ? fRs(Math.max(...ganhos)) : "—", "pos") + kpi("Maior perda", perdas.length ? fRs(Math.min(...perdas)) : "—", "neg")
+    + kpi("Taxas pagas", "R$ " + fR(cs.reduce((a,c)=>a+c.taxas,0)));
+  const bloco = (t, arr) => { const s = soma(arr); return `<div>${t}<b class="${arr.length ? (s>=0?"pos":"neg") : ""}">${arr.length} ${arr.length===1?"op":"ops"} · ${arr.length ? fRs(s) : "—"}</b></div>`; };
+  $("dComp").innerHTML = bloco("Com sinal do painel", com) + bloco("Sem sinal (manual)", sem);
+  const falta = Math.max(0, 20 - com.length);
+  $("dMeta").innerHTML = falta ? `Meta para avaliar o modelo: <b>20 operações com sinal</b> (faltam ${falta}).` : `Meta atingida: <b>${com.length} operações com sinal</b>. Já dá para avaliar o modelo pelo resultado delas.`;
+  // gráfico: barras por operação + linha do acumulado
+  if(n){
+    const ult = cs.slice(-30), W = 400, H = 110, pad = 14, bw = Math.min(22, (W-2*pad)/ult.length*0.7), passo = (W-2*pad)/ult.length;
+    let a = 0; const acs = ult.map(c=> a += c.res);
+    const ext = Math.max(0.01, ...ult.map(c=>Math.abs(c.res)), ...acs.map(Math.abs)), y = v => H/2 - v/ext*(H/2-12);
+    const barras = ult.map((c,i)=>{ const x = pad + i*passo + (passo-bw)/2, y0 = y(Math.max(0,c.res)), hh = Math.abs(y(c.res)-y(0)); return `<rect x="${x}" y="${y0}" width="${bw}" height="${Math.max(1,hh)}" fill="${c.res>=0?"#2ebd85":"#ef5d6a"}" rx="2"/>`; }).join("");
+    const linha = acs.map((v,i)=> (pad + i*passo + passo/2) + "," + y(v)).join(" ");
+    $("dGraf").innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Resultado por operação e acumulado" style="display:block;width:100%;height:auto;margin-top:8px"><rect width="${W}" height="${H}" fill="#1d232a" rx="8"/><line x1="${pad}" y1="${y(0)}" x2="${W-pad}" y2="${y(0)}" stroke="#3a4652" stroke-dasharray="3 3"/>${barras}<polyline points="${linha}" fill="none" stroke="#e7eaed" stroke-width="1.5"/><text x="${pad}" y="12" fill="#8b96a1" font-size="9" font-family="IBM Plex Sans, sans-serif">barras = cada operação · linha = acumulado</text></svg>`;
+  } else $("dGraf").innerHTML = "";
+  $("tabDiario").innerHTML = n ? ops.map((o,i)=>[o,cs[i]]).reverse().map(([o,c])=>
+    `<tr data-id="${o.id}"><td>${fDH(o.tIn)}<br><span class="tag ${o.sinal?"s":"n"}">${o.sinal?"com sinal":"sem sinal"}</span></td><td class="mono">${fP(o.entrada)} → ${fP(o.saida)}<br><span class="nota" style="margin:0">${tempoTexto(o.tOut - o.tIn)}${o.nota ? " · " + o.nota.replace(/</g,"&lt;") : ""}</span></td><td>${o.motivo}</td><td class="mono ${c.res>=0?"pos":"neg"}">${fRs(c.res)}<br>${fPct(c.pct)}</td></tr>`).join("")
+    : `<tr><td colspan="4" style="color:var(--muted)">Nenhuma operação ainda. Use "Registrar saída" ao encerrar, ou "+ Adicionar operação antiga".</td></tr>`;
+}
+/* formulário de adicionar / editar */
+let editId = null;
+const FD = ["fdData","fdSinal","fdHoraIn","fdHoraOut","fdEntrada","fdQtd","fdSaida","fdQtdV","fdSobraIni","fdSobraFim","fdMotivo","fdNota"];
+function abrirForm(op){
+  editId = op ? op.id : null;
+  $("fdTit").textContent = op ? "Editar operação" : "Adicionar operação"; $("fdApagar").hidden = !op;
+  const o = op || {tIn: Date.now(), tOut: Date.now(), sinal:false, sobraIni:0, sobraFim:0, motivo:"Trailing (stop)", nota:""};
+  $("fdData").value = msParaData(o.tIn); $("fdSinal").value = o.sinal ? "sim" : "nao";
+  $("fdHoraIn").value = msParaHora(o.tIn); $("fdHoraOut").value = msParaHora(o.tOut);
+  $("fdEntrada").value = o.entrada ?? ""; $("fdQtd").value = o.qtd ?? ""; $("fdSaida").value = o.saida ?? ""; $("fdQtdV").value = o.qtdV ?? "";
+  $("fdSobraIni").value = o.sobraIni || 0; $("fdSobraFim").value = o.sobraFim || 0; $("fdMotivo").value = o.motivo; $("fdNota").value = o.nota || "";
+  $("formDiario").hidden = false; calcForm(); $("formDiario").scrollIntoView({behavior:"smooth", block:"nearest"});
+}
+function lerForm(){
+  const base = $("fdData").value ? new Date($("fdData").value + "T12:00:00").getTime() : Date.now();
+  const o = {tIn: horaParaMs($("fdHoraIn").value, base) || base, tOut: horaParaMs($("fdHoraOut").value, base) || base,
+    entrada: num("fdEntrada"), qtd: num("fdQtd"), saida: num("fdSaida"), qtdV: num("fdQtdV"), sobraIni: num("fdSobraIni") || 0, sobraFim: num("fdSobraFim") || 0,
+    motivo: $("fdMotivo").value, sinal: $("fdSinal").value === "sim", nota: $("fdNota").value.trim()};
+  if(o.tOut < o.tIn) o.tOut += 86400000;
+  return o;
+}
+function calcForm(){
+  const o = lerForm();
+  if(!(o.entrada>0 && o.qtd>0 && o.saida>0 && o.qtdV>0)){ $("fdCalc").innerHTML = "<dt>Preencha preços e quantias</dt><dd>—</dd>"; return; }
+  const c = contaOp(o);
+  $("fdCalc").innerHTML = `<dt>Custo</dt><dd>R$ ${fR(c.custo)}</dd><dt>Recebido (sem 0,1%)</dt><dd>R$ ${fR(c.recebido)}</dd><dt><b style="color:var(--fg)">Resultado</b></dt><dd class="${c.res>=0?"pos":"neg"}"><b>${fRs(c.res)} · ${fPct(c.pct)}</b></dd>`;
+}
+FD.forEach(id => $(id).addEventListener("input", calcForm));
+$("btnAddDiario").addEventListener("click", ()=> abrirForm(null));
+$("tabDiario").addEventListener("click", ev => { const tr = ev.target.closest("tr[data-id]"); if(!tr) return; const op = diario.find(o=>String(o.id)===tr.dataset.id); if(op) abrirForm(op); });
+$("fdCancelar").addEventListener("click", ()=>{ $("formDiario").hidden = true; editId = null; });
+$("fdSalvar").addEventListener("click", ()=>{
+  const o = lerForm();
+  if(!(o.entrada>0 && o.qtd>0 && o.saida>0 && o.qtdV>0)){ $("fdCalc").innerHTML = "<dt>Preencha preços e quantias para salvar</dt><dd>—</dd>"; return; }
+  if(editId){ const k = diario.findIndex(x=>x.id===editId); if(k>=0) diario[k] = Object.assign({}, diario[k], o); }
+  else diario.push(Object.assign({id: Date.now()}, o));
+  const ultima = diario.slice().sort((a,b)=>a.tOut-b.tOut).pop(); if(ultima) sobraConta = ultima.sobraFim || 0;
+  salvarDiario(); $("formDiario").hidden = true; editId = null; renderDiario(); if(!pos) preencherPos();
+});
+let confirmaApagar = 0;
+$("fdApagar").addEventListener("click", ()=>{
+  if(Date.now() - confirmaApagar > 4000){ confirmaApagar = Date.now(); $("fdApagar").textContent = "Toque de novo para apagar"; setTimeout(()=>{ $("fdApagar").textContent = "Apagar"; }, 4000); return; }
+  diario = diario.filter(x=>x.id!==editId); salvarDiario(); $("formDiario").hidden = true; editId = null; $("fdApagar").textContent = "Apagar"; renderDiario();
+});
+$("btnCopiarDiario").addEventListener("click", ()=>{
+  const linhas = [["Data","Compra","Venda","Preço pago","Qtd comprada","Preço venda","Qtd vendida","Sobra antes","Sobra depois","Motivo","Com sinal","Resultado R$","Resultado %","Taxas R$","Anotação"].join("\t")];
+  diario.slice().sort((a,b)=>a.tIn-b.tIn).forEach(o=>{ const c = contaOp(o);
+    linhas.push([fD(o.tIn), fHM(o.tIn), fHM(o.tOut), o.entrada, String(o.qtd).replace(".",","), o.saida, String(o.qtdV).replace(".",","), String(o.sobraIni||0).replace(".",","), String(o.sobraFim||0).replace(".",","), o.motivo, o.sinal?"sim":"não", fR(c.res), fN(c.pct,2), fR(c.taxas), o.nota||""].join("\t")); });
+  const txt = linhas.join("\n"), b = $("btnCopiarDiario"), t = $("txtDiario");
+  const ok = () => { b.textContent = "Copiado: cole na planilha"; setTimeout(()=>{ b.textContent = "Copiar diário (planilha)"; }, 2500); };
+  const falha = () => { t.hidden = false; t.value = txt; t.focus(); t.select(); b.textContent = "Selecione o texto abaixo e copie"; };
+  try{ navigator.clipboard.writeText(txt).then(ok, falha); }catch(e){ falha(); }
+});
+renderDiario();
 
 /* ---------- mercados ---------- */
 const PARES = ["USDTBRL","BTCBRL","BTCUSDT"];
@@ -704,6 +1004,9 @@ function atualizarHistorico(){
     const ref = cfg.saida === "sinais" ? d.b : d.a;
     return `<tr class="${d.td===cfg.td?"atual":""}"><td>${d.td ? fTd(d.td) : "Auto"}</td><td class="mono">${ref.n}</td><td class="mono">${ref.n ? Math.round(ref.acerto*100)+"%" : "—"}</td>${cel(d.a, d.td+"a")}${cel(d.b, d.td+"b")}</tr>`;
   }).join("");
+  const sigCom = sigBase.map((s,i)=> s && dolarBruto(velas[i].t));
+  const fc = resumo(simular(regras({desdeT:iniT, sigArr:sigCom})).trades), fs = resumo(simular(regras({desdeT:iniT, sigArr:sigBase})).trades);
+  $("btDolar").innerHTML = Pd ? `Filtro do dólar: <b>ligado</b>, ${fc.n} ops e total <span class="${fc.total>=0?"pos":"neg"}">${fc.n?fPct(fc.total):"—"}</span> · <b>desligado</b>, ${fs.n} ops e total <span class="${fs.total>=0?"pos":"neg"}">${fs.n?fPct(fs.total):"—"}</span>.` : "Filtro do dólar: carregando o histórico do USDT/BRL…";
   const m = resumo(simular(regras({entrada:"mercado", desdeT:iniT})).trades), rp = resumo(simular(regras({entrada:"repique", desdeT:iniT})).trades);
   $("btEntrada").innerHTML = `Com o T/D e a saída dos seus Ajustes: entrando <b>a mercado</b>, ${m.n} ops e total <span class="${m.total>=0?"pos":"neg"}">${m.n?fPct(m.total):"—"}</span> · <b>no repique</b>, ${rp.n} ops e total <span class="${rp.total>=0?"pos":"neg"}">${rp.n?fPct(rp.total):"—"}</span>.`;
   $("sumAj").textContent = "T/D " + (cfg.td ? fTd(cfg.td) : "auto") + " · " + cfg.horaIni + "h–" + cfg.horaFim + "h";
@@ -760,7 +1063,7 @@ function desenharLinhas(){
   if(!sC || !velas.length) return;
   linhasPreco.forEach(l=>sC.removePriceLine(l)); linhasPreco=[];
   if(pos){
-    const a = acompanhar(pos, pos.t);
+    const a = acompanhar(pos, pos.tTrail || pos.t, topoPos);
     linhasPreco.push(sC.createPriceLine({price:pos.entrada,color:"#5aa9e6",lineWidth:1,lineStyle:2,axisLabelVisible:true,title:"Entrada"}));
     linhasPreco.push(sC.createPriceLine({price:a.nivel,color:"#ef5d6a",lineWidth:1,lineStyle:2,axisLabelVisible:true,title:"Trailing"}));
   }
@@ -803,6 +1106,27 @@ async function carregarInfo(){
     if(mn && +mn.minNotional>0) INFO.minimo = +mn.minNotional;
   }catch(e){}
 }
+async function carregarUsd(){
+  try{
+    let todas=[], fim=null;
+    for(let p=0;p<PAGINAS;p++){
+      const q = "/api/v3/klines?symbol=USDTBRL&interval="+TF+"&limit=1000" + (fim?("&endTime="+fim):"");
+      const r = await getJSON(REST.map(b=>b+q)); if(!r.length) break;
+      todas = r.map(paraVela).concat(todas); fim = +r[0][0]-1; if(r.length < 1000) break;
+    }
+    const vistos = new Set(); velasUsd = todas.filter(k=> !vistos.has(k.t) && vistos.add(k.t)).sort((a,b)=>a.t-b.t);
+    prepUsd(); recalcular(true);
+  }catch(e){}
+}
+async function atualizarUsd(){
+  if(!velasUsd.length) return;
+  try{
+    const r = await getJSON(REST.map(b=>b+"/api/v3/klines?symbol=USDTBRL&interval="+TF+"&limit=3"));
+    r.map(paraVela).forEach(v => { const k = velasUsd.findIndex(x=>x.t===v.t); if(k>=0) velasUsd[k] = v; else if(v.t > velasUsd[velasUsd.length-1].t) velasUsd.push(v); });
+    prepUsd();
+  }catch(e){}
+}
+setInterval(atualizarUsd, 30000);
 async function carregarContexto(){
   try{ const j = await getJSON(["https://api.alternative.me/fng/?limit=1"]); ctx.fg = parseFloat(j.data[0].value); }catch(e){ ctx.fg = NaN; }
   try{
@@ -857,15 +1181,17 @@ $("btnNotif").addEventListener("click", async ()=>{
 });
 
 /* caixas recolhíveis: lembra o que você deixou aberto */
-["caixaUltimas","caixaBt","ajustes"].forEach(id => {
+["caixaDiario","caixaUltimas","caixaBt","ajustes"].forEach(id => {
   const el = $(id);
-  try{ if(localStorage.getItem("sinaisTS.aberto."+id) === "1") el.open = true; }catch(e){}
+  try{ const v = localStorage.getItem("sinaisTS.aberto."+id); if(v === "1") el.open = true; else if(v === "0") el.open = false; }catch(e){}
   el.addEventListener("toggle", () => { try{ localStorage.setItem("sinaisTS.aberto."+id, el.open ? "1" : "0"); }catch(e){} });
 });
 
 function relogio(){ try{ $("relogio").textContent = new Date().toLocaleTimeString("pt-BR",{timeZone:tz}) + " Brasília"; }catch(e){ $("relogio").textContent = new Date().toLocaleTimeString("pt-BR"); } }
 setInterval(()=>{ relogio(); if(carregado){ atualizarSinal(); if(pos) desenharLinhas(); } }, 1000);
 setInterval(atualizarMercados, 5000);
+setInterval(atualizarTopoPos, 20000);
+preencherPos(); atualizarTopoPos();
 setInterval(carregarContexto, 30*60000);
 relogio(); atualizarMercados();
 
@@ -882,6 +1208,7 @@ relogio(); atualizarMercados();
   if(chart) chart.timeScale().fitContent();
   carregarContexto();
   conectar();
+  carregarUsd();
 })();
 })();
 </script>
