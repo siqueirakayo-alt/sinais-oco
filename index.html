@@ -43,6 +43,9 @@ header{display:flex;align-items:center;justify-content:space-between;gap:10px;fl
 .instr{color:var(--muted);margin:6px 0 0;line-height:1.45}
 .hoje{margin-top:10px;font-size:.82rem;color:var(--muted)}
 .hoje b{color:var(--fg);font-family:var(--mono)}
+.sinal[data-tone="buy"] .estado{font-size:2.3rem;letter-spacing:.03em}
+.sinal[data-tone="buy"]{border-left-width:8px;box-shadow:0 0 0 1px var(--buy) inset}
+.passo{margin-top:14px;color:var(--fg)}
 .refAviso{margin:14px 0 0;padding:8px 10px;border:1px dashed var(--warn);border-radius:6px;color:var(--warn);font-size:.82rem;line-height:1.4}
 .refAviso b{color:var(--fg)}
 .entrada{margin-top:12px;display:flex;flex-direction:column;gap:4px}
@@ -111,6 +114,7 @@ footer{color:var(--muted);font-size:.75rem;line-height:1.5}
   </div>
   <div id="detalhe" hidden>
     <p class="refAviso" id="refAviso" hidden>Sem sinal agora. Estes são os valores <b>se você entrasse no preço atual</b>, só como referência.</p>
+    <div class="rot passo">1 · Aba Comprar → Market</div>
     <dl class="grade">
       <dt>Entrada (referência)</dt><dd id="dEntrada">—</dd>
       <dt>Quantia (BTC)</dt><dd id="dQtd">—</dd>
@@ -118,7 +122,7 @@ footer{color:var(--muted);font-size:.75rem;line-height:1.5}
       <dt id="dTempoLbl">Tempo restante</dt><dd class="relogio" id="dTempo">—</dd>
     </dl>
     <div class="oco">
-      <div class="rot">OCO de venda (aba Vender → OCO)</div>
+      <div class="rot passo">2 · Aba Vender → OCO (na ordem do app)</div>
       <dl class="grade">
         <dt>Limite TP (BRL)</dt><dd class="tp" id="dTP">—</dd>
         <dt>Ativação SL (BRL)</dt><dd class="sl" id="dSL">—</dd>
@@ -231,16 +235,16 @@ const REST = ["https://data-api.binance.vision","https://api.binance.com","https
 const WS   = ["wss://data-stream.binance.vision/ws/btcbrl@kline_5m","wss://stream.binance.com:9443/ws/btcbrl@kline_5m"];
 
 /* ---------- ajustes ---------- */
-const PADRAO = {valorEntrada:15, banca:100, rr:1.5, tempo:60, atrMult:1.5, minStop:0.4, mvrvMax:3, fgMax:80, mvrvMan:0, fgMan:0, taxaBnb:true};
+const PADRAO = {valorEntrada:15, banca:100, rr:1.5, tempo:30, atrMult:1.5, minStop:0.4, mvrvMax:3, fgMax:80, mvrvMan:0, fgMan:0, taxaBnb:true};
 let cfg = Object.assign({}, PADRAO);
-try{ const s = JSON.parse(localStorage.getItem("sinaisOCO.brl")||"null"); if(s) Object.assign(cfg, s); }catch(e){}
+try{ const s = JSON.parse(localStorage.getItem("sinaisOCO.brl2")||"null"); if(s) Object.assign(cfg, s); }catch(e){}
 Object.keys(PADRAO).forEach(k => {
   const el=$(k);
   if(el.type==="checkbox") el.checked = !!cfg[k]; else el.value = cfg[k];
   el.addEventListener("change", () => {
     if(el.type==="checkbox") cfg[k]=el.checked;
     else { const v = parseFloat(String(el.value).replace(",", ".")); cfg[k] = isFinite(v) ? v : PADRAO[k]; }
-    try{ localStorage.setItem("sinaisOCO.brl", JSON.stringify(cfg)); }catch(e){}
+    try{ localStorage.setItem("sinaisOCO.brl2", JSON.stringify(cfg)); }catch(e){}
     recalcular(true);
   });
 });
@@ -374,7 +378,7 @@ function atualizarSinal(){
   if(aberta){
     const resta = aberta.T + cfg.tempo*60000 - agora;
     if(agora - aberta.T < TF_MS){
-      mostrar("buy","COMPRAR AGORA","Compre a mercado no app a quantia indicada. Depois vá em Vender → OCO e preencha os três preços e a quantia da OCO.", aberta);
+      mostrar("buy","ENTRE AGORA","Compre a mercado no app e logo em seguida coloque a OCO de venda com os valores abaixo.", aberta);
       chave = "c"+aberta.T;
     } else {
       mostrar("info","EM OPERAÇÃO","A OCO deve estar ativa. Se o tempo acabar sem TP nem SL, cancele a OCO e venda a mercado.", aberta);
