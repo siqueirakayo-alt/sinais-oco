@@ -1057,12 +1057,12 @@ $("btnCopiarDiario").addEventListener("click", ()=>{
 renderDiario();
 
 /* ---------- importar CSV da Binance (Histórico de Trades Spot) ---------- */
-let impTrades = [], impOps = [], impTexto = "";
+let impTrades = [], impOps = [], impTexto = "", impNome = "";
 $("btnImportar").addEventListener("click", ()=> $("arqCsv").click());
 $("arqCsv").addEventListener("change", ()=>{
   const f = $("arqCsv").files[0]; if(!f) return;
   const rd = new FileReader();
-  rd.onload = () => { impTexto = String(rd.result||""); processarCsv(true); $("arqCsv").value = ""; };
+  impNome = (f && f.name) || ""; rd.onload = () => { impTexto = String(rd.result||""); processarCsv(true); $("arqCsv").value = ""; };
   rd.onerror = () => { mostrarImport("Não consegui ler o arquivo. Tente baixar o CSV de novo."); };
   rd.readAsText(f);
 });
@@ -1098,12 +1098,15 @@ function processarCsv(primeira){
   const linhas = lerCsv(impTexto);
   if(linhas.length < 2){ mostrarImport("O arquivo não tem linhas de operações."); return; }
   const cab = linhas[0].map(semAcento);
-  const acha = (...ks) => cab.findIndex(c => ks.some(k => c.includes(k)));
-  const C = {id: acha("pedido","order","id"), t: acha("date","data","tempo","time","hora"), par: acha("pair","par","symbol","mercado"), lado: acha("side","lado","tipo"),
-    preco: acha("price","preco"), exec: acha("executed","executado","filled"), total: acha("amount","quantidade","total"), taxa: acha("fee","taxa")};
+  // procura pela ordem das palavras (a primeira que existir vence)
+  const acha = (...ks) => { for(const k of ks){ const i = cab.findIndex(c => c.includes(k)); if(i >= 0) return i; } return -1; };
+  // Histórico de Ordens tem dois "Tempo": o 1º é quando a ordem foi criada, o 2º quando executou. Vale o 2º.
+  const achaUlt = (...ks) => { for(const k of ks){ let i = -1; cab.forEach((c,j)=>{ if(c.includes(k)) i = j; }); if(i >= 0) return i; } return -1; };
+  const C = {id: acha("numero do pedido","order no","order id","pedido","order"), t: achaUlt("date","data","tempo","time","hora"), par: acha("pair","par","symbol","mercado"), lado: acha("lado","side","direcao","tipo"),
+    preco: acha("preco medio","average","avg","preco","price"), exec: acha("executado","executed","filled"), total: acha("total de trades","total","amount"), taxa: acha("taxa","fee")};
   if(C.id >= 0 && [C.t,C.par,C.lado,C.preco,C.exec,C.total,C.taxa].includes(C.id)) C.id = -1;
   if([C.t,C.par,C.lado,C.preco,C.exec].some(x=>x<0)){ mostrarImport("Não reconheci as colunas deste CSV. Me mande o arquivo para eu ajustar a leitura."); return; }
-  if(primeira){ const ct = cab[C.t]; $("impFuso").value = /utc\s*[-−]+\s*3|-03|brasil/.test(ct) ? "br" : "utc"; }
+  if(primeira){ const ct = cab[C.t]; $("impFuso").value = /utc\s*[-−_]+\s*3|-03|brasil/i.test(ct + " " + impNome) ? "br" : "utc"; }
   const desloc = $("impFuso").value === "utc" ? 0 : 3*3600000;
   impTrades = [];
   linhas.slice(1).forEach(l => {
