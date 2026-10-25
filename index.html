@@ -99,6 +99,8 @@ th.grp{text-align:center;border-bottom:none;padding-bottom:0}
 .relogio-br{font-family:var(--mono);font-size:1.05rem;font-weight:600;font-variant-numeric:tabular-nums}
 .relogio-br::after{content:" Brasília";font-family:var(--sans);font-size:.7rem;font-weight:500;color:var(--muted)}
 tr.h24 td:first-child{border-left:3px solid var(--info);padding-left:6px}
+tr.fora td{color:var(--muted)}
+tr.agora td{background:rgba(90,169,230,.08)}
 tr.aberta td{background:rgba(46,189,133,.08)}
 </style>
 </head>
@@ -191,10 +193,29 @@ tr.aberta td{background:rgba(46,189,133,.08)}
     </table>
   </div>
   <p class="nota">Use o alvo que fecha positivo. MVRV e Medo e Ganância não entram no backtest porque só temos o valor de hoje.</p>
+  <div class="rot" style="margin-top:16px" id="janTitulo">Na sua janela de operação</div>
+  <p class="nota" id="janNota">—</p>
+  <div class="scroll">
+    <table>
+      <thead><tr><th>Cenário</th><th>Ops</th><th>Acerto</th><th>Resultado</th><th>R$</th></tr></thead>
+      <tbody id="btJan"></tbody>
+    </table>
+  </div>
 </section>
 
 <section class="card">
-  <div class="titulo-rel"><div class="rot">Últimas 10 operações do alvo escolhido</div><div class="relogio-br" id="relogio" aria-label="Horário de Brasília">--:--:--</div></div>
+  <div class="titulo-rel"><div class="rot">Últimas 10 horas, hora a hora</div><div class="relogio-br" id="relogio" aria-label="Horário de Brasília">--:--:--</div></div>
+  <p class="nota" id="horasNota">Preço no fim de cada hora, quanto variou e se houve sinal ou saída de operação naquela hora.</p>
+  <div class="scroll">
+    <table>
+      <thead><tr><th>Hora</th><th>Preço</th><th>Variação</th><th>Sinal</th><th>Saída</th></tr></thead>
+      <tbody id="horas"></tbody>
+    </table>
+  </div>
+</section>
+
+<details class="card">
+  <summary>Últimas 10 operações do alvo escolhido</summary>
   <p class="nota" id="ult24">—</p>
   <div class="scroll">
     <table>
@@ -202,7 +223,7 @@ tr.aberta td{background:rgba(46,189,133,.08)}
       <tbody id="ultimas"></tbody>
     </table>
   </div>
-</section>
+</details>
 
 <section class="card">
   <div class="rot">Explorador de ajustes</div>
@@ -236,7 +257,8 @@ tr.aberta td{background:rgba(46,189,133,.08)}
     <label for="fgMan">Medo e Ganância manual (0 = automático)<input id="fgMan" type="number" step="1" min="0" max="100"></label>
     <label for="banca">Pote para operar (R$)<input id="banca" type="number" step="1" min="10"></label>
     <label class="check" for="filtro200"><input id="filtro200" type="checkbox"> Só comprar acima da média de 200 (filtro de tendência)</label>
-    <label class="check" for="taxaBnb"><input id="taxaBnb" type="checkbox"> Pago as taxas com BNB (0,075% por ordem; sem BNB, 0,1%)</label>
+    <label for="horaIni">Minha janela: começo (h)<input id="horaIni" type="number" step="1" min="0" max="23"></label>
+    <label for="horaFim">Minha janela: fim (h)<input id="horaFim" type="number" step="1" min="1" max="24"></label>
   </div>
   <p class="nota">MVRV e Medo e Ganância são carregados automaticamente (Coin Metrics e alternative.me) e só bloqueiam sinais de BTC. Se quiser usar outro valor, digite nos campos manuais; ele vale até você zerar o campo.</p>
 </details>
@@ -263,7 +285,7 @@ const ATIVOS = {BTCBRL:{nome:"BTC/BRL", base:"BTC", tick:1, passo:0.00001},
 const REST = ["https://data-api.binance.vision","https://api.binance.com","https://api1.binance.com"];
 
 /* ---------- ajustes ---------- */
-const PADRAO = {valorEntrada:20, banca:20, rr:1.5, tempo:1440, atrMult:1.5, minStop:1, mvrvMax:3, fgMax:80, mvrvMan:0, fgMan:0, taxaBnb:true, filtro200:true};
+const PADRAO = {valorEntrada:20, banca:20, rr:1.5, tempo:1440, atrMult:1.5, minStop:1, mvrvMax:3, fgMax:80, mvrvMan:0, fgMan:0, filtro200:true, horaIni:7, horaFim:22};
 let cfg = Object.assign({}, PADRAO, {tf:"15m", ativo:"BTCBRL"});
 try{ const s = JSON.parse(localStorage.getItem("sinaisOCO.v5")||"null"); if(s) Object.assign(cfg, s); }catch(e){}
 if(!TFS[cfg.tf]) cfg.tf = "15m";
@@ -272,7 +294,7 @@ function salvar(){ try{ localStorage.setItem("sinaisOCO.v5", JSON.stringify(cfg)
 
 let TF_MS = TFS[cfg.tf].ms;
 let INFO = Object.assign({minimo:10}, ATIVOS[cfg.ativo]);   // tick, passo e mínimo reais vêm da Binance
-const taxaRT = () => cfg.taxaBnb ? 0.15 : 0.2;              // % ida e volta
+const taxaRT = () => 0.2;   // 0,1% na compra + 0,1% na venda (taxa padrão da Binance, sem BNB)
 
 function preencherCampos(){
   Object.keys(PADRAO).forEach(k => { const el=$(k); if(el.type==="checkbox") el.checked = !!cfg[k]; else el.value = cfg[k]; });
@@ -299,6 +321,8 @@ const fPct = x => (x>=0?"+":"") + x.toLocaleString("pt-BR",{minimumFractionDigit
 const fHora = ms => new Date(ms).toLocaleString("pt-BR",{day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"});
 const ajusta = (x, p, modo) => { const n = x/p; const k = modo==="baixo" ? Math.floor(n+1e-9) : modo==="cima" ? Math.ceil(n-1e-9) : Math.round(n); return Number((k*p).toFixed(decs(p))); };
 const diaDe = ms => new Date(ms).toDateString();
+const horaBR = ms => { try{ return +new Date(ms).toLocaleString("en-US",{timeZone:"America/Sao_Paulo", hour:"numeric", hour12:false}) % 24; }catch(e){ return new Date(ms).getHours(); } };
+const naJanela = ms => { const h = horaBR(ms); return cfg.horaIni <= cfg.horaFim ? (h >= cfg.horaIni && h < cfg.horaFim) : (h >= cfg.horaIni || h < cfg.horaFim); };
 
 /* ---------- indicadores ---------- */
 function ema(v,n){ const o=new Array(v.length).fill(NaN); if(v.length<n) return o;
@@ -345,14 +369,18 @@ function niveis(entrada, sd, rr){
   const sl = ajusta(entrada - sd, INFO.tick);
   const slLim = ajusta(sl*(1-0.001), INFO.tick, "baixo");
   const tp = ajusta(entrada + sd*rr, INFO.tick);
-  const minimo = ajusta(INFO.minimo*1.02 / slLim, INFO.passo, "cima");
-  const qtd = Math.max(minimo, ajusta(cfg.valorEntrada / entrada, INFO.passo));
-  const qtdOco = cfg.taxaBnb ? qtd : ajusta(qtd*0.999, INFO.passo, "baixo");
+  // a taxa de 0,1% sai da moeda comprada: a OCO só pode vender o que sobrou, arredondado para baixo,
+  // e essa venda também precisa passar do mínimo da Binance no preço do stop
+  const minimoOco = ajusta(INFO.minimo*1.02 / slLim, INFO.passo, "cima");
+  let qtd = ajusta(cfg.valorEntrada / entrada, INFO.passo);
+  let guarda = 0;
+  while(ajusta(qtd*0.999, INFO.passo, "baixo") < minimoOco && guarda++ < 1000) qtd = ajusta(qtd + INFO.passo, INFO.passo);
+  const qtdOco = ajusta(qtd*0.999, INFO.passo, "baixo");
   return {entrada, sd, sl, slLim, tp, qtd, qtdOco};
 }
 
 /* Simula as operações: entrada no fechamento do candle do sinal, OCO com TP e SL, saída por tempo. */
-function simular(rr, usaFiltro, incluiAberta, desdeT){
+function simular(rr, usaFiltro, incluiAberta, desdeT, jan){
   const trades=[]; let ab=null; const agora=Date.now(); const taxa = taxaRT();
   const barsMax = Math.max(1, Math.round(cfg.tempo*60000/TF_MS));
   const ok = contextoOK(); const filtroOK = !usaFiltro || (ok.mvrv && ok.fg);
@@ -364,9 +392,10 @@ function simular(rr, usaFiltro, incluiAberta, desdeT){
       if(i>ab.i){
         const bSL = k.l<=ab.sl, bTP = k.h>=ab.tp;
         const bT = k.closed ? (i-ab.i)>=barsMax : agora >= ab.T + cfg.tempo*60000;
-        if(bSL||bTP||bT){
+        const bJ = !!(jan && jan.zerar && k.closed && !naJanela(k.T+1));
+        if(bSL||bTP||bT||bJ){
           const saida = bSL? ab.sl : bTP? ab.tp : k.c;
-          const motivo = bSL? "SL" : bTP? "TP" : "Tempo";
+          const motivo = bSL? "SL" : bTP? "TP" : bJ? "Fim da janela" : "Tempo";
           const pct = (saida-ab.entrada)/ab.entrada*100 - taxa;
           const brl = ab.qtd*(saida-ab.entrada) - ab.qtd*ab.entrada*taxa/100;
           trades.push(Object.assign({}, ab, {saida, motivo, pct, brl, saidaT: k.closed? k.T+1 : agora}));
@@ -375,7 +404,7 @@ function simular(rr, usaFiltro, incluiAberta, desdeT){
       }
       continue;
     }
-    if(k.closed && ind.sig[i] && filtroOK && (!desdeT || k.t >= desdeT)){
+    if(k.closed && ind.sig[i] && filtroOK && (!desdeT || k.t >= desdeT) && (!jan || naJanela(k.T+1))){
       const d = diaDe(k.T+1); porDia[d] = (porDia[d]||0) + 1;
       ab = Object.assign({i, T:k.T+1}, niveis(k.c, ind.sd[i], rr));
     }
@@ -427,7 +456,7 @@ function atualizarSinal(){
   if(aberta){
     const resta = aberta.T + cfg.tempo*60000 - agora;
     if(agora - aberta.T < TF_MS){
-      mostrar("buy","ENTRE AGORA","Compre a mercado no app e logo em seguida coloque a OCO de venda com os valores abaixo.", aberta);
+      mostrar("buy","ENTRE AGORA","Compre a mercado no app e logo em seguida coloque a OCO de venda com os valores abaixo." + (naJanela(agora) ? "" : " Atenção: fora da sua janela (" + cfg.horaIni + "h às " + cfg.horaFim + "h)."), aberta);
       chave = "c"+aberta.T;
     } else {
       mostrar("info","EM OPERAÇÃO","A OCO deve estar ativa. Se o tempo acabar sem TP nem SL, cancele a OCO e venda a mercado.", aberta);
@@ -461,11 +490,11 @@ function ajustarCompra(){
     const sl = ajusta(p-sd, INFO.tick); slLim = ajusta(sl*(1-0.001), INFO.tick, "baixo");
     $("aSL").textContent=fP(sl); $("aSLL").textContent=fP(slLim); $("aTP").textContent=fP(ajusta(p+sd*cfg.rr, INFO.tick));
   } else { ["aSL","aSLL","aTP"].forEach(id=>$(id).textContent="—"); }
-  const qo = isFinite(q) ? (cfg.taxaBnb ? ajusta(q, INFO.passo, "baixo") : ajusta(q*0.999, INFO.passo, "baixo")) : NaN;
+  const qo = isFinite(q) ? ajusta(q*0.999, INFO.passo, "baixo") : NaN;
   $("aQtd").textContent = fQ(qo);
   const av = $("aAviso");
   if(isFinite(qo) && isFinite(slLim) && qo*slLim < INFO.minimo){
-    av.hidden=false; av.textContent = "Atenção: essa quantia vale menos que o mínimo de R$ " + fR(INFO.minimo) + " no preço do stop e a Binance pode recusar a OCO. Compre um pouco mais ou pague a taxa com BNB.";
+    av.hidden=false; av.textContent = "Atenção: essa quantia vale menos que o mínimo de R$ " + fR(INFO.minimo) + " no preço do stop e a Binance pode recusar a OCO. Compre um pouco mais.";
   } else av.hidden=true;
 }
 $("pago").addEventListener("input", ajustarCompra);
@@ -485,6 +514,17 @@ function atualizarBacktest(){
     return `<tr class="${rr===cfg.rr?"atual":""}"><td>${String(rr).replace(".",",")}×</td><td class="mono">${n}</td><td class="mono">${n?Math.round(w/n*100)+"%":"—"}</td><td class="mono ${n?cls:""}">${n?fPct(soma):"—"}</td><td class="mono ${n?cls:""}">${n?fR(brl):"—"}</td></tr>`;
   });
   $("bt").innerHTML = linhas.join("");
+  const linhaCen = (nome, trades) => {
+    const n=trades.length, w=trades.filter(t=>t.pct>0).length, soma=trades.reduce((a,t)=>a+t.pct,0), brl=trades.reduce((a,t)=>a+t.brl,0), cls = soma>=0?"pos":"neg";
+    return `<tr><td style="text-align:left">${nome}</td><td class="mono">${n}</td><td class="mono">${n?Math.round(w/n*100)+"%":"—"}</td><td class="mono ${n?cls:""}">${n?fPct(soma):"—"}</td><td class="mono ${n?cls:""}">${n?fR(brl):"—"}</td></tr>`;
+  };
+  $("janTitulo").textContent = "Na sua janela de operação (" + cfg.horaIni + "h às " + cfg.horaFim + "h, horário de Brasília)";
+  $("janNota").textContent = "Mesmo alvo dos Ajustes (" + String(cfg.rr).replace(".",",") + "×). Compara seguir todos os sinais com entrar só no seu horário e, no último cenário, também vender o que estiver aberto no fim da janela, para não dormir comprado.";
+  $("btJan").innerHTML = [
+    linhaCen("Todos os sinais (24/7)", simular(cfg.rr,false,false,iniT).trades),
+    linhaCen("Só entradas no seu horário (OCO fica à noite)", simular(cfg.rr,false,false,iniT,{zerar:false}).trades),
+    linhaCen("Entradas no seu horário e venda às " + cfg.horaFim + "h", simular(cfg.rr,false,false,iniT,{zerar:true}).trades)
+  ].join("");
   const {trades} = simular(cfg.rr,false,false,iniT);
   atualizarUltimas();
   return trades;
@@ -517,6 +557,32 @@ function sinalFormando(){
   const ok = contextoOK();
   return cond && ok.mvrv && ok.fg;
 }
+/* Últimas 10 horas, a partir de candles de 1 hora baixados à parte (não depende do tempo do candle escolhido). */
+let horasV = [];
+async function carregarHoras(){
+  try{
+    const r = await getJSON(REST.map(b=>b+"/api/v3/klines?symbol="+cfg.ativo+"&interval=1h&limit=10"));
+    horasV = r.map(paraVela);
+  }catch(e){ horasV = []; }
+  atualizarHoras();
+}
+function atualizarHoras(){
+  if(!horasV.length){ $("horas").innerHTML = `<tr><td colspan="5" style="text-align:left;color:var(--muted)">Carregando…</td></tr>`; return; }
+  const agora = Date.now();
+  const ultP = velas.length ? velas[velas.length-1].c : NaN;
+  const {trades, aberta} = carregado ? simular(cfg.rr,true,true) : {trades:[], aberta:null};
+  const todas = trades.concat(aberta ? [aberta] : []);
+  const hhmm = ms => { try{ return new Date(ms).toLocaleTimeString("pt-BR",{timeZone:"America/Sao_Paulo",hour:"2-digit",minute:"2-digit"}); }catch(e){ return new Date(ms).toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"}); } };
+  $("horas").innerHTML = horasV.slice().reverse().map(k=>{
+    const fim = k.T+1, emCurso = agora < fim;
+    const fech = emCurso && isFinite(ultP) ? ultP : k.c;
+    const varr = (fech - k.o)/k.o*100;
+    const sinais = todas.filter(t=> t.T >= k.t && t.T < fim).length;
+    const saidas = trades.filter(t=> t.saidaT > k.t && t.saidaT <= fim).map(t=>t.motivo);
+    return `<tr class="${emCurso?"agora":""}${naJanela(k.t)?"":" fora"}"><td>${hhmm(k.t)}–${hhmm(fim)}${emCurso?" · agora":""}</td><td class="mono">${fP(fech)}</td><td class="mono ${varr>=0?"pos":"neg"}">${(varr>=0?"+":"") + varr.toLocaleString("pt-BR",{minimumFractionDigits:2,maximumFractionDigits:2})}%</td><td>${sinais? "Compra" + (sinais>1?" ×"+sinais:"") : "—"}</td><td>${saidas.length? saidas.join(", ") : "—"}</td></tr>`;
+  }).join("");
+}
+
 function relogio(){
   try{ $("relogio").textContent = new Date().toLocaleTimeString("pt-BR",{timeZone:"America/Sao_Paulo", hour:"2-digit", minute:"2-digit", second:"2-digit"}); }
   catch(e){ $("relogio").textContent = new Date().toLocaleTimeString("pt-BR"); }
@@ -754,7 +820,8 @@ $("btnNotif").addEventListener("click", async ()=>{
   catch(e){ $("btnNotif").textContent="Notificações indisponíveis aqui"; }
 });
 
-setInterval(()=>{ relogio(); if(carregado){ atualizarSinal(); atualizarUltimas(); } }, 1000);
+setInterval(()=>{ relogio(); if(carregado){ atualizarSinal(); atualizarUltimas(); atualizarHoras(); } }, 1000);
+setInterval(carregarHoras, 60000);
 relogio();
 setInterval(carregarContexto, 30*60000);
 
@@ -780,6 +847,7 @@ async function iniciarDados(){
     return;
   }
   carregado = true; ultimoAviso = null; opAtual = null;
+  carregarHoras();
   if(velas.length) $("preco").textContent = fP(velas[velas.length-1].c);
   recalcular(true);
   if(chart) chart.timeScale().fitContent();
