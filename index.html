@@ -161,6 +161,8 @@ footer{color:var(--muted);font-size:.72rem;line-height:1.5}
 .tag{display:inline-block;font-size:.62rem;border-radius:4px;padding:1px 5px;margin-top:2px}
 .tag.s{background:rgba(46,189,133,.15);color:var(--buy)} .tag.n{background:rgba(232,163,61,.15);color:var(--warn)}
 #tabDiario tr{cursor:pointer}
+#impLista select{padding:4px;font-size:13px;width:auto}
+#impLista td{vertical-align:middle}
 #formDiario{margin-top:10px;border-top:1px dashed var(--line);padding-top:10px}
 textarea{width:100%;min-height:90px;background:var(--bg);color:var(--fg);border:1px solid var(--line);border-radius:6px;font-family:var(--mono);font-size:12px;padding:8px}
 @media (max-width:370px){.kpis{grid-template-columns:1fr 1fr}.comp{grid-template-columns:1fr}}
@@ -303,7 +305,19 @@ textarea{width:100%;min-height:90px;background:var(--bg);color:var(--fg);border:
     <tbody id="tabDiario"></tbody>
   </table></div>
   <p class="nota">Toque numa linha para editar ou apagar. O diário fica salvo neste aparelho; use "Copiar diário" para guardar um backup numa planilha.</p>
-  <div class="botoes" style="margin-top:10px"><button id="btnAddDiario" type="button">+ Adicionar operação antiga</button><button id="btnCopiarDiario" type="button">Copiar diário (planilha)</button></div>
+  <div class="botoes" style="margin-top:10px"><button class="prim" id="btnImportar" type="button">Importar CSV da Binance</button><button id="btnAddDiario" type="button">+ Adicionar operação antiga</button><button id="btnCopiarDiario" type="button">Copiar diário (planilha)</button></div>
+  <input id="arqCsv" type="file" accept=".csv,text/csv,text/plain" hidden>
+  <div id="boxImport" hidden>
+    <div class="subtit" style="margin-top:12px">Importar do CSV</div>
+    <p class="nota" id="impInfo">—</p>
+    <label for="impFuso" style="margin-top:8px">Horário do arquivo<select id="impFuso"><option value="utc">UTC (padrão do CSV da Binance)</option><option value="br">Brasília (UTC−3)</option></select></label>
+    <div class="scroll"><table>
+      <thead><tr><th></th><th>Operação</th><th>Result.</th><th>Com sinal?</th><th>Motivo</th></tr></thead>
+      <tbody id="impLista"></tbody>
+    </table></div>
+    <div class="botoes" style="margin-top:10px"><button class="prim" id="impSalvar" type="button">Salvar no diário</button><button id="impCancelar" type="button">Cancelar</button></div>
+    <p class="nota">A leitura é feita só neste aparelho. O painel guarda apenas os dados das operações (horários, preços, quantidades e taxas).</p>
+  </div>
   <textarea id="txtDiario" hidden readonly aria-label="Diário em texto"></textarea>
   <div id="formDiario" hidden>
     <div class="subtit" id="fdTit">Adicionar operação</div>
@@ -785,9 +799,11 @@ const msParaData = ms => { const d = new Date(ms); return d.getFullYear() + "-" 
 /* Conta de uma operação: o que entrou, o que saiu e a sobra (marcada a preço de mercado). */
 function contaOp(o){
   const custo = o.entrada*o.qtd + (o.sobraIni||0)*o.entrada;
-  const recebido = o.saida*o.qtdV*0.999;
+  const taxaVenda = isFinite(o.taxaVendaBRL) ? o.taxaVendaBRL : o.saida*o.qtdV*0.001;   // importado: taxa exata do CSV
+  const taxaCompra = isFinite(o.taxaCompraBTC) ? o.taxaCompraBTC*o.entrada : o.entrada*o.qtd*0.001;
+  const recebido = o.saida*o.qtdV - taxaVenda;
   const res = recebido + (o.sobraFim||0)*o.saida - custo;
-  return {custo, recebido, res, pct: custo ? res/custo*100 : NaN, taxas: o.entrada*o.qtd*0.001 + o.saida*o.qtdV*0.001};
+  return {custo, recebido, res, pct: custo ? res/custo*100 : NaN, taxas: taxaCompra + taxaVenda};
 }
 
 function calcEntrada(){
@@ -947,6 +963,142 @@ $("btnCopiarDiario").addEventListener("click", ()=>{
   try{ navigator.clipboard.writeText(txt).then(ok, falha); }catch(e){ falha(); }
 });
 renderDiario();
+
+/* ---------- importar CSV da Binance (Histórico de Trades Spot) ---------- */
+let impTrades = [], impOps = [], impTexto = "";
+$("btnImportar").addEventListener("click", ()=> $("arqCsv").click());
+$("arqCsv").addEventListener("change", ()=>{
+  const f = $("arqCsv").files[0]; if(!f) return;
+  const rd = new FileReader();
+  rd.onload = () => { impTexto = String(rd.result||""); processarCsv(true); $("arqCsv").value = ""; };
+  rd.onerror = () => { mostrarImport("Não consegui ler o arquivo. Tente baixar o CSV de novo."); };
+  rd.readAsText(f);
+});
+$("impFuso").addEventListener("change", ()=> processarCsv(false));
+$("impCancelar").addEventListener("click", ()=>{ $("boxImport").hidden = true; impOps = []; });
+
+function lerCsv(txt){
+  txt = txt.replace(/^﻿/, "");
+  const prim = txt.split(/\r?\n/)[0] || "";
+  const sep = (prim.split(";").length > prim.split(",").length) ? ";" : (prim.split("\t").length > prim.split(",").length ? "\t" : ",");
+  const linhas = []; let campo = "", linha = [], aspas = false;
+  for(let i=0;i<txt.length;i++){
+    const ch = txt[i];
+    if(aspas){ if(ch === '"'){ if(txt[i+1] === '"'){ campo += '"'; i++; } else aspas = false; } else campo += ch; }
+    else if(ch === '"') aspas = true;
+    else if(ch === sep){ linha.push(campo); campo = ""; }
+    else if(ch === "\n" || ch === "\r"){ if(ch === "\r" && txt[i+1] === "\n") i++; linha.push(campo); campo = ""; if(linha.some(c=>c.trim())) linhas.push(linha); linha = []; }
+    else campo += ch;
+  }
+  linha.push(campo); if(linha.some(c=>c.trim())) linhas.push(linha);
+  return linhas;
+}
+const semAcento = s => String(s).toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
+/* "0.00004BTC" → {v:0.00004, a:"BTC"}; aceita "1,234.5" e "1.234,5" */
+function valorUnid(s){
+  s = String(s||"").trim(); const m = /([A-Za-z]+)\s*$/.exec(s); const a = m ? m[1].toUpperCase() : "";
+  let n = s.replace(/[A-Za-z\s]/g, "");
+  if(n.includes(",") && n.includes(".")) n = n.lastIndexOf(",") > n.lastIndexOf(".") ? n.replace(/\./g,"").replace(",", ".") : n.replace(/,/g,"");
+  else if(n.includes(",")) n = n.replace(",", ".");
+  return {v: parseFloat(n), a};
+}
+function processarCsv(primeira){
+  const linhas = lerCsv(impTexto);
+  if(linhas.length < 2){ mostrarImport("O arquivo não tem linhas de operações."); return; }
+  const cab = linhas[0].map(semAcento);
+  const acha = (...ks) => cab.findIndex(c => ks.some(k => c.includes(k)));
+  const C = {id: acha("pedido","order","id"), t: acha("date","data","tempo","time","hora"), par: acha("pair","par","symbol","mercado"), lado: acha("side","lado","tipo"),
+    preco: acha("price","preco"), exec: acha("executed","executado","filled"), total: acha("amount","quantidade","total"), taxa: acha("fee","taxa")};
+  if(C.id >= 0 && [C.t,C.par,C.lado,C.preco,C.exec,C.total,C.taxa].includes(C.id)) C.id = -1;
+  if([C.t,C.par,C.lado,C.preco,C.exec].some(x=>x<0)){ mostrarImport("Não reconheci as colunas deste CSV. Me mande o arquivo para eu ajustar a leitura."); return; }
+  if(primeira){ const ct = cab[C.t]; $("impFuso").value = /utc\s*[-−]+\s*3|-03|brasil/.test(ct) ? "br" : "utc"; }
+  const desloc = $("impFuso").value === "utc" ? 0 : 3*3600000;
+  impTrades = [];
+  linhas.slice(1).forEach(l => {
+    const par = String(l[C.par]||"").replace(/[^A-Za-z]/g,"").toUpperCase(); if(par !== "BTCBRL") return;
+    const m = /(\d{4})-(\d{2})-(\d{2})[ T](\d{2}):(\d{2})(?::(\d{2}))?/.exec(l[C.t]||""); if(!m) return;
+    const t = Date.UTC(+m[1], +m[2]-1, +m[3], +m[4], +m[5], +(m[6]||0)) + desloc;
+    const lado = /buy|compra/i.test(l[C.lado]) ? "BUY" : /sell|venda/i.test(l[C.lado]) ? "SELL" : ""; if(!lado) return;
+    const ex = valorUnid(l[C.exec]), pr = valorUnid(l[C.preco]).v, tot = C.total>=0 ? valorUnid(l[C.total]) : {v: ex.v*pr, a:"BRL"}, tx = C.taxa>=0 ? valorUnid(l[C.taxa]) : {v:NaN, a:""};
+    if(!(ex.v > 0) || !(pr > 0)) return;
+    impTrades.push({id: C.id>=0 ? String(l[C.id]).trim() : (t+lado+pr+ex.v), t, lado, preco: pr, qtd: ex.v, brl: tot.v, taxa: tx.v, taxaA: tx.a || (lado==="BUY" ? "BTC" : "BRL")});
+  });
+  impTrades.sort((a,b)=>a.t-b.t);
+  montarOps(); renderImport();
+}
+/* Junta compra(s) → venda(s) até a próxima compra. */
+function montarOps(){
+  impOps = []; let cur = null, sobra = 0, semCompra = 0;
+  const fecha = () => {
+    if(!cur) return;
+    if(!cur.vendas.length){ cur.aberta = true; impOps.push(cur); cur = null; return; }
+    const qB = cur.compras.reduce((a,x)=>a+x.qtd,0), vB = cur.compras.reduce((a,x)=>a+x.preco*x.qtd,0);
+    const qS = cur.vendas.reduce((a,x)=>a+x.qtd,0), vS = cur.vendas.reduce((a,x)=>a+x.preco*x.qtd,0);
+    const feeBTC = cur.compras.reduce((a,x)=>a + (x.taxaA==="BTC" && isFinite(x.taxa) ? x.taxa : x.taxaA==="BTC" ? x.qtd*0.001 : 0),0);
+    const feeBuyBRL = cur.compras.reduce((a,x)=>a + (x.taxaA==="BRL" && isFinite(x.taxa) ? x.taxa : 0),0);
+    const feeBRL = cur.vendas.reduce((a,x)=>a + (x.taxaA==="BRL" && isFinite(x.taxa) ? x.taxa : x.taxaA==="BTC" && isFinite(x.taxa) ? x.taxa*x.preco : x.preco*x.qtd*0.001),0);
+    const entrada = vB/qB, saida = vS/qS, sobraIni = sobra;
+    const sobraFim = Math.max(0, +(sobraIni + qB - feeBTC - qS).toFixed(8));
+    const op = {chave: cur.compras[0].id + ">" + cur.vendas[cur.vendas.length-1].id, tIn: cur.compras[0].t, tOut: cur.vendas[cur.vendas.length-1].t,
+      entrada, qtd: qB, saida, qtdV: qS, sobraIni, sobraFim, taxaCompraBTC: feeBTC + feeBuyBRL/entrada, taxaVendaBRL: feeBRL,
+      motivo: saida > entrada*(1+TAXA/100) ? "Trailing (gain)" : "Trailing (stop)", sinal: false, nota: "importado do CSV"};
+    sobra = sobraFim; impOps.push(op); cur = null;
+  };
+  impTrades.forEach(tr => {
+    if(tr.lado === "BUY"){ if(cur && cur.vendas.length) fecha(); if(!cur) cur = {compras:[], vendas:[]}; cur.compras.push(tr); }
+    else { if(!cur){ semCompra++; return; } cur.vendas.push(tr); }
+  });
+  fecha();
+  impOps.semCompra = semCompra;
+  // já está no diário? (mesmo pedido, ou registrado à mão com a mesma compra)
+  impOps.forEach(op => {
+    if(op.aberta) return;
+    const igual = diario.find(d => d.chave && d.chave === op.chave);
+    const mao = diario.find(d => !d.chave && Math.abs(d.tIn - op.tIn) < 10*60000 && Math.abs(d.entrada - op.entrada) < 2);
+    op.status = igual ? "igual" : mao ? "mao" : "novo";
+    op.alvo = mao ? mao.id : null;
+    if(mao){ op.sinal = !!mao.sinal; op.motivo = mao.motivo || op.motivo; op.nota = mao.nota || op.nota; }
+    op.incluir = op.status !== "igual";
+  });
+}
+function mostrarImport(msg){ $("boxImport").hidden = false; $("impInfo").textContent = msg; $("impLista").innerHTML = ""; }
+function renderImport(){
+  $("boxImport").hidden = false;
+  const fech = impOps.filter(o=>!o.aberta), novos = fech.filter(o=>o.status==="novo").length, mao = fech.filter(o=>o.status==="mao").length, iguais = fech.filter(o=>o.status==="igual").length;
+  const abertas = impOps.filter(o=>o.aberta).length;
+  $("impInfo").innerHTML = `Encontrei <b>${impTrades.length}</b> negócios de BTC/BRL → <b>${fech.length}</b> operações completas: ${novos} novas, ${mao} já registradas à mão (serão atualizadas com os valores exatos) e ${iguais} já importadas antes (ignoradas).`
+    + (abertas ? ` ${abertas} compra(s) ainda sem venda no arquivo ficam de fora.` : "")
+    + (impOps.semCompra ? ` ${impOps.semCompra} venda(s) sem a compra no período do arquivo ficaram de fora.` : "")
+    + " Confira os horários: se estiverem 3 h adiantados ou atrasados, troque o horário do arquivo abaixo.";
+  const motivos = ["Trailing (stop)","Trailing (gain)","Sinal de saída","Fim do horário","Manual"];
+  $("impLista").innerHTML = fech.map((o,i)=>{
+    const c = contaOp(o), k = impOps.indexOf(o);
+    const st = o.status === "igual" ? "já importada" : o.status === "mao" ? "atualiza a registrada" : "nova";
+    return `<tr><td><input type="checkbox" data-k="${k}" class="impInc" ${o.incluir?"checked":""} ${o.status==="igual"?"disabled":""} aria-label="Incluir"></td>
+      <td>${fDH(o.tIn)} → ${fHM(o.tOut)}<br><span class="mono">${fP(o.entrada)} → ${fP(o.saida)}</span><br><span class="nota" style="margin:0">${st}</span></td>
+      <td class="mono ${c.res>=0?"pos":"neg"}">${fRs(c.res)}<br>${fPct(c.pct)}</td>
+      <td><select data-k="${k}" class="impSin"><option value="nao" ${!o.sinal?"selected":""}>Não</option><option value="sim" ${o.sinal?"selected":""}>Sim</option></select></td>
+      <td><select data-k="${k}" class="impMot">${motivos.map(m=>`<option ${m===o.motivo?"selected":""}>${m}</option>`).join("")}</select></td></tr>`;
+  }).join("") || `<tr><td colspan="5" style="color:var(--muted)">Nenhuma operação completa (compra e venda) de BTC/BRL no arquivo.</td></tr>`;
+}
+$("impLista").addEventListener("change", ev => {
+  const el = ev.target, o = impOps[+el.dataset.k]; if(!o) return;
+  if(el.classList.contains("impInc")) o.incluir = el.checked;
+  if(el.classList.contains("impSin")) o.sinal = el.value === "sim";
+  if(el.classList.contains("impMot")) o.motivo = el.value;
+});
+$("impSalvar").addEventListener("click", ()=>{
+  let n = 0;
+  impOps.filter(o=>!o.aberta && o.incluir && o.status!=="igual").forEach(o => {
+    const dados = {chave:o.chave, tIn:o.tIn, tOut:o.tOut, entrada:o.entrada, qtd:o.qtd, saida:o.saida, qtdV:o.qtdV, sobraIni:o.sobraIni, sobraFim:o.sobraFim,
+      taxaCompraBTC:o.taxaCompraBTC, taxaVendaBRL:o.taxaVendaBRL, motivo:o.motivo, sinal:o.sinal, nota:o.nota};
+    if(o.status === "mao"){ const k = diario.findIndex(d=>d.id===o.alvo); if(k>=0){ diario[k] = Object.assign({}, diario[k], dados); n++; return; } }
+    diario.push(Object.assign({id: Date.now() + Math.random()}, dados)); n++;
+  });
+  const ultima = diario.slice().sort((a,b)=>a.tOut-b.tOut).pop(); if(ultima) sobraConta = ultima.sobraFim || 0;
+  salvarDiario(); renderDiario(); if(!pos) preencherPos();
+  $("boxImport").hidden = true; $("sumDiario").textContent += " · " + n + " importada(s)";
+});
 
 /* ---------- mercados ---------- */
 const PARES = ["USDTBRL","BTCBRL","BTCUSDT"];
