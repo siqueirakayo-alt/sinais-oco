@@ -166,6 +166,26 @@ footer{color:var(--muted);font-size:.72rem;line-height:1.5}
 #formDiario{margin-top:10px;border-top:1px dashed var(--line);padding-top:10px}
 textarea{width:100%;min-height:90px;background:var(--bg);color:var(--fg);border:1px solid var(--line);border-radius:6px;font-family:var(--mono);font-size:12px;padding:8px}
 @media (max-width:370px){.kpis{grid-template-columns:1fr 1fr}.comp{grid-template-columns:1fr}}
+.reguas{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.reguas .regua{background:var(--panel);border:1px solid var(--line);border-radius:12px;min-height:340px;padding:10px}
+.regua .cab{display:flex;justify-content:space-between;align-items:baseline;gap:4px}
+.regua .cab b{font-size:.8rem}
+.regua .cab span{font-size:.64rem;color:var(--muted);font-family:var(--mono)}
+.regua .dol{font-size:.64rem;color:var(--muted);font-family:var(--mono);margin-top:2px;min-height:1em}
+.regua .dol b{color:var(--fg)}
+.decomp{display:grid;grid-template-columns:1fr auto 1fr auto 1fr;gap:4px;align-items:center;margin-top:8px;text-align:center}
+.decomp div{background:var(--panel2);border-radius:8px;padding:8px 4px;font-size:.68rem;color:var(--muted);line-height:1.3}
+.decomp b{display:block;font-family:var(--mono);font-size:1rem}
+.decomp i{font-style:normal;color:var(--muted);font-family:var(--mono)}
+.ordem{margin-top:12px;background:var(--panel2);border-radius:10px;padding:10px;border-left:3px solid var(--info)}
+.ordem.c{border-left-color:var(--buy)} .ordem.v{border-left-color:var(--sell)}
+.ordem .tit{display:flex;justify-content:space-between;align-items:center;gap:6px;font-size:.8rem;font-weight:700}
+.ordem .tit span{font-size:.7rem;color:var(--muted);font-weight:500}
+.ordem .grid2{display:grid;grid-template-columns:1fr 1fr;gap:0 6px}
+.ordem .campo{background:var(--panel)}
+.ordem + .ordem{margin-top:8px}
+.ordem .passoAntes{margin-top:8px}
+@media (max-width:370px){.reguas{grid-template-columns:1fr}.reguas .regua{min-height:280px}.ordem .grid2{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -225,6 +245,8 @@ textarea{width:100%;min-height:90px;background:var(--bg);color:var(--fg);border:
     <div class="trilho-leg"><span id="legStop">—</span><span id="legPreco">—</span><span id="legLucro">—</span></div>
   </div>
 
+  <div class="ordem" id="ordem" hidden></div>
+
   <div class="posbox" id="boxEntrei">
     <div class="rot">Minha operação</div>
     <div class="subtit">Registrar entrada</div>
@@ -267,22 +289,27 @@ textarea{width:100%;min-height:90px;background:var(--bg);color:var(--fg);border:
   <div class="linhaCtx" id="contexto">—</div>
 </section>
 
-<!-- Bilhete + régua -->
-<section class="spot">
-  <div class="card">
-    <div class="abas"><button class="c on" id="abaC" type="button">Comprar</button><button class="v" id="abaV" type="button">Vender</button></div>
-    <div id="formC">
-      <div id="formCDin"></div>
-      <div class="campo"><div><span class="lb">Valor da entrada (R$)</span></div><input id="valorEntrada" type="number" step="1" min="10" inputmode="decimal" aria-label="Valor da entrada em reais"></div>
-    </div>
-    <div id="formV" class="esconde"></div>
-  </div>
+<!-- Réguas: reais e dólar -->
+<section class="reguas">
   <div class="regua" id="regua">
-    <div class="tit">Régua de preço</div>
-    <div class="faixa g" id="fG"></div>
-    <div class="faixa r" id="fR"></div>
+    <div class="cab"><b>Em reais</b><span>BTC/BRL</span></div>
+    <div class="dol" id="cabBrl">&nbsp;</div>
+    <div class="faixa g" id="fG"></div><div class="faixa r" id="fR"></div>
     <div id="niveis"></div>
   </div>
+  <div class="regua" id="reguaUsd">
+    <div class="cab"><b>Em dólar</b><span>BTC/USDT</span></div>
+    <div class="dol" id="cabUsd">—</div>
+    <div class="faixa g" id="fGu"></div><div class="faixa r" id="fRu"></div>
+    <div id="niveisUsd"></div>
+  </div>
+</section>
+
+<!-- De onde vem o resultado -->
+<section class="card">
+  <div class="rot" id="decTit">De onde vem o resultado</div>
+  <div class="decomp" id="decomp"></div>
+  <p class="nota" id="decNota">—</p>
 </section>
 
 <!-- Gráfico -->
@@ -365,6 +392,7 @@ textarea{width:100%;min-height:90px;background:var(--bg);color:var(--fg);border:
 <details id="ajustes">
   <summary><span class="rot">Ajustes</span><span class="sum" id="sumAj">—</span></summary>
   <div class="campos">
+    <label for="valorEntrada">Valor da entrada (R$)<input id="valorEntrada" type="number" step="1" min="10" inputmode="decimal"></label>
     <label for="td">Trailing (T/D)<select id="td"><option value="0">Automático (pela volatilidade)</option><option value="0.5">0,5%</option><option value="1">1%</option><option value="1.5">1,5%</option><option value="2">2%</option></select></label>
     <label for="saida">Como sair<select id="saida"><option value="sinais">Trailing + sinais de saída</option><option value="trailing">Só o trailing</option></select></label>
     <label for="entrada">Como entrar<select id="entrada"><option value="mercado">A mercado, no sinal</option><option value="repique">No repique (trailing de compra)</option></select></label>
@@ -610,7 +638,9 @@ function sinalFormando(){
 
 /* ---------- tela: sinal, bilhete e régua ---------- */
 const ORDEM = ["aguardando","formando","compre","operacao","saia"];
+let etapaAtual = "";
 function quadro(etapa, tom, titulo, expl){
+  etapaAtual = etapa;
   document.querySelectorAll(".etapa").forEach(d=>{
     const i = ORDEM.indexOf(d.dataset.k), a = ORDEM.indexOf(etapa);
     d.className = "etapa" + (i<a ? " feita" : "") + (i===a ? " atual t-"+tom : "");
@@ -665,35 +695,71 @@ function bilheteVenda(qtdVenda, td, sair){
     + campo("Quantia (BTC)", fQ(qtdVenda), fQ(qtdVenda)) + `<div class="caixinha"><i></i>Preço de Ativação (desmarcado)</div>`
     + `<div class="btnfake v">Vender BTC</div><p class="nota">Logo depois da compra. Se subir, o stop sobe junto e vende quando cair ${fTd(td)} do topo.</p>`;
 }
-function aba(qual, auto){
-  if(auto && Date.now() - abaManual < 60000) return;
-  const c = qual === "c";
-  $("abaC").classList.toggle("on", c); $("abaV").classList.toggle("on", !c);
-  $("formC").classList.toggle("esconde", !c); $("formV").classList.toggle("esconde", c);
-}
-$("abaC").addEventListener("click", ()=>{ abaManual = Date.now(); aba("c"); });
-$("abaV").addEventListener("click", ()=>{ abaManual = Date.now(); aba("v"); });
+function aba(){}   // o bilhete com abas saiu; a ordem agora aparece resumida no quadro do sinal
 document.addEventListener("click", ev => {
   const b = ev.target.closest(".copiar"); if(!b) return;
   const ok = () => { b.textContent = "Copiado"; b.classList.add("ok"); setTimeout(()=>{ b.textContent="Copiar"; b.classList.remove("ok"); }, 1500); };
   try{ navigator.clipboard.writeText(b.dataset.c).then(ok, ok); }catch(e){ ok(); }
 });
-let htmlC = "", htmlV = "";
-function setBilhete(c, v){
-  if(c !== htmlC){ $("formCDin").innerHTML = c; htmlC = c; }
-  if(v !== htmlV){ $("formV").innerHTML = v; htmlV = v; }
+let htmlC = "", htmlV = "", htmlOrdem = "";
+function setBilhete(c, v){ htmlC = c; htmlV = v; }
+/* Mostra a ordem só quando há algo a fazer na Binance. */
+function renderOrdem(){
+  const limpa = s => s.replace(/<div class="btnfake[^"]*">[^<]*<\/div>/g, "");
+  const bloco = (cls, tit, sub, corpo) => {
+    const m = /^([\s\S]*?)(<div class="caixinha|<p class="nota|$)/.exec(limpa(corpo));
+    const campos = m[1].replace(/<div class="passoAntes">[\s\S]*?<\/div>/, "");
+    const antes = (/<div class="passoAntes">[\s\S]*?<\/div>/.exec(corpo)||[""])[0];
+    const resto = limpa(corpo).slice(m[1].length);
+    return `<div class="ordem ${cls}"><div class="tit">${tit}<span>${sub||""}</span></div>${antes}<div class="grid2">${campos}</div>${resto}</div>`;
+  };
+  let html = "";
+  const sair = /passoAntes/.test(htmlV);
+  if(etapaAtual === "compre"){
+    html = bloco("c", cfg.entrada === "repique" && /Trailing Stop/.test(htmlC) ? "1 · Aba Comprar → Trailing Stop" : "1 · Aba Comprar → Market", "agora", htmlC)
+         + bloco("v", "2 · Logo depois: aba Vender → Trailing Stop", "proteção", htmlV);
+  } else if(pos && etapaAtual === "operacao"){
+    html = bloco("", "Ordem na Binance: Vender → Trailing Stop", "já colocada", htmlV);
+  } else if(pos && etapaAtual === "saia"){
+    html = bloco("v", sair ? "Sair: aba Vender → Market" : "Confira em Ordens abertas", sair ? "agora" : "", htmlV);
+  }
+  if(html !== htmlOrdem){ $("ordem").innerHTML = html; htmlOrdem = html; }
+  $("ordem").hidden = !html;
 }
 /* Régua: níveis em escala, do maior (em cima) para o menor (embaixo), sem sobreposição. */
-function regua(niveis){
+function regua(niveis){ reguaEm({n:"niveis", g:"fG", r:"fR"}, niveis, fP); }
+function reguaEm(ids, niveis, fmt){
+  niveis = niveis.filter(n => isFinite(n.p));
+  if(!niveis.length){ $(ids.n).innerHTML = ""; return; }
   const ps = niveis.map(n=>n.p), max = Math.max(...ps), min = Math.min(...ps), amp = (max-min) || max*0.01;
-  const topo = 14, base = 92;
+  const topo = 18, base = 92;
   let lista = niveis.map(n=>Object.assign({}, n, {y: topo + (max - n.p)/amp*(base-topo)})).sort((a,b)=>a.y-b.y);
   for(let i=1;i<lista.length;i++) if(lista[i].y - lista[i-1].y < 13) lista[i].y = lista[i-1].y + 13;
   const exc = lista[lista.length-1].y - 94; if(exc > 0) lista.forEach(n=> n.y -= exc*(n.y-topo)/(lista[lista.length-1].y-topo));
-  $("niveis").innerHTML = lista.map(n=>`<div class="nivel ${n.c}" style="top:${n.y}%"><div class="ln"></div>${n.t}<b>${fP(n.p)}</b></div>`).join("");
+  $(ids.n).innerHTML = lista.map(n=>`<div class="nivel ${n.c}" style="top:${n.y}%"><div class="ln"></div>${n.t}<b>${n.aprox ? "≈ " : ""}${fmt(n.p)}</b></div>`).join("");
   const yA = (lista.find(n=>n.c==="atual")||{y:50}).y, yL = (lista.find(n=>n.c==="lucro")||{y:topo}).y, yS = (lista.find(n=>n.c==="stop")||{y:base}).y;
-  $("fG").style.top = yL + "%"; $("fG").style.height = Math.max(0, yA - yL) + "%";
-  $("fR").style.top = yA + "%"; $("fR").style.height = Math.max(0, yS - yA + 6) + "%";
+  $(ids.g).style.top = yL + "%"; $(ids.g).style.height = Math.max(0, yA - yL) + "%";
+  $(ids.r).style.top = yA + "%"; $(ids.r).style.height = Math.max(0, yS - yA + 6) + "%";
+}
+/* Dólar: agora (mercados ao vivo) e no momento da compra (histórico de 15 min do USDT/BRL). */
+const usdAgora = () => (mkt.USDTBRL && mkt.USDTBRL.p) || (velasUsd.length ? velasUsd[velasUsd.length-1].c : NaN);
+function usdEm(t){
+  for(let i=velasUsd.length-1;i>=0;i--){ const k = velasUsd[i]; if(k.t <= t) return (t <= k.T+1) ? k.c : NaN; }
+  return NaN;
+}
+const fU = x => fN(x, 0), fD3 = x => fN(x, 3);
+function decomp(a, d, t, titulo, nota){
+  $("decTit").textContent = "De onde vem o resultado · " + titulo;
+  const cel = (rot, v) => `<div>${rot}<b class="${v>=0?"pos":"neg"}">${isFinite(v) ? fPct(v,2) : "—"}</b></div>`;
+  $("decomp").innerHTML = cel("BTC em dólar", a) + "<i>+</i>" + cel("Dólar (USDT/BRL)", d) + "<i>=</i>" + cel("BTC em reais", t);
+  let txt = nota || "";
+  if(isFinite(a) && isFinite(d)){
+    if(a < 0 && d > 0) txt += " O bitcoin caiu lá fora, mas o dólar subiu e compensou " + (t >= 0 ? "tudo." : "parte.");
+    else if(a > 0 && d < 0) txt += " O bitcoin subiu lá fora, mas o real se valorizou e tirou " + (t <= 0 ? "todo o ganho." : "parte do ganho.");
+    else if(a >= 0 && d >= 0) txt += " Bitcoin e dólar subiram juntos: os dois ajudaram.";
+    else txt += " Bitcoin e dólar caíram juntos: os dois atrapalharam.";
+  }
+  $("decNota").textContent = txt.trim();
 }
 
 function atualizarSinal(){
@@ -704,17 +770,42 @@ function atualizarSinal(){
   const ok = contextoOK();
   let chave = null;
   $("boxEntrei").hidden = !!pos; $("boxEncerrar").hidden = !pos;
-  const refRegua = () => regua([
-    {t:"Lucro começa", p:lucroDe(preco, tdAgora), c:"lucro"},
-    {t:"Preço agora", p:preco, c:"atual"},
-    {t:"Trailing vende", p:preco*(1-tdAgora/100), c:"stop"}]);
+  const refRegua = () => {
+    regua([
+      {t:"Lucro começa", p:lucroDe(preco, tdAgora), c:"lucro"},
+      {t:"Preço agora", p:preco, c:"atual"},
+      {t:"Trailing vende", p:preco*(1-tdAgora/100), c:"stop"}]);
+    const u = usdAgora();
+    $("cabBrl").innerHTML = "se entrasse agora";
+    $("cabUsd").innerHTML = isFinite(u) ? "Dólar agora <b>R$ " + fD3(u) + "</b>" : "carregando o dólar…";
+    reguaEm({n:"niveisUsd", g:"fGu", r:"fRu"}, [
+      {t:"Lucro começa", p:lucroDe(preco, tdAgora)/u, c:"lucro", aprox:true},
+      {t:"BTC agora", p:(mkt.BTCUSDT && mkt.BTCUSDT.p) || preco/u, c:"atual"},
+      {t:"Trailing vende", p:preco*(1-tdAgora/100)/u, c:"stop", aprox:true}], fU);
+    if(mkt.BTCUSDT && mkt.USDTBRL && mkt.BTCBRL) decomp(mkt.BTCUSDT.v, mkt.USDTBRL.v, mkt.BTCBRL.v, "últimas 24h", "Sem operação aberta: variação do mercado nas últimas 24 horas.");
+  };
   const posRegua = (p, a) => { const l = [
     {t:"Lucro a partir de", p:lucroDe(p.entrada, p.td), c:"lucro"},
     {t:"Preço agora", p:a.preco, c:"atual"},
     {t:"Entrada", p:p.entrada, c:"ent"},
     {t:"Trailing vende", p:a.nivel, c:"stop"}];
     if(a.topo > a.preco*1.0005 && a.topo > p.entrada*1.0005) l.push({t:"Topo", p:a.topo, c:"topo"});
-    regua(l); };
+    regua(l);
+    const t0 = p.fillT || p.t, uE = usdEm(t0), uN = usdAgora();
+    $("cabBrl").innerHTML = "compra às <b>" + fHM(t0) + "</b>";
+    $("cabUsd").innerHTML = isFinite(uE) && isFinite(uN) ? "Dólar " + fD3(uE) + " → <b>" + fD3(uN) + "</b>" : isFinite(uN) ? "Dólar agora <b>" + fD3(uN) + "</b>" : "carregando o dólar…";
+    const lu = [
+      {t:"Lucro a partir de", p:lucroDe(p.entrada, p.td)/uN, c:"lucro", aprox:true},
+      {t:"BTC agora", p:a.preco/uN, c:"atual"},
+      {t:"Trailing vende", p:a.nivel/uN, c:"stop", aprox:true}];
+    if(isFinite(uE)) lu.push({t:"Entrada (real)", p:p.entrada/uE, c:"ent"});
+    if(a.topo > a.preco*1.0005 && a.topo > p.entrada*1.0005) lu.push({t:"Topo", p:a.topo/uN, c:"topo", aprox:true});
+    reguaEm({n:"niveisUsd", g:"fGu", r:"fRu"}, lu, fU);
+    if(isFinite(uE) && isFinite(uN)){
+      const btcE = p.entrada/uE, btcN = a.preco/uN;
+      decomp((btcN/btcE-1)*100, (uN/uE-1)*100, (a.preco/p.entrada-1)*100, "desde a compra (" + fHM(t0) + ")", "Sem contar as taxas.");
+    } else decomp(NaN, NaN, (a.preco/p.entrada-1)*100, "desde a compra", "O dólar da hora da compra ainda está carregando.");
+  };
   const refBilhete = () => { const q = quantias(preco, tdAgora); setBilhete(bilheteCompra("mercado", preco, tdAgora), bilheteVenda(qtdVendaReal(q.qtd), tdAgora)); };
 
   if(pos){
@@ -742,7 +833,7 @@ function atualizarSinal(){
     refRegua(); aba("c", true);
   } else if(r.aberta && agora - r.aberta.fillT < TF_MS){
     const a = r.aberta;
-    quadro("compre","buy","COMPRE AGORA","Sinal às " + fHM(a.T) + " a cerca de " + fP(a.entrada) + ". Faça a compra (aba Comprar), logo em seguida a proteção (aba Vender) e toque em \"Entrei\".");
+    quadro("compre","buy","COMPRE AGORA","Sinal às " + fHM(a.T) + " a cerca de " + fP(a.entrada) + ". Faça os 2 passos abaixo na Binance e depois registre a entrada.");
     chave = "c"+a.T; mostrarCondicoes("var(--buy)");
     const q = quantias(preco, a.td);
     setBilhete(bilheteCompra("mercado", preco, a.td), bilheteVenda(qtdVendaReal(q.qtd), a.td));
@@ -774,6 +865,7 @@ function atualizarSinal(){
     }
     refBilhete(); refRegua();
   }
+  renderOrdem();
   if(chave && chave !== ultimoAviso){ if(ultimoAviso !== null) avisar($("status").textContent, $("expl").textContent); ultimoAviso = chave; }
   if(ultimoAviso === null) ultimoAviso = "inicio";
 }
