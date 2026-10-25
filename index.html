@@ -95,6 +95,11 @@ footer{color:var(--muted);font-size:.75rem;line-height:1.5}
 .prog{font-family:var(--mono);font-size:.82rem;color:var(--muted);margin-top:8px}
 .resumo{margin-top:10px;font-size:.88rem;line-height:1.45}
 th.grp{text-align:center;border-bottom:none;padding-bottom:0}
+.titulo-rel{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap}
+.relogio-br{font-family:var(--mono);font-size:1.05rem;font-weight:600;font-variant-numeric:tabular-nums}
+.relogio-br::after{content:" Brasília";font-family:var(--sans);font-size:.7rem;font-weight:500;color:var(--muted)}
+tr.h24 td:first-child{border-left:3px solid var(--info);padding-left:6px}
+tr.aberta td{background:rgba(46,189,133,.08)}
 </style>
 </head>
 <body>
@@ -189,7 +194,8 @@ th.grp{text-align:center;border-bottom:none;padding-bottom:0}
 </section>
 
 <section class="card">
-  <div class="rot">Últimas operações do alvo escolhido</div>
+  <div class="titulo-rel"><div class="rot">Últimas 10 operações do alvo escolhido</div><div class="relogio-br" id="relogio" aria-label="Horário de Brasília">--:--:--</div></div>
+  <p class="nota" id="ult24">—</p>
   <div class="scroll">
     <table>
       <thead><tr><th>Entrada</th><th>Preço</th><th>Saída</th><th>Motivo</th><th>Result.</th></tr></thead>
@@ -200,14 +206,14 @@ th.grp{text-align:center;border-bottom:none;padding-bottom:0}
 
 <section class="card">
   <div class="rot">Explorador de ajustes</div>
-  <p class="nota">Testa BTC, ETH, SOL e USDT em reais, nos candles de 1 hora, 4 horas e diário, com várias combinações de alvo, stop e filtro de tendência, já com as taxas. O último ano é dividido em duas partes: os <b>8 primeiros meses</b>, onde as combinações são comparadas, e os <b>4 últimos</b>, que servem de prova. Só vale confiar no que ficou positivo nas duas.</p>
+  <p class="nota">Testa BTC/BRL e USDT/BRL, nos candles de 15 min, 1 hora, 4 horas e diário, com várias combinações de alvo, stop e filtro de tendência, já com as taxas. O histórico (até 1 ano) é dividido em duas partes: os <b>primeiros 2/3</b>, onde as combinações são comparadas, e o <b>último 1/3</b>, que serve de prova. Só vale confiar no que ficou positivo nas duas.</p>
   <div class="botoes" style="margin-top:10px"><button id="btnExplorar" type="button">Testar combinações</button></div>
   <div class="prog" id="expProg" hidden></div>
   <div class="resumo" id="expResumo" hidden></div>
   <div class="scroll exp-res" id="expTabela" hidden>
     <table>
       <thead>
-        <tr><th></th><th></th><th></th><th class="grp" colspan="2">8 meses</th><th class="grp" colspan="2">4 meses (prova)</th><th></th></tr>
+        <tr><th></th><th></th><th></th><th class="grp" colspan="2">Comparação</th><th class="grp" colspan="2">Prova</th><th></th></tr>
         <tr><th>Ativo</th><th>Candle</th><th>Ajuste</th><th>Ops</th><th>Result.</th><th>Ops</th><th>Result.</th><th></th></tr>
       </thead>
       <tbody id="expCorpo"></tbody>
@@ -218,7 +224,7 @@ th.grp{text-align:center;border-bottom:none;padding-bottom:0}
 <details class="card" id="ajustes">
   <summary>Ajustes</summary>
   <div class="campos">
-    <label for="ativo">Ativo<select id="ativo"><option value="BTCBRL">BTC/BRL</option><option value="ETHBRL">ETH/BRL</option><option value="SOLBRL">SOL/BRL</option><option value="USDTBRL">USDT/BRL (dólar)</option></select></label>
+    <label for="ativo">Ativo<select id="ativo"><option value="BTCBRL">BTC/BRL</option><option value="USDTBRL">USDT/BRL (dólar)</option></select></label>
     <label for="tf">Tempo do candle<select id="tf"><option value="5m">5 min (day trade)</option><option value="15m">15 min</option><option value="1h">1 hora</option><option value="4h">4 horas</option><option value="1d">Diário (semanal)</option></select></label>
     <label for="rr">Alvo (× o risco)<select id="rr"><option value="1">1×</option><option value="1.5">1,5×</option><option value="2">2×</option></select></label>
     <label for="tempo">Tempo máximo (min)<input id="tempo" type="number" step="5" min="5"></label>
@@ -228,11 +234,11 @@ th.grp{text-align:center;border-bottom:none;padding-bottom:0}
     <label for="fgMax">Bloquear com índice a partir de<input id="fgMax" type="number" step="1" min="50" max="100"></label>
     <label for="mvrvMan">MVRV manual (0 = automático)<input id="mvrvMan" type="number" step="0.01" min="0"></label>
     <label for="fgMan">Medo e Ganância manual (0 = automático)<input id="fgMan" type="number" step="1" min="0" max="100"></label>
-    <label for="banca">Banca na Binance (R$)<input id="banca" type="number" step="1" min="10"></label>
+    <label for="banca">Pote para operar (R$)<input id="banca" type="number" step="1" min="10"></label>
     <label class="check" for="filtro200"><input id="filtro200" type="checkbox"> Só comprar acima da média de 200 (filtro de tendência)</label>
     <label class="check" for="taxaBnb"><input id="taxaBnb" type="checkbox"> Pago as taxas com BNB (0,075% por ordem; sem BNB, 0,1%)</label>
   </div>
-  <p class="nota">MVRV e Medo e Ganância são carregados automaticamente (Coin Metrics e alternative.me) e só bloqueiam sinais de BTC, ETH e SOL. Se quiser usar outro valor, digite nos campos manuais; ele vale até você zerar o campo.</p>
+  <p class="nota">MVRV e Medo e Ganância são carregados automaticamente (Coin Metrics e alternative.me) e só bloqueiam sinais de BTC. Se quiser usar outro valor, digite nos campos manuais; ele vale até você zerar o campo.</p>
 </details>
 
 <div class="botoes">
@@ -249,22 +255,20 @@ th.grp{text-align:center;border-bottom:none;padding-bottom:0}
 (function(){
 "use strict";
 const $ = id => document.getElementById(id);
-const TFS = {"5m":{ms:5*60000, nome:"5 min", paginas:4, tempo:1440}, "15m":{ms:15*60000, nome:"15 min", paginas:4, tempo:1440},
+const TFS = {"5m":{ms:5*60000, nome:"5 min", paginas:12, tempo:1440}, "15m":{ms:15*60000, nome:"15 min", paginas:12, tempo:1440},
   "1h":{ms:3600000, nome:"1 hora", paginas:9, tempo:2880}, "4h":{ms:4*3600000, nome:"4 horas", paginas:3, tempo:10080},
   "1d":{ms:86400000, nome:"diário", paginas:1, tempo:10080}};
 const ATIVOS = {BTCBRL:{nome:"BTC/BRL", base:"BTC", tick:1, passo:0.00001},
-  ETHBRL:{nome:"ETH/BRL", base:"ETH", tick:1, passo:0.0001},
-  SOLBRL:{nome:"SOL/BRL", base:"SOL", tick:0.1, passo:0.001},
   USDTBRL:{nome:"USDT/BRL", base:"USDT", tick:0.001, passo:0.1}};
 const REST = ["https://data-api.binance.vision","https://api.binance.com","https://api1.binance.com"];
 
 /* ---------- ajustes ---------- */
-const PADRAO = {valorEntrada:15, banca:100, rr:1.5, tempo:10080, atrMult:1.5, minStop:1, mvrvMax:3, fgMax:80, mvrvMan:0, fgMan:0, taxaBnb:true, filtro200:true};
-let cfg = Object.assign({}, PADRAO, {tf:"1d", ativo:"BTCBRL"});
-try{ const s = JSON.parse(localStorage.getItem("sinaisOCO.brl3")||"null"); if(s) Object.assign(cfg, s); }catch(e){}
-if(!TFS[cfg.tf]) cfg.tf = "1d";
+const PADRAO = {valorEntrada:20, banca:20, rr:1.5, tempo:1440, atrMult:1.5, minStop:1, mvrvMax:3, fgMax:80, mvrvMan:0, fgMan:0, taxaBnb:true, filtro200:true};
+let cfg = Object.assign({}, PADRAO, {tf:"15m", ativo:"BTCBRL"});
+try{ const s = JSON.parse(localStorage.getItem("sinaisOCO.v5")||"null"); if(s) Object.assign(cfg, s); }catch(e){}
+if(!TFS[cfg.tf]) cfg.tf = "15m";
 if(!ATIVOS[cfg.ativo]) cfg.ativo = "BTCBRL";
-function salvar(){ try{ localStorage.setItem("sinaisOCO.brl3", JSON.stringify(cfg)); }catch(e){} }
+function salvar(){ try{ localStorage.setItem("sinaisOCO.v5", JSON.stringify(cfg)); }catch(e){} }
 
 let TF_MS = TFS[cfg.tf].ms;
 let INFO = Object.assign({minimo:10}, ATIVOS[cfg.ativo]);   // tick, passo e mínimo reais vêm da Binance
@@ -331,7 +335,7 @@ function calcIndicadores(){
 function mvrvAtual(){ return cfg.mvrvMan>0 ? cfg.mvrvMan : ctx.mvrv; }
 function fgAtual(){ return cfg.fgMan>0 ? cfg.fgMan : ctx.fg; }
 function contextoOK(){
-  if(cfg.ativo==="USDTBRL") return {mvrv:true, fg:true};
+  if(cfg.ativo!=="BTCBRL") return {mvrv:true, fg:true};
   const m = mvrvAtual(), f = fgAtual();
   return { mvrv: !(isFinite(m) && m >= cfg.mvrvMax), fg: !(isFinite(f) && f >= cfg.fgMax) };
 }
@@ -398,8 +402,9 @@ function mostrar(tone, estado, instr, op, ehRef){
   }
 }
 
-function tempoTexto(ms){
-  if(ms <= 0) return "0 min";
+function tempoTexto(ms, seg){
+  if(!(ms > 0)) return "0 min";
+  if(seg && ms < 3600000) return Math.floor(ms/60000) + " min " + String(Math.floor(ms/1000)%60).padStart(2,"0") + " s";
   const d = Math.floor(ms/86400000), h = Math.floor(ms/3600000)%24, m = Math.floor(ms/60000)%60;
   return (d? d+" d ":"") + (d||h? h+" h ":"") + m + " min";
 }
@@ -408,12 +413,14 @@ function atualizarSinal(){
   if(!carregado) return;
   const {trades, aberta, porDia} = simular(cfg.rr, true, true);
   const agora = Date.now(); const ok = contextoOK();
-  const hojeN = porDia[diaDe(agora)] || 0;
-  $("hoje").innerHTML = `Sinais hoje: <b>${hojeN}</b> · candle de <b>${TFS[cfg.tf].nome}</b> · taxa ida e volta <b>${String(taxaRT()).replace(".",",")}%</b>`;
+  const n24 = trades.filter(t=>agora - t.T < 86400000).length + (aberta && agora - aberta.T < 86400000 ? 1 : 0);
+  const ultV = velas[velas.length-1]; const fecha = ultV && !ultV.closed ? ultV.T+1 - agora : NaN;
+  $("hoje").innerHTML = `Sinais nas últimas 24h: <b>${n24}</b> · candle de <b>${TFS[cfg.tf].nome}</b>` + (isFinite(fecha) ? ` fecha em <b>${tempoTexto(fecha, true)}</b>` : "") + ` · taxa ida e volta <b>${String(taxaRT()).replace(".",",")}%</b>`;
   const atual = velas.length ? niveis(velas[velas.length-1].c, ind.sd[ind.sd.length-1] || velas[velas.length-1].c*cfg.minStop/100, cfg.rr) : null;
   const ref = aberta || atual;
   if(ref) $("arred").textContent = "Vai comprar " + fQ(ref.qtd) + " " + INFO.base + " ≈ R$ " + fR(ref.qtd*ref.entrada) + (aberta ? " neste sinal." : " no preço atual.") +
-    " A Binance só aceita múltiplos de " + fQ(INFO.passo) + " " + INFO.base + " (≈ R$ " + fR(INFO.passo*ref.entrada) + ") e ordens de pelo menos R$ " + fR(INFO.minimo) + ", por isso o valor é arredondado.";
+    " A Binance só aceita múltiplos de " + fQ(INFO.passo) + " " + INFO.base + " (≈ R$ " + fR(INFO.passo*ref.entrada) + ") e ordens de pelo menos R$ " + fR(INFO.minimo) + ", por isso o valor é arredondado." +
+    (ref.qtd*ref.entrada > cfg.banca ? " Atenção: passa do seu pote de R$ " + fR(cfg.banca) + " definido em Ajustes." : "");
   if(aberta && (!opAtual || opAtual.T !== aberta.T)){ $("pago").value = aberta.entrada; $("qtdComprada").value = aberta.qtd; }
   opAtual = aberta;
   let chave = null;
@@ -435,6 +442,8 @@ function atualizarSinal(){
       chave = "s"+u.T+u.motivo;
     } else if(!(ok.mvrv && ok.fg)){
       mostrar("warn","BLOQUEADO PELO CONTEXTO", (!ok.mvrv ? "MVRV acima do limite. " : "") + (!ok.fg ? "Medo e Ganância acima do limite. " : "") + "Nenhuma compra até o contexto melhorar.", atual, true);
+    } else if(sinalFormando()){
+      mostrar("warn","SINAL SE FORMANDO","As condições de compra estão aparecendo no candle atual. Ainda não entre: o sinal só vale se continuar assim no fechamento do candle (" + tempoTexto(fecha, true) + ").", atual, true);
     } else {
       mostrar("info","AGUARDANDO SINAL","Nenhuma operação aberta. Quando aparecer um sinal, este quadro fica verde e os valores abaixo passam a ser os do sinal.", atual, true);
     }
@@ -477,10 +486,40 @@ function atualizarBacktest(){
   });
   $("bt").innerHTML = linhas.join("");
   const {trades} = simular(cfg.rr,false,false,iniT);
-  const ult = trades.slice(-10).reverse();
-  $("ultimas").innerHTML = ult.length ? ult.map(t=>`<tr><td>${fHora(t.T)}</td><td class="mono">${fP(t.entrada)}</td><td class="mono">${fP(t.saida)}</td><td>${t.motivo}</td><td class="mono ${t.pct>=0?"pos":"neg"}">${fPct(t.pct)}</td></tr>`).join("")
-    : `<tr><td colspan="5" style="text-align:left;color:var(--muted)">Nenhuma operação no período.</td></tr>`;
+  atualizarUltimas();
   return trades;
+}
+
+/* Últimas 10 operações (as das últimas 24h ficam marcadas), com a operação em aberto no topo. */
+function atualizarUltimas(){
+  if(!carregado) return;
+  const agora = Date.now();
+  const {trades, aberta} = simular(cfg.rr,false,true);
+  const ult = trades.slice(-10).reverse();
+  const em24 = trades.filter(t=> agora - t.saidaT < 86400000);
+  const soma24 = em24.reduce((a,t)=>a+t.pct,0), brl24 = em24.reduce((a,t)=>a+t.brl,0);
+  $("ult24").innerHTML = `Últimas 24h: <b>${em24.length}</b> operação(ões) encerrada(s)` + (em24.length ? ` · resultado <b class="${soma24>=0?"pos":"neg"}">${fPct(soma24)} (R$ ${fR(brl24)})</b>` : "") + ` · marcadas com a barra azul.`;
+  let html = "";
+  if(aberta){
+    const atualP = velas[velas.length-1].c, pct = (atualP-aberta.entrada)/aberta.entrada*100 - taxaRT();
+    html += `<tr class="aberta h24"><td>${fHora(aberta.T)}</td><td class="mono">${fP(aberta.entrada)}</td><td class="mono">${fP(atualP)}</td><td>Em aberto</td><td class="mono ${pct>=0?"pos":"neg"}">${fPct(pct)}</td></tr>`;
+  }
+  html += ult.map(t=>`<tr class="${agora - t.saidaT < 86400000 ? "h24" : ""}"><td>${fHora(t.T)}</td><td class="mono">${fP(t.entrada)}</td><td class="mono">${fP(t.saida)}</td><td>${t.motivo}</td><td class="mono ${t.pct>=0?"pos":"neg"}">${fPct(t.pct)}</td></tr>`).join("");
+  $("ultimas").innerHTML = html || `<tr><td colspan="5" style="text-align:left;color:var(--muted)">Nenhuma operação no período.</td></tr>`;
+}
+/* Mostra se as condições estão aparecendo no candle que ainda não fechou (pode sumir até o fechamento). */
+function sinalFormando(){
+  const n = velas.length; if(n < 205) return false;
+  const u = velas[n-1]; if(u.closed) return false;
+  const Q = preparar(velas.slice(-600));
+  const V = velas.slice(-600), i = V.length-1;
+  const cond = Q.e9[i-1] <= Q.e21[i-1] && Q.e9[i] > Q.e21[i] && Q.rsi[i] > 50 && Q.rsi[i] < 70 && (!cfg.filtro200 || u.c > P.e200[n-2]);
+  const ok = contextoOK();
+  return cond && ok.mvrv && ok.fg;
+}
+function relogio(){
+  try{ $("relogio").textContent = new Date().toLocaleTimeString("pt-BR",{timeZone:"America/Sao_Paulo", hour:"2-digit", minute:"2-digit", second:"2-digit"}); }
+  catch(e){ $("relogio").textContent = new Date().toLocaleTimeString("pt-BR"); }
 }
 
 function atualizarContexto(){
@@ -608,7 +647,7 @@ function conectar(){
     const u = velas[velas.length-1];
     let novaFechada = false;
     if(u && u.t===v.t){ velas[velas.length-1]=v; novaFechada = v.closed && !u.closed; }
-    else if(!u || v.t>u.t){ if(u && !u.closed){ u.closed=true; novaFechada=true; } velas.push(v); if(velas.length>9500) velas.shift(); novaFechada = novaFechada || v.closed; }
+    else if(!u || v.t>u.t){ if(u && !u.closed){ u.closed=true; novaFechada=true; } velas.push(v); if(velas.length>13000) velas.shift(); novaFechada = novaFechada || v.closed; }
     $("preco").textContent = fP(v.c);
     if(novaFechada){ recalcular(true); }
     else { atualizarSinal(); if(sC) sC.update({time:tsec(v.t),open:v.o,high:v.h,low:v.l,close:v.c}); }
@@ -646,11 +685,11 @@ function simPuro(V, Pr, prm, deT, ateT, taxa){
 async function explorar(){
   const btn = $("btnExplorar"); btn.disabled = true; btn.textContent = "Testando…";
   $("expProg").hidden=false; $("expResumo").hidden=true; $("expTabela").hidden=true;
-  const agora = Date.now(), ini = agora - 365*86400000, corte = agora - 122*86400000;
+  const agora = Date.now();
   const taxa = taxaRT(), res = [];
   let total = 0, falhas = [];
   const grupos = [];
-  for(const a of Object.keys(ATIVOS)) for(const tf of ["1h","4h","1d"]) grupos.push([a,tf]);
+  for(const a of Object.keys(ATIVOS)) for(const tf of ["15m","1h","4h","1d"]) grupos.push([a,tf]);
   for(let g=0; g<grupos.length; g++){
     const [a, tf] = grupos[g];
     $("expProg").textContent = "Baixando e testando " + ATIVOS[a].nome + " · " + TFS[tf].nome + " (" + (g+1) + " de " + grupos.length + ")…";
@@ -659,6 +698,7 @@ async function explorar(){
     try{ V = await baixarVelas(a, tf, TFS[tf].paginas); }catch(e){ falhas.push(ATIVOS[a].nome+" "+TFS[tf].nome); continue; }
     if(V.length < 260) continue;
     const Pr = preparar(V);
+    const ini = Math.max(V[201].t, agora - 365*86400000), corte = ini + (agora - ini)*2/3;
     for(const rr of [1,1.5,2]) for(const minStop of [0.5,1,2,4]) for(const atrMult of [1,1.5,2]) for(const filtro of [true,false]){
       const prm = {ativo:a, tf, rr, minStop, atrMult, filtro};
       const A = simPuro(V,Pr,prm,ini,corte,taxa), B = simPuro(V,Pr,prm,corte,agora+1,taxa);
@@ -673,7 +713,7 @@ async function explorar(){
   $("expProg").hidden = true;
   $("expResumo").hidden = false;
   $("expResumo").innerHTML = passaram.length
-    ? `<b>${passaram.length}</b> de ${total} combinações ficaram positivas nas duas partes. A tabela mostra as 12 melhores dos 8 primeiros meses. Prefira as que também ficaram <span class="pos">verdes na prova</span> e com mais operações.`
+    ? `<b>${passaram.length}</b> de ${total} combinações ficaram positivas nas duas partes. A tabela mostra as 12 melhores da parte de comparação. Prefira as que também ficaram <span class="pos">verdes na prova</span> e com mais operações.`
     : `<span class="aviso"><b>Nenhuma</b> das ${total} combinações ficou positiva nas duas partes.</span> Neste período, a estratégia não mostrou vantagem em nenhum ativo. A decisão mais segura é <b>não operar</b> e testar de novo daqui a algumas semanas.`;
   if(falhas.length) $("expResumo").innerHTML += `<br><span class="nota">Não consegui baixar: ${falhas.join(", ")}.</span>`;
   $("expCorpo").innerHTML = lista.map((r,idx)=>{
@@ -714,7 +754,8 @@ $("btnNotif").addEventListener("click", async ()=>{
   catch(e){ $("btnNotif").textContent="Notificações indisponíveis aqui"; }
 });
 
-setInterval(()=>{ if(carregado) atualizarSinal(); }, 1000);
+setInterval(()=>{ relogio(); if(carregado){ atualizarSinal(); atualizarUltimas(); } }, 1000);
+relogio();
 setInterval(carregarContexto, 30*60000);
 
 /* ---------- início ---------- */
