@@ -43,6 +43,8 @@ header{display:flex;align-items:center;justify-content:space-between;gap:10px;fl
 .instr{color:var(--muted);margin:6px 0 0;line-height:1.45}
 .hoje{margin-top:10px;font-size:.82rem;color:var(--muted)}
 .hoje b{color:var(--fg);font-family:var(--mono)}
+.refAviso{margin:14px 0 0;padding:8px 10px;border:1px dashed var(--warn);border-radius:6px;color:var(--warn);font-size:.82rem;line-height:1.4}
+.refAviso b{color:var(--fg)}
 .entrada{margin-top:12px;display:flex;flex-direction:column;gap:4px}
 .entrada input{max-width:160px;font-size:1.1rem}
 .grade{display:grid;grid-template-columns:1fr auto;gap:6px 12px;margin-top:12px;align-items:baseline}
@@ -108,11 +110,12 @@ footer{color:var(--muted);font-size:.75rem;line-height:1.5}
     <p class="nota" id="arred">—</p>
   </div>
   <div id="detalhe" hidden>
+    <p class="refAviso" id="refAviso" hidden>Sem sinal agora. Estes são os valores <b>se você entrasse no preço atual</b>, só como referência.</p>
     <dl class="grade">
       <dt>Entrada (referência)</dt><dd id="dEntrada">—</dd>
       <dt>Quantia (BTC)</dt><dd id="dQtd">—</dd>
       <dt>Total (BRL)</dt><dd id="dTotal">—</dd>
-      <dt>Tempo restante</dt><dd class="relogio" id="dTempo">—</dd>
+      <dt id="dTempoLbl">Tempo restante</dt><dd class="relogio" id="dTempo">—</dd>
     </dl>
     <div class="oco">
       <div class="rot">OCO de venda (aba Vender → OCO)</div>
@@ -335,9 +338,12 @@ function simular(rr, usaFiltro, incluiAberta){
 }
 
 /* ---------- tela ---------- */
-function mostrar(tone, estado, instr, op){
+function mostrar(tone, estado, instr, op, ehRef){
   $("sinal").dataset.tone = tone; $("estado").textContent = estado; $("instr").textContent = instr;
   $("detalhe").hidden = !op;
+  $("refAviso").hidden = !ehRef;
+  $("dTempoLbl").textContent = ehRef ? "Tempo máximo" : "Tempo restante";
+  if(ehRef) $("dTempo").textContent = cfg.tempo + " min";
   if(op){
     const total = op.qtd*op.entrada;
     $("dEntrada").textContent = fP(op.entrada);
@@ -358,7 +364,8 @@ function atualizarSinal(){
   const hojeN = porDia[diaDe(agora)] || 0;
   const resHoje = trades.filter(t=>diaDe(t.T)===diaDe(agora)).reduce((a,t)=>a+t.brl,0);
   $("hoje").innerHTML = `Sinais hoje: <b>${hojeN}</b> · resultado se seguisse todos: <b>${resHoje>=0?"+":"−"}R$ ${fR(Math.abs(resHoje))}</b>`;
-  const ref = aberta || (velas.length ? niveis(velas[velas.length-1].c, ind.sd[ind.sd.length-1] || velas[velas.length-1].c*cfg.minStop/100, cfg.rr) : null);
+  const atual = velas.length ? niveis(velas[velas.length-1].c, ind.sd[ind.sd.length-1] || velas[velas.length-1].c*cfg.minStop/100, cfg.rr) : null;
+  const ref = aberta || atual;
   if(ref) $("arred").textContent = "Vai comprar " + fQ(ref.qtd) + " BTC ≈ R$ " + fR(ref.qtd*ref.entrada) + (aberta ? " neste sinal." : " no preço atual.") +
     " A Binance só aceita múltiplos de 0,00001 BTC (≈ R$ " + fR(PASSO*ref.entrada) + "), por isso o valor é arredondado.";
   if(aberta && (!opAtual || opAtual.T !== aberta.T)){ $("pago").value = Math.round(aberta.entrada); $("qtdComprada").value = aberta.qtd.toFixed(5); }
@@ -376,14 +383,14 @@ function atualizarSinal(){
   } else {
     const u = trades[trades.length-1];
     if(u && agora - u.saidaT < 15*60000){
-      if(u.motivo==="TP") mostrar("buy","TP ATINGIDO","O preço chegou ao alvo. A OCO deve ter vendido com lucro. Confira no app.", null);
-      else if(u.motivo==="SL") mostrar("sell","SL ATINGIDO","O preço chegou ao stop. A OCO deve ter vendido. Confira no app se a ordem executou.", null);
-      else mostrar("warn","SAIR A MERCADO","Acabou o tempo sem TP nem SL. Cancele a OCO e venda o BTC a mercado agora.", null);
+      if(u.motivo==="TP") mostrar("buy","TP ATINGIDO","O preço chegou ao alvo. A OCO deve ter vendido com lucro. Confira no app.", atual, true);
+      else if(u.motivo==="SL") mostrar("sell","SL ATINGIDO","O preço chegou ao stop. A OCO deve ter vendido. Confira no app se a ordem executou.", atual, true);
+      else mostrar("warn","SAIR A MERCADO","Acabou o tempo sem TP nem SL. Cancele a OCO e venda o BTC a mercado agora.", atual, true);
       chave = "s"+u.T+u.motivo;
     } else if(!(ok.mvrv && ok.fg)){
-      mostrar("warn","BLOQUEADO PELO CONTEXTO", (!ok.mvrv ? "MVRV acima do limite. " : "") + (!ok.fg ? "Medo e Ganância acima do limite. " : "") + "Nenhuma compra até o contexto melhorar.", null);
+      mostrar("warn","BLOQUEADO PELO CONTEXTO", (!ok.mvrv ? "MVRV acima do limite. " : "") + (!ok.fg ? "Medo e Ganância acima do limite. " : "") + "Nenhuma compra até o contexto melhorar.", atual, true);
     } else {
-      mostrar("info","AGUARDANDO SINAL","Nenhuma operação aberta. Quando aparecer um sinal, este quadro fica verde e mostra os preços da OCO.", null);
+      mostrar("info","AGUARDANDO SINAL","Nenhuma operação aberta. Quando aparecer um sinal, este quadro fica verde e os valores abaixo passam a ser os do sinal.", atual, true);
     }
   }
   if(chave && chave!==ultimoAviso){ if(ultimoAviso!==null) avisar($("estado").textContent, $("instr").textContent); ultimoAviso=chave; }
@@ -393,12 +400,12 @@ function atualizarSinal(){
 
 function ajustarCompra(){
   const p = parseFloat($("pago").value), q = parseFloat($("qtdComprada").value);
-  const sd = opAtual ? opAtual.sd : NaN;
+  const sd = opAtual ? opAtual.sd : (ind.sd.length ? ind.sd[ind.sd.length-1] : NaN);
   let slLim = NaN;
   if(isFinite(p) && isFinite(sd)){
     const sl=Math.round(p-sd); slLim=Math.floor(sl*(1-0.001));
     $("aSL").textContent=fP(sl); $("aSLL").textContent=fP(slLim); $("aTP").textContent=fP(p+sd*cfg.rr);
-  } else { ["aSL","aSLL","aTP"].forEach(id=>$(id).textContent= opAtual?"—":"sem operação aberta"); }
+  } else { ["aSL","aSLL","aTP"].forEach(id=>$(id).textContent="—"); }
   const qo = isFinite(q) ? (cfg.taxaBnb ? passoBaixo(q) : passoBaixo(q*0.999)) : NaN;
   $("aQtd").textContent = fQ(qo);
   const av = $("aAviso");
