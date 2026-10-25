@@ -4,9 +4,9 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="Sinais OCO">
+<meta name="apple-mobile-web-app-title" content="Sinais BTC">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<title>Sinais OCO</title>
+<title>Sinais BTC</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
 <script src="https://unpkg.com/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
@@ -25,55 +25,54 @@ html,body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--sans);
 header{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
 .par{font-weight:700;font-size:1.15rem;letter-spacing:.01em}
 .par small{color:var(--muted);font-weight:500;font-size:.8rem;margin-left:6px}
+.dir{text-align:right}
 .preco{font-family:var(--mono);font-size:1.35rem;font-weight:600;font-variant-numeric:tabular-nums}
+.relogio-br{font-family:var(--mono);font-size:.85rem;color:var(--muted);font-variant-numeric:tabular-nums}
 .conn{display:flex;align-items:center;gap:6px;color:var(--muted);font-size:.78rem}
 .dot{width:8px;height:8px;border-radius:50%;background:var(--warn)}
 .dot.ok{background:var(--buy)} .dot.err{background:var(--sell)}
 .card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px}
 .sinal{border-left:4px solid var(--muted)}
-.sinal[data-tone="buy"]{border-left-color:var(--buy)}
-.sinal[data-tone="sell"]{border-left-color:var(--sell)}
+.sinal[data-tone="buy"]{border-left:8px solid var(--buy);box-shadow:0 0 0 1px var(--buy) inset}
+.sinal[data-tone="sell"]{border-left:8px solid var(--sell);box-shadow:0 0 0 1px var(--sell) inset}
 .sinal[data-tone="warn"]{border-left-color:var(--warn)}
 .sinal[data-tone="info"]{border-left-color:var(--info)}
 .estado{font-size:1.5rem;font-weight:700;letter-spacing:.02em;line-height:1.15;text-wrap:balance}
+.sinal[data-tone="buy"] .estado,.sinal[data-tone="sell"] .estado{font-size:2.1rem}
 .sinal[data-tone="buy"] .estado{color:var(--buy)}
 .sinal[data-tone="sell"] .estado{color:var(--sell)}
 .sinal[data-tone="warn"] .estado{color:var(--warn)}
 .sinal[data-tone="info"] .estado{color:var(--info)}
 .instr{color:var(--muted);margin:6px 0 0;line-height:1.45}
-.hoje{margin-top:10px;font-size:.82rem;color:var(--muted)}
-.hoje b{color:var(--fg);font-family:var(--mono)}
-.sinal[data-tone="buy"] .estado{font-size:2.3rem;letter-spacing:.03em}
-.sinal[data-tone="buy"]{border-left-width:8px;box-shadow:0 0 0 1px var(--buy) inset}
-.passo{margin-top:14px;color:var(--fg)}
+.linha{margin-top:10px;font-size:.82rem;color:var(--muted);line-height:1.5}
+.linha b{color:var(--fg);font-family:var(--mono);font-weight:600}
+.linha b.pos{color:var(--buy)} .linha b.neg{color:var(--sell)}
+.linha a{color:var(--info)}
+.campo-ent{margin-top:12px;display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end}
+.campo-ent label{max-width:170px}
 .refAviso{margin:14px 0 0;padding:8px 10px;border:1px dashed var(--warn);border-radius:6px;color:var(--warn);font-size:.82rem;line-height:1.4}
 .refAviso b{color:var(--fg)}
-.entrada{margin-top:12px;display:flex;flex-direction:column;gap:4px}
-.entrada input{max-width:160px;font-size:1.1rem}
-.grade{display:grid;grid-template-columns:1fr auto;gap:6px 12px;margin-top:12px;align-items:baseline}
+.passo{margin-top:14px;padding-top:10px;border-top:1px dashed var(--line)}
+.rot{font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:600}
+.passo .rot{color:var(--fg)}
+.grade{display:grid;grid-template-columns:1fr auto;gap:6px 12px;margin:10px 0 0;align-items:baseline}
 .grade dt{color:var(--muted);font-size:.86rem}
 .grade dd{margin:0;font-family:var(--mono);font-variant-numeric:tabular-nums;text-align:right;font-size:1.02rem}
-.oco{margin-top:12px;border-top:1px dashed var(--line);padding-top:10px}
-.rot{font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:600}
 .tp{color:var(--buy)} .sl{color:var(--sell)}
-.relogio{font-family:var(--mono);font-size:1.05rem}
-.ctx{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.ctx .card{padding:12px}
-.ctx .val{font-family:var(--mono);font-size:1.25rem;font-weight:600;margin-top:4px}
-.ctx .zona{font-size:.82rem;color:var(--muted);margin-top:2px}
-.ctx .fonte{font-size:.7rem;color:var(--muted);margin-top:6px;line-height:1.4}
-.ctx a{color:var(--info)}
-.bloq{color:var(--warn)}
+.pos{color:var(--buy)} .neg{color:var(--sell)}
+.posbox{margin-top:14px;padding-top:10px;border-top:1px dashed var(--line)}
+.posbox .campos{margin-top:8px}
 #grafico{height:300px;width:100%}
 table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
-th,td{padding:7px 6px;text-align:right;border-bottom:1px solid var(--line);font-size:.88rem}
+th,td{padding:7px 6px;text-align:right;border-bottom:1px solid var(--line);font-size:.86rem}
 th:first-child,td:first-child{text-align:left}
-th{color:var(--muted);font-weight:500;font-size:.75rem;text-transform:uppercase;letter-spacing:.05em}
-tr.atual td{background:rgba(90,169,230,.08)}
-.pos{color:var(--buy)} .neg{color:var(--sell)}
+th{color:var(--muted);font-weight:500;font-size:.72rem;text-transform:uppercase;letter-spacing:.05em}
+tr.atual td{background:rgba(90,169,230,.10)}
+tr.aberta td{background:rgba(46,189,133,.08)}
+td.melhor{font-weight:700;text-decoration:underline;text-underline-offset:3px}
 .mono{font-family:var(--mono)}
 .nota{color:var(--muted);font-size:.8rem;line-height:1.45;margin:8px 0 0}
-.aviso{color:var(--warn)}
+.nota b{color:var(--fg)}
 details summary{cursor:pointer;font-weight:600;list-style:none}
 details summary::-webkit-details-marker{display:none}
 details summary::after{content:"+";float:right;color:var(--muted)}
@@ -85,30 +84,14 @@ label.check input{width:auto}
 input,select{background:var(--bg);color:var(--fg);border:1px solid var(--line);border-radius:6px;padding:8px;font-family:var(--mono);font-size:16px;width:100%}
 input:focus,select:focus,button:focus-visible{outline:2px solid var(--info);outline-offset:1px}
 .botoes{display:flex;gap:8px;flex-wrap:wrap}
-button{background:#1d242b;color:var(--fg);border:1px solid var(--line);border-radius:6px;padding:8px 12px;font-family:var(--sans);font-size:.85rem;cursor:pointer}
+button{background:#1d242b;color:var(--fg);border:1px solid var(--line);border-radius:6px;padding:9px 12px;font-family:var(--sans);font-size:.85rem;cursor:pointer}
 button:hover{border-color:var(--muted)}
+button.prim{background:var(--buy);border-color:var(--buy);color:#06140e;font-weight:700}
+button.perigo{border-color:var(--sell);color:var(--sell)}
 .scroll{overflow-x:auto}
 footer{color:var(--muted);font-size:.75rem;line-height:1.5}
-@media (max-width:380px){.ctx{grid-template-columns:1fr}.campos{grid-template-columns:1fr}}
+@media (max-width:380px){.campos{grid-template-columns:1fr}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
-.exp-res td button{padding:4px 8px;font-size:.78rem}
-.prog{font-family:var(--mono);font-size:.82rem;color:var(--muted);margin-top:8px}
-.resumo{margin-top:10px;font-size:.88rem;line-height:1.45}
-th.grp{text-align:center;border-bottom:none;padding-bottom:0}
-.titulo-rel{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap}
-.relogio-br{font-family:var(--mono);font-size:1.05rem;font-weight:600;font-variant-numeric:tabular-nums}
-.relogio-br::after{content:" Brasília";font-family:var(--sans);font-size:.7rem;font-weight:500;color:var(--muted)}
-tr.h24 td:first-child{border-left:3px solid var(--info);padding-left:6px}
-tr.fora td{color:var(--muted)}
-tr.agora td{background:rgba(90,169,230,.08)}
-tr.aberta td{background:rgba(46,189,133,.08)}
-table.saida td:first-child{color:var(--muted)}
-.chip{display:inline-block;margin:10px 0 0;padding:6px 10px;border-radius:8px;font-size:.84rem;font-weight:600;line-height:1.35}
-.chip.pos{background:rgba(46,189,133,.14);color:var(--buy)}
-.chip.neg{background:rgba(239,93,106,.14);color:var(--sell)}
-.chip.warn{background:rgba(232,163,61,.14);color:var(--warn)}
-.mini{font-size:.75rem;color:var(--muted)}
-#probs .grade dd{font-size:.95rem}
 </style>
 </head>
 <body>
@@ -116,184 +99,85 @@ table.saida td:first-child{color:var(--muted)}
 
 <header>
   <div>
-    <div class="par"><span id="parLbl">BTC/BRL</span> <small id="tfLbl">Binance</small></div>
+    <div class="par">BTC/BRL <small>Binance · candle de 15 min</small></div>
     <div class="conn"><span class="dot" id="dot"></span><span id="connTxt">Conectando…</span></div>
   </div>
-  <div class="preco" id="preco">—</div>
+  <div class="dir">
+    <div class="preco" id="preco">—</div>
+    <div class="relogio-br" id="relogio">--:--:--</div>
+  </div>
 </header>
 
 <section class="card sinal" id="sinal" data-tone="info" aria-live="polite">
   <div class="estado" id="estado">CARREGANDO</div>
   <p class="instr" id="instr">Baixando o histórico de candles da Binance.</p>
-  <div class="hoje" id="hoje">—</div>
-  <div class="entrada">
+  <div class="campo-ent">
     <label for="valorEntrada">Valor da entrada (R$)<input id="valorEntrada" type="number" step="1" min="10" inputmode="decimal"></label>
-    <p class="nota" id="arred">—</p>
   </div>
-  <div id="detalhe" hidden>
-    <p class="refAviso" id="refAviso" hidden>Sem sinal agora. Estes são os valores <b>se você entrasse no preço atual</b>, só como referência.</p>
-    <div id="blocoOco" hidden>
-      <div class="rot passo">1 · Aba Comprar → OCO (entrada)</div>
-      <dl class="grade">
-        <dt>Limite TP (BRL) · compra se recuar</dt><dd class="tp" id="eRec">—</dd>
-        <dt>Ativação SL (BRL) · compra se romper</dt><dd id="eRomp">—</dd>
-        <dt>Menu ao lado do Limite SL</dt><dd>Mercado</dd>
-        <dt>Quantia (<span class="base">BTC</span>)</dt><dd id="eQtd">—</dd>
-        <dt>Total aproximado</dt><dd id="eTot">—</dd>
-        <dt id="eValLbl">Validade da ordem</dt><dd class="relogio" id="eVal">—</dd>
-      </dl>
-      <div class="oco">
-        <div class="rot passo">2 · Depois que comprar: aba Vender → OCO</div>
-        <p class="nota" style="margin-top:4px">Use a coluna de como a compra executou. Se o preço pago foi outro, use "Ajustar a OCO ao preço que eu paguei".</p>
-        <div class="scroll">
-          <table class="saida">
-            <thead><tr><th>Campo</th><th>Comprou no recuo</th><th>Comprou no rompimento</th></tr></thead>
-            <tbody id="saidaOco"></tbody>
-          </table>
-        </div>
-      </div>
+  <p class="refAviso" id="refAviso" hidden>Sem sinal agora. Estes são os valores <b>se você entrasse no preço atual</b>, só como referência.</p>
+  <div id="passos"></div>
+
+  <div class="posbox" id="boxEntrei">
+    <div class="rot">Já comprei</div>
+    <p class="nota" style="margin-top:4px">Informe o que executou no app. O painel passa a acompanhar a sua operação: o topo desde a sua compra, onde está o seu trailing e a hora de sair.</p>
+    <div class="campos">
+      <label for="pago">Preço pago (BRL)<input id="pago" type="number" step="1" inputmode="decimal"></label>
+      <label for="qtdPaga">Quantia comprada (BTC)<input id="qtdPaga" type="number" step="any" inputmode="decimal"></label>
     </div>
-    <div id="blocoMarket">
-      <div class="rot passo" id="p1Tit">1 · Aba Comprar → Market</div>
-      <dl class="grade">
-        <dt>Entrada (referência)</dt><dd id="dEntrada">—</dd>
-        <dt>Quantia (<span class="base">BTC</span>)</dt><dd id="dQtd">—</dd>
-        <dt>Total (BRL)</dt><dd id="dTotal">—</dd>
-        <dt id="dTempoLbl">Tempo restante</dt><dd class="relogio" id="dTempo">—</dd>
-      </dl>
-      <div class="oco">
-        <div class="rot passo">2 · Aba Vender → OCO (na ordem do app)</div>
-        <dl class="grade">
-          <dt>Limite TP (BRL)</dt><dd class="tp" id="dTP">—</dd>
-          <dt>Ativação SL (BRL)</dt><dd class="sl" id="dSL">—</dd>
-          <dt>Limite de SL (BRL)</dt><dd class="sl" id="dSLL">—</dd>
-          <dt>Quantia (<span class="base">BTC</span>)</dt><dd id="dQtdOco">—</dd>
-          <dt>Ganho se bater TP</dt><dd class="tp" id="dGanho">—</dd>
-          <dt>Perda se bater SL</dt><dd class="sl" id="dPerda">—</dd>
-        </dl>
-      </div>
-    </div>
-    <div class="oco" id="probs"></div>
+    <div class="botoes" style="margin-top:10px"><button class="prim" id="btnEntrei" type="button">Entrei</button></div>
   </div>
+  <div class="posbox" id="boxEncerrar" hidden>
+    <div class="botoes"><button class="perigo" id="btnEncerrei" type="button">Encerrei a operação</button></div>
+    <p class="nota">Toque quando a venda tiver executado no app (pelo trailing ou a mercado).</p>
+  </div>
+
+  <div class="linha" id="contexto">—</div>
+  <div class="linha" id="historico">—</div>
 </section>
 
-<details class="card" id="ajusteCompra">
-  <summary>Ajustar a OCO ao preço que eu paguei</summary>
-  <p class="nota">Já vem preenchido com o sinal. Troque pelo preço médio e pela quantia da sua compra executada (em Ordens → Histórico) e use estes números na OCO.</p>
-  <div class="campos">
-    <label for="pago">Preço pago (BRL)<input id="pago" type="number" step="any" inputmode="decimal"></label>
-    <label for="qtdComprada">Quantia comprada (<span class="base">BTC</span>)<input id="qtdComprada" type="number" step="any" inputmode="decimal"></label>
-  </div>
-  <dl class="grade">
-    <dt>Quantia da OCO (<span class="base">BTC</span>)</dt><dd id="aQtd">—</dd>
-    <dt>Limite TP</dt><dd class="tp" id="aTP">—</dd>
-    <dt>Ativação SL</dt><dd class="sl" id="aSL">—</dd>
-    <dt>Limite de SL</dt><dd class="sl" id="aSLL">—</dd>
-  </dl>
-  <p class="nota aviso" id="aAviso" hidden></p>
-</details>
-
-<div class="ctx">
-  <div class="card">
-    <div class="rot">MVRV (Bitcoin)</div>
-    <div class="val" id="mvrvVal">—</div>
-    <div class="zona" id="mvrvZona">carregando</div>
-    <div class="fonte"><span id="mvrvFonte"></span><br><a href="https://charts.checkonchain.com/btconchain/pricing/pricing_mvrv_bands/pricing_mvrv_bands_light.html" target="_blank" rel="noopener">Ver no checkonchain ↗</a></div>
-  </div>
-  <div class="card">
-    <div class="rot">Medo e Ganância</div>
-    <div class="val" id="fgVal">—</div>
-    <div class="zona" id="fgZona">carregando</div>
-    <div class="fonte"><span id="fgFonte"></span><br><a href="https://coinmarketcap.com/pt-br/charts/fear-and-greed-index/" target="_blank" rel="noopener">Ver no CoinMarketCap ↗</a></div>
-  </div>
-</div>
-
 <section class="card">
-  <div class="rot" style="margin-bottom:8px">Gráfico · médias 9, 21 e 200 · setas = sinais</div>
+  <div class="rot" style="margin-bottom:8px">Gráfico · médias 9, 21 e 200 · C = compra, V = venda</div>
   <div id="grafico"></div>
   <p class="nota" id="semGrafico" hidden>O gráfico não carregou. Os sinais continuam funcionando.</p>
 </section>
 
 <section class="card">
-  <div class="rot" id="btTitulo">Backtest com as mesmas regras e taxas</div>
-  <p class="nota" id="periodo">—</p>
-  <div class="scroll">
-    <table>
-      <thead><tr><th>Alvo</th><th>Ops</th><th>Acerto</th><th>Resultado</th><th>R$</th></tr></thead>
-      <tbody id="bt"></tbody>
-    </table>
-  </div>
-  <p class="nota">Use o alvo que fecha positivo. MVRV e Medo e Ganância não entram no backtest porque só temos o valor de hoje.</p>
-  <div class="rot" style="margin-top:16px" id="janTitulo">Na sua janela de operação</div>
-  <p class="nota" id="janNota">—</p>
-  <div class="scroll">
-    <table>
-      <thead><tr><th>Cenário</th><th>Ops</th><th>Acerto</th><th>Resultado</th><th>R$</th></tr></thead>
-      <tbody id="btJan"></tbody>
-    </table>
-  </div>
-</section>
-
-<section class="card">
-  <div class="titulo-rel"><div class="rot">Últimas 10 horas, hora a hora</div><div class="relogio-br" id="relogio" aria-label="Horário de Brasília">--:--:--</div></div>
-  <p class="nota" id="horasNota">Preço no fim de cada hora, quanto variou e se houve sinal ou saída de operação naquela hora.</p>
-  <div class="scroll">
-    <table>
-      <thead><tr><th>Hora</th><th>Preço</th><th>Variação</th><th>Sinal</th><th>Saída</th></tr></thead>
-      <tbody id="horas"></tbody>
-    </table>
-  </div>
-</section>
-
-<details class="card">
-  <summary>Últimas 10 operações do alvo escolhido</summary>
-  <p class="nota" id="ult24">—</p>
+  <div class="rot">Últimas 10 operações (pelas regras atuais)</div>
   <div class="scroll">
     <table>
       <thead><tr><th>Entrada</th><th>Preço</th><th>Saída</th><th>Motivo</th><th>Result.</th></tr></thead>
       <tbody id="ultimas"></tbody>
     </table>
   </div>
-</details>
+</section>
 
 <section class="card">
-  <div class="rot">Explorador de ajustes</div>
-  <p class="nota">Testa BTC/BRL e USDT/BRL, nos candles de 15 min, 1 hora, 4 horas e diário, com várias combinações de alvo, stop e filtro de tendência, já com as taxas (entrada a mercado). O histórico (até 1 ano) é dividido em duas partes: os <b>primeiros 2/3</b>, onde as combinações são comparadas, e o <b>último 1/3</b>, que serve de prova. Só vale confiar no que ficou positivo nas duas.</p>
-  <div class="botoes" style="margin-top:10px"><button id="btnExplorar" type="button">Testar combinações</button></div>
-  <div class="prog" id="expProg" hidden></div>
-  <div class="resumo" id="expResumo" hidden></div>
-  <div class="scroll exp-res" id="expTabela" hidden>
+  <div class="rot">Backtest · qual T/D funcionou melhor</div>
+  <p class="nota" id="periodo">—</p>
+  <div class="scroll">
     <table>
-      <thead>
-        <tr><th></th><th></th><th></th><th class="grp" colspan="2">Comparação</th><th class="grp" colspan="2">Prova</th><th></th></tr>
-        <tr><th>Ativo</th><th>Candle</th><th>Ajuste</th><th>Ops</th><th>Result.</th><th>Ops</th><th>Result.</th><th></th></tr>
-      </thead>
-      <tbody id="expCorpo"></tbody>
+      <thead><tr><th>T/D</th><th>Ops</th><th>Acerto</th><th>Só trailing</th><th>Com sinais de saída</th></tr></thead>
+      <tbody id="bt"></tbody>
     </table>
   </div>
+  <p class="nota" id="btEntrada">—</p>
+  <p class="nota">Resultado somado em %, já com 0,2% de taxa por operação, só com entradas dentro do seu horário e saída no fim dele. A linha destacada é a dos seus Ajustes; o valor sublinhado é o melhor da tabela. Resultado passado não garante o futuro.</p>
 </section>
 
 <details class="card" id="ajustes">
   <summary>Ajustes</summary>
   <div class="campos">
-    <label for="ativo">Ativo<select id="ativo"><option value="BTCBRL">BTC/BRL</option><option value="USDTBRL">USDT/BRL (dólar)</option></select></label>
-    <label for="modoEntrada">Como entrar<select id="modoEntrada"><option value="oco">OCO de compra (recuo ou rompimento)</option><option value="market">Market (compra na hora)</option></select></label>
-    <label for="validade">Validade da OCO de compra (candles)<input id="validade" type="number" step="1" min="1"></label>
-    <label for="tf">Tempo do candle<select id="tf"><option value="5m">5 min (day trade)</option><option value="15m">15 min</option><option value="1h">1 hora</option><option value="4h">4 horas</option><option value="1d">Diário (semanal)</option></select></label>
-    <label for="rr">Alvo (× o risco)<select id="rr"><option value="1">1×</option><option value="1.5">1,5×</option><option value="2">2×</option></select></label>
-    <label for="tempo">Tempo máximo (min)<input id="tempo" type="number" step="5" min="5"></label>
-    <label for="minStop">Stop mínimo (%)<input id="minStop" type="number" step="0.05" min="0.1"></label>
-    <label for="atrMult">Stop (× ATR)<input id="atrMult" type="number" step="0.1" min="0.5"></label>
+    <label for="td">Trailing (T/D)<select id="td"><option value="0">Automático (pela volatilidade)</option><option value="0.5">0,5%</option><option value="1">1%</option><option value="1.5">1,5%</option><option value="2">2%</option></select></label>
+    <label for="saida">Como sair<select id="saida"><option value="sinais">Trailing + sinais de saída</option><option value="trailing">Só o trailing</option></select></label>
+    <label for="entrada">Como entrar<select id="entrada"><option value="mercado">A mercado, no sinal</option><option value="repique">No repique (trailing de compra)</option></select></label>
+    <label for="repique">Repique para comprar (%)<input id="repique" type="number" step="0.1" min="0.1"></label>
+    <label for="validade">Validade do repique (candles)<input id="validade" type="number" step="1" min="1"></label>
+    <label for="horaIni">Meu horário: início (h)<input id="horaIni" type="number" step="1" min="0" max="23"></label>
+    <label for="horaFim">Meu horário: fim (h)<input id="horaFim" type="number" step="1" min="1" max="24"></label>
     <label for="mvrvMax">Bloquear com MVRV acima de<input id="mvrvMax" type="number" step="0.1"></label>
-    <label for="fgMax">Bloquear com índice a partir de<input id="fgMax" type="number" step="1" min="50" max="100"></label>
-    <label for="mvrvMan">MVRV manual (0 = automático)<input id="mvrvMan" type="number" step="0.01" min="0"></label>
-    <label for="fgMan">Medo e Ganância manual (0 = automático)<input id="fgMan" type="number" step="1" min="0" max="100"></label>
-    <label for="banca">Pote para operar (R$)<input id="banca" type="number" step="1" min="10"></label>
-    <label class="check" for="filtro200"><input id="filtro200" type="checkbox"> Só comprar acima da média de 200 (filtro de tendência)</label>
-    <label for="horaIni">Minha janela: começo (h)<input id="horaIni" type="number" step="1" min="0" max="23"></label>
-    <label for="horaFim">Minha janela: fim (h)<input id="horaFim" type="number" step="1" min="1" max="24"></label>
+    <label for="fgMax">Bloquear com Medo e Ganância a partir de<input id="fgMax" type="number" step="1" min="50" max="100"></label>
+    <label class="check" for="filtro200"><input id="filtro200" type="checkbox"> Só comprar com o preço acima da média de 200</label>
   </div>
-  <p class="nota">MVRV e Medo e Ganância são carregados automaticamente (Coin Metrics e alternative.me) e só bloqueiam sinais de BTC. Se quiser usar outro valor, digite nos campos manuais; ele vale até você zerar o campo.</p>
 </details>
 
 <div class="botoes">
@@ -302,63 +186,62 @@ table.saida td:first-child{color:var(--muted)}
 </div>
 
 <footer>
-  Sinal = média 9 cruza a 21 para cima e RSI entre 50 e 70, com o preço acima da média 200 quando o filtro de tendência está ligado, em candles fechados do tempo escolhido nos Ajustes. O candle diário fecha às 21h de Brasília. Só compra, no spot.
-  Ferramenta de estudo, não é recomendação de investimento. Resultado passado não garante resultado futuro. Você pode perder dinheiro. Confira os preços no app antes de enviar a ordem.
+  Sinal de compra: média 9 cruza a 21 para cima e RSI entre 50 e 70, com o preço acima da média 200, em candle de 15 min fechado, dentro do seu horário. Saída: trailing stop na Binance; média 9 cruzando a 21 para baixo; RSI voltando abaixo de 70 depois de passar dele; ou fim do seu horário.
+  Ferramenta de estudo, não é recomendação de investimento. Você pode perder dinheiro. Confira os preços no app antes de enviar a ordem.
 </footer>
 </div>
+
 <script>
 (function(){
 "use strict";
 const $ = id => document.getElementById(id);
-const TFS = {"5m":{ms:5*60000, nome:"5 min", paginas:12, tempo:1440}, "15m":{ms:15*60000, nome:"15 min", paginas:12, tempo:1440},
-  "1h":{ms:3600000, nome:"1 hora", paginas:9, tempo:2880}, "4h":{ms:4*3600000, nome:"4 horas", paginas:3, tempo:10080},
-  "1d":{ms:86400000, nome:"diário", paginas:1, tempo:10080}};
-const ATIVOS = {BTCBRL:{nome:"BTC/BRL", base:"BTC", tick:1, passo:0.00001},
-  USDTBRL:{nome:"USDT/BRL", base:"USDT", tick:0.001, passo:0.1}};
+const SIMB = "BTCBRL", TF = "15m", TF_MS = 15*60000, PAGINAS = 12;
 const REST = ["https://data-api.binance.vision","https://api.binance.com","https://api1.binance.com"];
+const TAXA = 0.2;                       // 0,1% na compra + 0,1% na venda
+const TDS = [0.5, 1, 1.5, 2, 0];        // 0 = automático
+let INFO = {tick:1, passo:0.00001, minimo:10};
 
 /* ---------- ajustes ---------- */
-const PADRAO = {valorEntrada:20, banca:20, rr:1.5, tempo:1440, atrMult:1.5, minStop:1, mvrvMax:3, fgMax:80, mvrvMan:0, fgMan:0, filtro200:true, horaIni:7, horaFim:22, validade:4};
-let cfg = Object.assign({}, PADRAO, {tf:"15m", ativo:"BTCBRL", modoEntrada:"oco"});
-try{ const s = JSON.parse(localStorage.getItem("sinaisOCO.v5")||"null"); if(s) Object.assign(cfg, s); }catch(e){}
-if(!TFS[cfg.tf]) cfg.tf = "15m";
-if(!ATIVOS[cfg.ativo]) cfg.ativo = "BTCBRL";
-if(cfg.modoEntrada!=="oco" && cfg.modoEntrada!=="market") cfg.modoEntrada = "oco";
-function salvar(){ try{ localStorage.setItem("sinaisOCO.v5", JSON.stringify(cfg)); }catch(e){} }
-
-let TF_MS = TFS[cfg.tf].ms;
-let INFO = Object.assign({minimo:10}, ATIVOS[cfg.ativo]);   // tick, passo e mínimo reais vêm da Binance
-const taxaRT = () => 0.2;   // 0,1% na compra + 0,1% na venda (taxa padrão da Binance, sem BNB)
-
-function preencherCampos(){
-  Object.keys(PADRAO).forEach(k => { const el=$(k); if(el.type==="checkbox") el.checked = !!cfg[k]; else el.value = cfg[k]; });
-  $("tf").value = cfg.tf; $("ativo").value = cfg.ativo; $("modoEntrada").value = cfg.modoEntrada;
-}
+const PADRAO = {valorEntrada:20, td:0, saida:"sinais", entrada:"mercado", repique:0.3, validade:4, horaIni:7, horaFim:22, mvrvMax:3, fgMax:80, filtro200:true};
+const TEXTO = ["saida","entrada"];
+let cfg = Object.assign({}, PADRAO);
+try{ const s = JSON.parse(localStorage.getItem("sinaisTS.v1")||"null"); if(s) Object.assign(cfg, s); }catch(e){}
+function salvar(){ try{ localStorage.setItem("sinaisTS.v1", JSON.stringify(cfg)); }catch(e){} }
 Object.keys(PADRAO).forEach(k => {
-  const el=$(k);
+  const el = $(k);
+  if(el.type==="checkbox") el.checked = !!cfg[k]; else el.value = cfg[k];
   el.addEventListener("change", () => {
-    if(el.type==="checkbox") cfg[k]=el.checked;
+    if(el.type==="checkbox") cfg[k] = el.checked;
+    else if(TEXTO.includes(k)) cfg[k] = el.value;
     else { const v = parseFloat(String(el.value).replace(",", ".")); cfg[k] = isFinite(v) ? v : PADRAO[k]; }
-    salvar(); recalcular(true);
+    salvar(); ultimoAviso = null; recalcular(true);
   });
 });
-$("tf").addEventListener("change", () => { cfg.tf = $("tf").value; cfg.tempo = TFS[cfg.tf].tempo; salvar(); preencherCampos(); reiniciar(); });
-$("ativo").addEventListener("change", () => { cfg.ativo = $("ativo").value; salvar(); reiniciar(); });
-$("modoEntrada").addEventListener("change", () => { cfg.modoEntrada = $("modoEntrada").value; salvar(); ultimoAviso = null; recalcular(true); });
-preencherCampos();
+
+/* posição informada pelo usuário (fica só neste aparelho) */
+let pos = null;
+try{ pos = JSON.parse(localStorage.getItem("sinaisTS.pos")||"null"); }catch(e){}
+function salvarPos(){ try{ pos ? localStorage.setItem("sinaisTS.pos", JSON.stringify(pos)) : localStorage.removeItem("sinaisTS.pos"); }catch(e){} }
 
 /* ---------- formatação ---------- */
 const decs = x => { const s = String(x); return s.includes("e-") ? parseInt(s.split("e-")[1]) : (s.split(".")[1]||"").length; };
 const fP = x => isFinite(x) ? x.toLocaleString("pt-BR",{minimumFractionDigits:decs(INFO.tick),maximumFractionDigits:decs(INFO.tick)}) : "—";
 const fR = x => isFinite(x) ? x.toLocaleString("pt-BR",{minimumFractionDigits:2,maximumFractionDigits:2}) : "—";
-const fQ = x => isFinite(x) ? x.toLocaleString("pt-BR",{minimumFractionDigits:decs(INFO.passo),maximumFractionDigits:decs(INFO.passo)}) : "—";
-const fPct = x => (x>=0?"+":"") + x.toLocaleString("pt-BR",{minimumFractionDigits:1,maximumFractionDigits:1}) + "%";
-const fHM = ms => { try{ return new Date(ms).toLocaleTimeString("pt-BR",{timeZone:"America/Sao_Paulo",hour:"2-digit",minute:"2-digit"}); }catch(e){ return new Date(ms).toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"}); } };
-const fHora = ms => new Date(ms).toLocaleString("pt-BR",{day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"});
+const fQ = x => isFinite(x) ? x.toLocaleString("pt-BR",{minimumFractionDigits:5,maximumFractionDigits:5}) : "—";
+const fPct = (x, d) => isFinite(x) ? (x>=0?"+":"−") + Math.abs(x).toLocaleString("pt-BR",{minimumFractionDigits:d??1,maximumFractionDigits:d??1}) + "%" : "—";
+const fTd = x => x.toLocaleString("pt-BR",{maximumFractionDigits:1}) + "%";
+const tz = "America/Sao_Paulo";
+const fHM = ms => { try{ return new Date(ms).toLocaleTimeString("pt-BR",{timeZone:tz,hour:"2-digit",minute:"2-digit"}); }catch(e){ return new Date(ms).toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"}); } };
+const fDH = ms => { try{ return new Date(ms).toLocaleString("pt-BR",{timeZone:tz,day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"}); }catch(e){ return new Date(ms).toLocaleString("pt-BR"); } };
+const fD = ms => { try{ return new Date(ms).toLocaleDateString("pt-BR",{timeZone:tz}); }catch(e){ return new Date(ms).toLocaleDateString("pt-BR"); } };
 const ajusta = (x, p, modo) => { const n = x/p; const k = modo==="baixo" ? Math.floor(n+1e-9) : modo==="cima" ? Math.ceil(n-1e-9) : Math.round(n); return Number((k*p).toFixed(decs(p))); };
-const diaDe = ms => new Date(ms).toDateString();
-const horaBR = ms => { try{ return +new Date(ms).toLocaleString("en-US",{timeZone:"America/Sao_Paulo", hour:"numeric", hour12:false}) % 24; }catch(e){ return new Date(ms).getHours(); } };
+const horaBR = ms => { try{ return +new Date(ms).toLocaleString("en-US",{timeZone:tz, hour:"numeric", hour12:false}) % 24; }catch(e){ return new Date(ms).getHours(); } };
 const naJanela = ms => { const h = horaBR(ms); return cfg.horaIni <= cfg.horaFim ? (h >= cfg.horaIni && h < cfg.horaFim) : (h >= cfg.horaIni || h < cfg.horaFim); };
+function tempoTexto(ms){
+  if(!(ms > 0)) return "0 min";
+  if(ms < 3600000) return Math.floor(ms/60000) + " min " + String(Math.floor(ms/1000)%60).padStart(2,"0") + " s";
+  return Math.floor(ms/3600000) + " h " + (Math.floor(ms/60000)%60) + " min";
+}
 
 /* ---------- indicadores ---------- */
 function ema(v,n){ const o=new Array(v.length).fill(NaN); if(v.length<n) return o;
@@ -373,413 +256,270 @@ function atr(c,n){ const o=new Array(c.length).fill(NaN); if(c.length<=n) return
   const tr=c.map((k,i)=> i===0? k.h-k.l : Math.max(k.h-k.l, Math.abs(k.h-c[i-1].c), Math.abs(k.l-c[i-1].c)));
   let s=0; for(let i=1;i<=n;i++) s+=tr[i]; o[n]=s/n;
   for(let i=n+1;i<c.length;i++) o[i]=(o[i-1]*(n-1)+tr[i])/n; return o; }
-/* Base comum: médias, RSI e ATR de uma lista de candles. */
-function preparar(V){
-  const cl = V.map(k=>k.c);
-  return {e9:ema(cl,9), e21:ema(cl,21), e200:ema(cl,200), rsi:rsi(cl,14), atr:atr(V,14)};
-}
-const temSinal = (V,P,i,filtro) => i>200 && V[i].closed && P.e9[i-1] <= P.e21[i-1] && P.e9[i] > P.e21[i]
-  && P.rsi[i] > 50 && P.rsi[i] < 70 && (!filtro || V[i].c > P.e200[i]);
+function preparar(V){ const cl = V.map(k=>k.c); return {e9:ema(cl,9), e21:ema(cl,21), e200:ema(cl,200), rsi:rsi(cl,14), atr:atr(V,14)}; }
+const condCompra = (V,Q,i) => Q.e9[i-1] <= Q.e21[i-1] && Q.e9[i] > Q.e21[i] && Q.rsi[i] > 50 && Q.rsi[i] < 70 && (!cfg.filtro200 || V[i].c > Q.e200[i]);
+const saidaMedias = i => P.e9[i-1] >= P.e21[i-1] && P.e9[i] < P.e21[i];
+const saidaRsi = i => P.rsi[i-1] > 70 && P.rsi[i] <= 70;
 
 /* ---------- estado ---------- */
-let velas = [], P = null;
-let ind = {sig:[], sd:[]};
-let ctx = {mvrv:NaN, mvrvFonte:"", fg:NaN, fgFonte:""};
-let ultimoAviso = null, carregado = false, somOn = false, audio = null, opAtual = null;
+let velas = [], P = null, sig = [];
+let ctx = {mvrv:NaN, fg:NaN};
+let ultimoAviso = null, carregado = false, somOn = false, audio = null;
 
-function calcIndicadores(){
-  P = preparar(velas);
-  ind.sig = velas.map((k,i)=> temSinal(velas,P,i,cfg.filtro200));
-  ind.sd = velas.map((k,i)=> Math.max((P.atr[i]||0)*cfg.atrMult, k.c*cfg.minStop/100));
-}
-function mvrvAtual(){ return cfg.mvrvMan>0 ? cfg.mvrvMan : ctx.mvrv; }
-function fgAtual(){ return cfg.fgMan>0 ? cfg.fgMan : ctx.fg; }
-function contextoOK(){
-  if(cfg.ativo!=="BTCBRL") return {mvrv:true, fg:true};
-  const m = mvrvAtual(), f = fgAtual();
-  return { mvrv: !(isFinite(m) && m >= cfg.mvrvMax), fg: !(isFinite(f) && f >= cfg.fgMax) };
+function calcIndicadores(){ P = preparar(velas); sig = velas.map((k,i)=> i>200 && k.closed && condCompra(velas,P,i)); }
+function contextoOK(){ return { mvrv: !(isFinite(ctx.mvrv) && ctx.mvrv >= cfg.mvrvMax), fg: !(isFinite(ctx.fg) && ctx.fg >= cfg.fgMax) }; }
+/* T/D automático: 2 vezes a variação média de um candle (ATR), entre 0,3% e 5%. */
+const tdAuto = i => { const a = P.atr[i], c = velas[i].c; return isFinite(a) ? Math.min(5, Math.max(0.3, Math.round(2*a/c*1000)/10)) : 1; };
+
+/* Quantia de compra perto do valor escolhido, grande o bastante para a venda
+   (já sem a taxa de 0,1%, que sai do BTC comprado) passar do mínimo da Binance no preço do stop. */
+function quantias(preco, td){
+  const stop = preco*(1 - td/100);
+  let qtd = Math.max(INFO.passo, ajusta(cfg.valorEntrada/preco, INFO.passo)), g = 0;
+  while(ajusta(qtd*0.999, INFO.passo, "baixo")*stop < INFO.minimo*1.02 && g++ < 1000) qtd = ajusta(qtd + INFO.passo, INFO.passo);
+  return {qtd, qtdVenda: ajusta(qtd*0.999, INFO.passo, "baixo")};
 }
 
-/* Quantia de compra: perto do valor escolhido e grande o bastante para a OCO de venda
-   (já sem a taxa de 0,1%, que sai da moeda comprada) passar do mínimo da Binance no preço do stop. */
-function qtdPara(precoRef, slLimRef){
-  const minimoOco = ajusta(INFO.minimo*1.02 / slLimRef, INFO.passo, "cima");
-  let qtd = ajusta(cfg.valorEntrada / precoRef, INFO.passo);
-  let guarda = 0;
-  while(ajusta(qtd*0.999, INFO.passo, "baixo") < minimoOco && guarda++ < 1000) qtd = ajusta(qtd + INFO.passo, INFO.passo);
-  return qtd;
-}
-/* Preços da OCO de venda a partir de um preço de entrada, arredondados às regras do par. */
-function niveis(entrada, sd, rr, qtdFix){
-  const sl = ajusta(entrada - sd, INFO.tick);
-  const slLim = ajusta(sl*(1-0.001), INFO.tick, "baixo");
-  const tp = ajusta(entrada + sd*rr, INFO.tick);
-  const qtd = qtdFix || qtdPara(entrada, slLim);
-  const qtdOco = ajusta(qtd*0.999, INFO.passo, "baixo");
-  return {entrada, sd, sl, slLim, tp, qtd, qtdOco};
-}
-/* OCO de compra (aba Comprar → OCO): compra no recuo (limite abaixo do preço)
-   ou no rompimento (stop acima da máxima do candle do sinal), o que vier primeiro. */
-function niveisEnt(c, h, a, sd, rr){
-  let L = ajusta(c - 0.5*a, INFO.tick, "baixo"); if(!(L < c)) L = ajusta(c - INFO.tick, INFO.tick);
-  let B = ajusta(Math.max(h, c) + 0.1*a, INFO.tick, "cima"); if(!(B > c)) B = ajusta(c + INFO.tick, INFO.tick);
-  const recuo0 = niveis(L, sd, rr);
-  const qtd = qtdPara(c, recuo0.slLim);
-  return {modo:"oco", c, L, B, sd, qtd, total: qtd*c, recuo: niveis(L, sd, rr, qtd), romp: niveis(B, sd, rr, qtd)};
-}
-const atrDe = i => (P && P.atr[i]) || (ind.sd[i]/cfg.atrMult);
-
-/* Simula as operações.
-   Market: compra no fechamento do candle do sinal.
-   OCO de compra: a ordem fica valendo por N candles e executa no recuo ou no rompimento; se nenhum for tocado, expira.
-   Depois da compra: OCO de venda com TP e SL, e saída por tempo. */
-function simular(rr, usaFiltro, incluiAberta, desdeT, jan){
-  const trades=[]; let ab=null, pend=null, ultimaExp=null; const agora=Date.now(); const taxa = taxaRT();
-  const barsMax = Math.max(1, Math.round(cfg.tempo*60000/TF_MS));
-  const ok = contextoOK(); const filtroOK = !usaFiltro || (ok.mvrv && ok.fg);
-  const oco = cfg.modoEntrada === "oco";
-  const stats = {sinais:0, rec:0, romp:0, exp:0};
-  const porDia = {};
+/* Simulação candle a candle (premissas conservadoras quando a ordem dos preços dentro do candle é desconhecida). */
+function simular(o){
+  const trades = []; let ab = null, pend = null, ultimaExp = null; const agora = Date.now();
+  const ok = contextoOK(), ctxOK = !o.usaCtx || (ok.mvrv && ok.fg);
+  const fecha = (saida, motivo, quando) => {
+    const pct = (saida - ab.entrada)/ab.entrada*100 - TAXA;
+    trades.push(Object.assign({}, ab, {saida, motivo, pct, brl: ab.qtd*(saida-ab.entrada) - ab.qtd*ab.entrada*TAXA/100, saidaT: quando}));
+    ab = null;
+  };
+  const motivoTrail = s => s > ab.entrada*(1+TAXA/100) ? "Trailing (gain)" : "Trailing (stop)";
   for(let i=201;i<velas.length;i++){
-    const k=velas[i];
-    if(!k.closed && !incluiAberta) break;
+    const k = velas[i];
+    if(!k.closed && !o.incluiAberta) break;
     if(ab){
-      if(i>ab.i){
-        const bSL = k.l<=ab.sl, bTP = k.h>=ab.tp;
-        const bT = k.closed ? (i-ab.i)>=barsMax : agora >= ab.fillT + cfg.tempo*60000;
-        const bJ = !!(jan && jan.zerar && k.closed && !naJanela(k.T+1));
-        if(bSL||bTP||bT||bJ){
-          const saida = bSL? ab.sl : bTP? ab.tp : k.c;
-          const motivo = bSL? "SL" : bTP? "TP" : bJ? "Fim da janela" : "Tempo";
-          const pct = (saida-ab.entrada)/ab.entrada*100 - taxa;
-          const brl = ab.qtd*(saida-ab.entrada) - ab.qtd*ab.entrada*taxa/100;
-          trades.push(Object.assign({}, ab, {saida, motivo, pct, brl, saidaT: k.closed? k.T+1 : agora}));
-          ab=null;
+      if(i > ab.i){
+        const quando = k.closed ? k.T+1 : agora;
+        let nivel = ab.topo*(1 - ab.td/100);
+        if(k.l <= nivel){ const s = Math.min(nivel, k.o); fecha(s, motivoTrail(s), quando); continue; }
+        ab.topo = Math.max(ab.topo, k.h); nivel = ab.topo*(1 - ab.td/100);
+        if(k.c <= nivel){ fecha(nivel, motivoTrail(nivel), quando); continue; }
+        if(k.closed){
+          if(o.saida === "sinais" && saidaMedias(i)){ fecha(k.c, "Médias viraram", quando); continue; }
+          if(o.saida === "sinais" && saidaRsi(i)){ fecha(k.c, "RSI esgotou", quando); continue; }
+          if(!naJanela(k.T+1)){ fecha(k.c, "Fim do horário", quando); continue; }
         }
       }
       continue;
     }
     if(pend){
-      if(i > pend.i + cfg.validade){
-        stats.exp++; ultimaExp = {T:pend.T, expT:pend.expira}; pend = null;
-      } else {
-        const hitL = k.l <= pend.L, hitB = k.h >= pend.B;
-        if(hitL || hitB){
-          let via;
-          if(hitL && hitB) via = k.o >= pend.B ? "romp" : k.o <= pend.L ? "rec" : ((k.o - pend.L) <= (pend.B - k.o) ? "rec" : "romp");
-          else via = hitL ? "rec" : "romp";
-          const fill = via === "rec" ? pend.L : Math.max(pend.B, k.o);
-          stats[via]++;
-          ab = Object.assign({i, T:pend.T, sinalI:pend.i, fillT: k.closed ? k.t + TF_MS/2 : Math.min(agora, k.T+1), via: via==="rec" ? "recuo" : "rompimento"}, niveis(fill, pend.sd, rr, pend.qtd));
+      if(i > pend.i + cfg.validade){ ultimaExp = {T:pend.T, expT:pend.expira}; pend = null; }
+      else {
+        const gat = pend.fundo*(1 + cfg.repique/100);
+        if(k.h >= gat){
+          const e = Math.max(gat, k.o);
+          ab = Object.assign({i, T:pend.T, fillT: k.closed ? k.t + TF_MS/2 : agora, entrada:e, topo:e, td:pend.td}, quantias(e, pend.td));
           pend = null;
-        }
+        } else pend.fundo = Math.min(pend.fundo, k.l);
         continue;
       }
     }
-    if(k.closed && ind.sig[i] && filtroOK && (!desdeT || k.t >= desdeT) && (!jan || naJanela(k.T+1))){
-      const d = diaDe(k.T+1); porDia[d] = (porDia[d]||0) + 1;
-      stats.sinais++;
-      if(oco) pend = Object.assign({i, T:k.T+1, expira: k.T+1 + cfg.validade*TF_MS}, niveisEnt(k.c, k.h, atrDe(i), ind.sd[i], rr));
-      else ab = Object.assign({i, T:k.T+1, fillT:k.T+1, via:"mercado"}, niveis(k.c, ind.sd[i], rr));
+    if(k.closed && sig[i] && ctxOK && naJanela(k.T+1) && (!o.desdeT || k.t >= o.desdeT)){
+      const td = o.td || tdAuto(i);
+      if(o.entrada === "repique") pend = {i, T:k.T+1, expira:k.T+1+cfg.validade*TF_MS, fundo:k.c, td};
+      else ab = Object.assign({i, T:k.T+1, fillT:k.T+1, entrada:k.c, topo:k.c, td}, quantias(k.c, td));
     }
   }
-  return {trades, aberta: ab, pendente: pend, ultimaExp, stats, porDia};
+  return {trades, aberta:ab, pendente:pend, ultimaExp};
+}
+const regras = extra => Object.assign({td:cfg.td, saida:cfg.saida, entrada:cfg.entrada}, extra);
+function resumo(trades){
+  const n = trades.length, w = trades.filter(t=>t.pct>0), l = trades.filter(t=>t.pct<=0);
+  return {n, acerto: n ? w.length/n : NaN, total: trades.reduce((a,t)=>a+t.pct,0),
+    ganhoMed: w.length ? w.reduce((a,t)=>a+t.pct,0)/w.length : NaN, perdaMed: l.length ? l.reduce((a,t)=>a+t.pct,0)/l.length : NaN};
 }
 
-/* Chance histórica de o preço tocar o TP antes do SL, entrando em qualquer candle (sem esperar sinal). */
-function taxaBase(rr, desdeT){
-  const barsMax = Math.max(1, Math.round(cfg.tempo*60000/TF_MS));
-  let w=0, l=0, t=0;
-  for(let i=201;i<velas.length;i++){
-    const k = velas[i]; if(!k.closed) break; if(desdeT && k.t < desdeT) continue;
-    const sd = ind.sd[i], tp = k.c + sd*rr, sl = k.c - sd;
-    let res = 0, fim = false;
-    for(let j=i+1; j<=i+barsMax; j++){
-      if(j >= velas.length || !velas[j].closed){ fim = true; break; }
-      const q = velas[j];
-      if(q.l <= sl){ res = 2; break; }
-      if(q.h >= tp){ res = 1; break; }
-    }
-    if(fim && res===0) continue;
-    if(res===1) w++; else if(res===2) l++; else t++;
-  }
-  return {w, l, t, n: w+l+t};
+/* ---------- quadro do sinal ---------- */
+function linhasCompra(preco, td){
+  const q = quantias(preco, td), stop = preco*(1-td/100);
+  const perda = q.qtd*preco*(td/100 + TAXA/100);
+  return `<div class="passo"><div class="rot">1 · Aba Comprar → Market</div><dl class="grade">
+      <dt>Quantia (BTC)</dt><dd>${fQ(q.qtd)}</dd><dt>Total aproximado</dt><dd>R$ ${fR(q.qtd*preco)}</dd></dl></div>
+    <div class="passo"><div class="rot">2 · Logo depois: aba Vender → Trailing Stop</div><dl class="grade">
+      <dt>T/D (%)</dt><dd class="tp">${fTd(td)}</dd><dt>Limite / Mercado</dt><dd>Mercado</dd>
+      <dt>Quantia (BTC)</dt><dd>${fQ(q.qtdVenda)}</dd><dt>Preço de Ativação</dt><dd>desmarcado</dd>
+      <dt>Vende sozinho se cair até</dt><dd class="sl">${fP(stop)}</dd><dt>Perda máxima</dt><dd class="sl">−R$ ${fR(perda)}</dd>
+      <dt>Lucro começa se subir mais de</dt><dd>${fTd(td + TAXA)}</dd></dl>
+      <p class="nota">Se o preço subir, o stop sobe junto e vende quando cair ${fTd(td)} do ponto mais alto.</p></div>`;
 }
-function wilson(k, n, z){
-  z = z || 1.645; if(!n) return [NaN, NaN];
-  const p = k/n, den = 1 + z*z/n, c = (p + z*z/(2*n))/den, m = z*Math.sqrt(p*(1-p)/n + z*z/(4*n*n))/den;
-  return [Math.max(0, c-m), Math.min(1, c+m)];
+function linhasRepique(p){
+  const gat = p.fundo*(1+cfg.repique/100), q = quantias(gat, p.td);
+  return `<div class="passo"><div class="rot">1 · Aba Comprar → Trailing Stop (compra no repique)</div><dl class="grade">
+      <dt>T/D (%)</dt><dd>${fTd(cfg.repique)}</dd><dt>Limite / Mercado</dt><dd>Mercado</dd>
+      <dt>Quantia (BTC)</dt><dd>${fQ(q.qtd)}</dd><dt>Preço de Ativação</dt><dd>desmarcado</dd>
+      <dt>Compra se repicar até cerca de</dt><dd>${fP(gat)}</dd><dt>Cancele se não comprar até</dt><dd>${fHM(p.expira)}</dd></dl></div>
+    <div class="passo"><div class="rot">2 · Depois que comprar: aba Vender → Trailing Stop</div><dl class="grade">
+      <dt>T/D (%)</dt><dd class="tp">${fTd(p.td)}</dd><dt>Limite / Mercado</dt><dd>Mercado</dd>
+      <dt>Quantia (BTC)</dt><dd>${fQ(q.qtdVenda)}</dd><dt>Preço de Ativação</dt><dd>desmarcado</dd></dl></div>`;
 }
-let PROB = null;
+function linhasPosicao(p, topo, nivel, preco, titulo){
+  const res = (preco - p.entrada)/p.entrada*100 - TAXA;
+  const resR = p.qtd*(preco - p.entrada) - p.qtd*p.entrada*TAXA/100;
+  return `<div class="passo"><div class="rot">${titulo || "Sua operação"}</div><dl class="grade">
+      <dt>Comprou a</dt><dd>${fP(p.entrada)}</dd><dt>Quantia</dt><dd>${fQ(p.qtd)} BTC</dd>
+      <dt>Trailing (T/D)</dt><dd>${fTd(p.td)}</dd>
+      <dt>Topo desde a compra</dt><dd>${fP(topo)}</dd><dt>Trailing vende em</dt><dd class="sl">${fP(nivel)}</dd>
+      <dt>Resultado agora (com taxas)</dt><dd class="${res>=0?"pos":"neg"}">${fPct(res,2)} · ${resR>=0?"+":"−"}R$ ${fR(Math.abs(resR))}</dd>
+      <dt>Fim do seu horário</dt><dd>${String(cfg.horaFim).padStart(2,"0")}:00</dd></dl></div>`;
+}
+const passosSair = qtd => `<div class="passo"><div class="rot">Como sair</div><dl class="grade">
+    <dt>1 · Ordens abertas</dt><dd>cancele o Trailing Stop</dd><dt>2 · Aba Vender → Market</dt><dd>${fQ(qtd)} BTC</dd></dl></div>`;
 
-/* ---------- tela ---------- */
-function mostrar(tone, estado, instr, op, ehRef){
+function quadro(tone, estado, instr, html, ehRef){
   $("sinal").dataset.tone = tone; $("estado").textContent = estado; $("instr").textContent = instr;
-  $("detalhe").hidden = !op;
-  $("refAviso").hidden = !ehRef;
-  if(!op) return;
-  const taxa = taxaRT();
-  const ehEntradaOco = op.modo === "oco";
-  $("blocoMarket").hidden = ehEntradaOco; $("blocoOco").hidden = !ehEntradaOco;
-  if(ehEntradaOco){
-    $("eRec").textContent = fP(op.L); $("eRomp").textContent = fP(op.B);
-    $("eQtd").textContent = fQ(op.qtd); $("eTot").textContent = "R$ " + fR(op.total);
-    if(ehRef){ $("eValLbl").textContent = "Validade da ordem"; $("eVal").textContent = cfg.validade + " candles (" + tempoTexto(cfg.validade*TF_MS) + ")"; }
-    const lin = (nome, f, cls) => `<tr><td>${nome}</td><td class="mono ${cls||""}">${f(op.recuo)}</td><td class="mono ${cls||""}">${f(op.romp)}</td></tr>`;
-    const ganho = o => "+R$ " + fR(o.qtd*(o.tp-o.entrada) - o.qtd*o.entrada*taxa/100);
-    const perda = o => "−R$ " + fR(o.qtd*(o.entrada-o.slLim) + o.qtd*o.entrada*taxa/100);
-    $("saidaOco").innerHTML = lin("Comprou a", o=>fP(o.entrada)) + lin("Limite TP", o=>fP(o.tp), "tp") + lin("Ativação SL", o=>fP(o.sl), "sl")
-      + lin("Limite SL (ou Mercado)", o=>fP(o.slLim), "sl") + lin("Quantia (" + INFO.base + ")", o=>fQ(o.qtdOco)) + lin("Ganho se bater TP", ganho, "tp") + lin("Perda se bater SL", perda, "sl");
-  } else {
-    $("p1Tit").textContent = op.via && op.via !== "mercado" ? "1 · Compra executada no " + op.via : "1 · Aba Comprar → Market";
-    $("dTempoLbl").textContent = ehRef ? "Tempo máximo" : "Tempo restante";
-    if(ehRef) $("dTempo").textContent = tempoTexto(cfg.tempo*60000);
-    const total = op.qtd*op.entrada;
-    $("dEntrada").textContent = fP(op.entrada);
-    $("dQtd").textContent = fQ(op.qtd);
-    $("dTotal").textContent = "R$ " + fR(total);
-    $("dTP").textContent = fP(op.tp); $("dSL").textContent = fP(op.sl); $("dSLL").textContent = fP(op.slLim);
-    $("dQtdOco").textContent = fQ(op.qtdOco);
-    $("dGanho").textContent = "+R$ " + fR(op.qtd*(op.tp-op.entrada) - total*taxa/100);
-    $("dPerda").textContent = "−R$ " + fR(op.qtd*(op.entrada-op.slLim) + total*taxa/100);
+  $("passos").innerHTML = html || ""; $("refAviso").hidden = !ehRef;
+}
+
+/* Acompanha uma posição desde a compra: topo, nível do trailing e sinais de saída. */
+function acompanhar(p, desdeT){
+  const n = velas.length, preco = velas[n-1].c;
+  let topo = p.entrada, motivo = null;
+  for(let i=1;i<n;i++){
+    const k = velas[i]; if(k.T < desdeT) continue;
+    topo = Math.max(topo, k.h);
+    if(k.closed && cfg.saida === "sinais" && !motivo){
+      if(saidaMedias(i)) motivo = "A média 9 cruzou para baixo da 21 às " + fHM(k.T+1) + ".";
+      else if(saidaRsi(i)) motivo = "O RSI passou de 70 e voltou a cair às " + fHM(k.T+1) + ".";
+    }
   }
-  renderProbs(op);
-}
-
-/* Probabilidades a partir do histórico baixado (frequências do passado, não previsão). */
-function renderProbs(op){
-  const el = $("probs");
-  if(!PROB){ el.innerHTML = ""; return; }
-  const pctTxt = x => isFinite(x) ? Math.round(x*100) + "%" : "—";
-  const preco = op.entrada || op.c, sd = op.sd;
-  const tpPct = sd*cfg.rr/preco*100, slPct = sd/preco*100, taxa = taxaRT();
-  const empate = (slPct + taxa)/(tpPct + slPct);
-  const nOps = PROB.tp + PROB.sl + PROB.tempo;
-  const pTP = nOps ? PROB.tp/nOps : NaN;
-  const [lo, hi] = wilson(PROB.tp, nOps);
-  const base = PROB.base, pBase = base.n ? base.w/base.n : NaN;
-  let ver, cls;
-  if(nOps < 10){ ver = "Poucos dados (" + nOps + " operações): ainda não dá para concluir"; cls = "warn"; }
-  else if(lo > empate){ ver = "Vantagem no histórico: o acerto passou do mínimo para empatar"; cls = "pos"; }
-  else if(hi < empate){ ver = "Sem vantagem no histórico: o acerto ficou abaixo do mínimo para empatar"; cls = "neg"; }
-  else { ver = "Inconclusivo: o acerto está perto do mínimo para empatar"; cls = "warn"; }
-  let h = `<div class="rot passo">Probabilidades no histórico (${PROB.periodo})</div><dl class="grade">`;
-  if(cfg.modoEntrada === "oco"){
-    const s = PROB.stats, n = s.rec + s.romp + s.exp;
-    h += `<dt>OCO de compra executar no recuo</dt><dd>${pctTxt(n ? s.rec/n : NaN)}</dd>`
-      +  `<dt>Executar no rompimento</dt><dd>${pctTxt(n ? s.romp/n : NaN)}</dd>`
-      +  `<dt>Não executar (expira)</dt><dd>${pctTxt(n ? s.exp/n : NaN)}</dd>`;
-  }
-  h += `<dt>Sair com gain (TP) depois da compra</dt><dd class="tp">${pctTxt(pTP)}</dd>`
-    +  `<dt>Faixa provável do gain (90%)</dt><dd>${isFinite(lo) ? Math.round(lo*100) + "% a " + Math.round(hi*100) + "%" : "—"}</dd>`
-    +  `<dt>Sair no stop (SL)</dt><dd class="sl">${pctTxt(nOps ? PROB.sl/nOps : NaN)}</dd>`
-    +  `<dt>Sair por tempo</dt><dd>${pctTxt(nOps ? PROB.tempo/nOps : NaN)}</dd>`
-    +  `<dt>Operações usadas no cálculo</dt><dd>${nOps}</dd>`
-    +  `<dt>TP antes do SL em qualquer momento</dt><dd>${pctTxt(pBase)} <span class="mini">(${base.n} casos)</span></dd>`
-    +  `<dt>Mínimo de gain para empatar</dt><dd><b>${pctTxt(empate)}</b></dd></dl>`
-    +  `<p class="chip ${cls}">${ver}</p>`
-    +  `<p class="nota">"Em qualquer momento" mostra a chance de o preço andar até o TP antes do SL sem esperar sinal. Se o número com sinal não for maior que ele, o sinal não está ajudando.</p>`;
-  el.innerHTML = h;
-}
-
-function tempoTexto(ms, seg){
-  if(!(ms > 0)) return "0 min";
-  if(seg && ms < 3600000) return Math.floor(ms/60000) + " min " + String(Math.floor(ms/1000)%60).padStart(2,"0") + " s";
-  const d = Math.floor(ms/86400000), h = Math.floor(ms/3600000)%24, m = Math.floor(ms/60000)%60;
-  return (d? d+" d ":"") + (d||h? h+" h ":"") + m + " min";
-}
-
-function refAtual(){
-  const n = velas.length; if(!n) return null;
-  const k = velas[n-1], sd = ind.sd[n-1] || k.c*cfg.minStop/100;
-  return cfg.modoEntrada === "oco" ? niveisEnt(k.c, k.h, atrDe(n-1), sd, cfg.rr) : niveis(k.c, sd, cfg.rr);
+  const nivel = topo*(1 - p.td/100);
+  if(preco <= nivel) motivo = "trailing";
+  else if(!naJanela(Date.now()) && !motivo) motivo = "fim";
+  return {topo, nivel, preco, motivo};
 }
 
 function atualizarSinal(){
-  if(!carregado) return;
-  const {trades, aberta, pendente, ultimaExp} = simular(cfg.rr, true, true);
-  const agora = Date.now(); const ok = contextoOK();
-  const n24 = trades.filter(t=>agora - t.T < 86400000).length + (aberta && agora - aberta.T < 86400000 ? 1 : 0) + (pendente ? 1 : 0);
-  const ultV = velas[velas.length-1]; const fecha = ultV && !ultV.closed ? ultV.T+1 - agora : NaN;
-  $("hoje").innerHTML = `Sinais nas últimas 24h: <b>${n24}</b> · candle de <b>${TFS[cfg.tf].nome}</b>` + (isFinite(fecha) ? ` fecha em <b>${tempoTexto(fecha, true)}</b>` : "") + ` · taxa ida e volta <b>${String(taxaRT()).replace(".",",")}%</b>`;
-  const atual = refAtual();
-  const ref = aberta || pendente || atual;
-  if(ref){
-    const tot = ref.total || ref.qtd*ref.entrada, pr = ref.c || ref.entrada;
-    $("arred").textContent = "Vai comprar " + fQ(ref.qtd) + " " + INFO.base + " ≈ R$ " + fR(tot) + (aberta || pendente ? " neste sinal." : " no preço atual.") +
-      " A Binance só aceita múltiplos de " + fQ(INFO.passo) + " " + INFO.base + " (≈ R$ " + fR(INFO.passo*pr) + ") e ordens de pelo menos R$ " + fR(INFO.minimo) + ", por isso o valor é arredondado." +
-      (tot > cfg.banca ? " Atenção: passa do seu pote de R$ " + fR(cfg.banca) + " definido em Ajustes." : "");
-  }
-  if(aberta && (!opAtual || opAtual.T !== aberta.T || opAtual.entrada !== aberta.entrada)){ $("pago").value = aberta.entrada; $("qtdComprada").value = aberta.qtd; }
-  opAtual = aberta || pendente;
-  const foraJan = naJanela(agora) ? "" : " Atenção: fora da sua janela (" + cfg.horaIni + "h às " + cfg.horaFim + "h).";
-  let chave = null;
-  if(pendente){
-    mostrar("buy","COLOQUE A OCO DE COMPRA","Aba Comprar → OCO com os valores do passo 1. Ela compra sozinha se o preço recuar até " + fP(pendente.L) + " ou romper " + fP(pendente.B) + ". Se não executar até " + fHM(pendente.expira) + ", cancele a ordem." + foraJan, pendente);
-    $("eValLbl").textContent = "Cancele se não executar em";
-    $("eVal").textContent = tempoTexto(pendente.expira - agora, true) + " (às " + fHM(pendente.expira) + ")";
-    chave = "p"+pendente.T;
-  } else if(aberta){
-    const resta = aberta.fillT + cfg.tempo*60000 - agora;
-    if(cfg.modoEntrada === "oco" && agora - aberta.fillT < Math.max(TF_MS, 15*60000)){
-      mostrar("buy","COMPRA EXECUTADA NO " + aberta.via.toUpperCase(),"A OCO de compra deve ter executado a cerca de " + fP(aberta.entrada) + ". Confira no app e coloque agora a OCO de venda (aba Vender → OCO). Se o preço pago foi outro, use \"Ajustar a OCO ao preço que eu paguei\".", aberta);
-      chave = "f"+aberta.T;
-    } else if(cfg.modoEntrada === "market" && agora - aberta.T < TF_MS){
-      mostrar("buy","ENTRE AGORA","Compre a mercado no app e logo em seguida coloque a OCO de venda com os valores abaixo." + foraJan, aberta);
-      chave = "c"+aberta.T;
-    } else {
-      mostrar("info","EM OPERAÇÃO","A OCO de venda deve estar ativa. Se o tempo acabar sem TP nem SL, cancele a OCO e venda a mercado.", aberta);
-    }
-    $("dTempo").textContent = tempoTexto(resta);
-  } else {
-    const u = trades[trades.length-1];
-    if(u && agora - u.saidaT < Math.max(15*60000, TF_MS)){
-      if(u.motivo==="TP") mostrar("buy","TP ATINGIDO","O preço chegou ao alvo. A OCO deve ter vendido com lucro. Confira no app.", atual, true);
-      else if(u.motivo==="SL") mostrar("sell","SL ATINGIDO","O preço chegou ao stop. A OCO deve ter vendido. Confira no app se a ordem executou.", atual, true);
-      else mostrar("warn","SAIR A MERCADO","Acabou o tempo sem TP nem SL. Cancele a OCO e venda a mercado agora.", atual, true);
-      chave = "s"+u.T+u.motivo;
-    } else if(ultimaExp && agora - ultimaExp.expT < Math.max(15*60000, TF_MS)){
-      mostrar("warn","ENTRADA NÃO EXECUTOU","O preço não chegou ao recuo nem ao rompimento a tempo. Cancele a OCO de compra em Ordens abertas.", atual, true);
-      chave = "e"+ultimaExp.T;
-    } else if(!(ok.mvrv && ok.fg)){
-      mostrar("warn","BLOQUEADO PELO CONTEXTO", (!ok.mvrv ? "MVRV acima do limite. " : "") + (!ok.fg ? "Medo e Ganância acima do limite. " : "") + "Nenhuma compra até o contexto melhorar.", atual, true);
-    } else if(sinalFormando()){
-      mostrar("warn","SINAL SE FORMANDO","As condições de compra estão aparecendo no candle atual. Ainda não entre: o sinal só vale se continuar assim no fechamento do candle (" + tempoTexto(fecha, true) + ").", atual, true);
-    } else {
-      mostrar("info","AGUARDANDO SINAL","Nenhuma operação aberta. Quando aparecer um sinal, este quadro fica verde e os valores abaixo passam a ser os do sinal.", atual, true);
-    }
-  }
-  if(chave && chave!==ultimoAviso){ if(ultimoAviso!==null) avisar($("estado").textContent, $("instr").textContent); ultimoAviso=chave; }
-  if(ultimoAviso===null) ultimoAviso = "inicio";
-  ajustarCompra();
-}
-
-function ajustarCompra(){
-  const p = parseFloat($("pago").value), q = parseFloat($("qtdComprada").value);
-  const sd = opAtual ? opAtual.sd : (ind.sd.length ? ind.sd[ind.sd.length-1] : NaN);
-  let slLim = NaN;
-  if(isFinite(p) && isFinite(sd)){
-    const sl = ajusta(p-sd, INFO.tick); slLim = ajusta(sl*(1-0.001), INFO.tick, "baixo");
-    $("aSL").textContent=fP(sl); $("aSLL").textContent=fP(slLim); $("aTP").textContent=fP(ajusta(p+sd*cfg.rr, INFO.tick));
-  } else { ["aSL","aSLL","aTP"].forEach(id=>$(id).textContent="—"); }
-  const qo = isFinite(q) ? ajusta(q*0.999, INFO.passo, "baixo") : NaN;
-  $("aQtd").textContent = fQ(qo);
-  const av = $("aAviso");
-  if(isFinite(qo) && isFinite(slLim) && qo*slLim < INFO.minimo){
-    av.hidden=false; av.textContent = "Atenção: essa quantia vale menos que o mínimo de R$ " + fR(INFO.minimo) + " no preço do stop e a Binance pode recusar a OCO. Compre um pouco mais.";
-  } else av.hidden=true;
-}
-$("pago").addEventListener("input", ajustarCompra);
-$("qtdComprada").addEventListener("input", ajustarCompra);
-
-function atualizarBacktest(){
-  const fechadas = velas.filter(k=>k.closed);
-  const umAno = Date.now() - 365*86400000;
-  const iniT = fechadas.length>201 ? Math.max(fechadas[201].t, umAno) : 0;
-  $("btTitulo").textContent = "Backtest com as mesmas regras e " + String(taxaRT()).replace(".",",") + "% de taxa por operação";
-  if(fechadas.length>201) $("periodo").textContent = INFO.nome + " · " + new Date(iniT).toLocaleDateString("pt-BR") + " até " + new Date(fechadas[fechadas.length-1].T+1).toLocaleDateString("pt-BR") + " (máximo de 1 ano, candle de " + TFS[cfg.tf].nome + "). Linha destacada = alvo escolhido nos Ajustes.";
-  const linhas = [1,1.5,2].map(rr=>{
-    const {trades} = simular(rr,false,false,iniT);
-    const n=trades.length, w=trades.filter(t=>t.pct>0).length;
-    const soma=trades.reduce((a,t)=>a+t.pct,0), brl=trades.reduce((a,t)=>a+t.brl,0);
-    const cls = soma>=0?"pos":"neg";
-    return `<tr class="${rr===cfg.rr?"atual":""}"><td>${String(rr).replace(".",",")}×</td><td class="mono">${n}</td><td class="mono">${n?Math.round(w/n*100)+"%":"—"}</td><td class="mono ${n?cls:""}">${n?fPct(soma):"—"}</td><td class="mono ${n?cls:""}">${n?fR(brl):"—"}</td></tr>`;
-  });
-  $("bt").innerHTML = linhas.join("");
-  { const r = simular(cfg.rr,false,false,iniT);
-    const per = new Date(iniT).toLocaleDateString("pt-BR") + " a " + new Date(fechadas[fechadas.length-1].T+1).toLocaleDateString("pt-BR");
-    PROB = {stats:r.stats, tp:r.trades.filter(t=>t.motivo==="TP").length, sl:r.trades.filter(t=>t.motivo==="SL").length,
-      tempo:r.trades.filter(t=>t.motivo!=="TP" && t.motivo!=="SL").length, base:taxaBase(cfg.rr, iniT), periodo: per}; }
-  const linhaCen = (nome, trades) => {
-    const n=trades.length, w=trades.filter(t=>t.pct>0).length, soma=trades.reduce((a,t)=>a+t.pct,0), brl=trades.reduce((a,t)=>a+t.brl,0), cls = soma>=0?"pos":"neg";
-    return `<tr><td style="text-align:left">${nome}</td><td class="mono">${n}</td><td class="mono">${n?Math.round(w/n*100)+"%":"—"}</td><td class="mono ${n?cls:""}">${n?fPct(soma):"—"}</td><td class="mono ${n?cls:""}">${n?fR(brl):"—"}</td></tr>`;
-  };
-  $("janTitulo").textContent = "Na sua janela de operação (" + cfg.horaIni + "h às " + cfg.horaFim + "h, horário de Brasília)";
-  $("janNota").textContent = "Mesmo alvo dos Ajustes (" + String(cfg.rr).replace(".",",") + "×). Compara seguir todos os sinais com entrar só no seu horário e, no último cenário, também vender o que estiver aberto no fim da janela, para não dormir comprado.";
-  $("btJan").innerHTML = [
-    linhaCen("Todos os sinais (24/7)", simular(cfg.rr,false,false,iniT).trades),
-    linhaCen("Só entradas no seu horário (OCO fica à noite)", simular(cfg.rr,false,false,iniT,{zerar:false}).trades),
-    linhaCen("Entradas no seu horário e venda às " + cfg.horaFim + "h", simular(cfg.rr,false,false,iniT,{zerar:true}).trades)
-  ].join("");
-  const {trades} = simular(cfg.rr,false,false,iniT);
-  atualizarUltimas();
-  return trades;
-}
-
-/* Últimas 10 operações (as das últimas 24h ficam marcadas), com a operação em aberto no topo. */
-function atualizarUltimas(){
-  if(!carregado) return;
-  const agora = Date.now();
-  const {trades, aberta} = simular(cfg.rr,false,true);
-  const ult = trades.slice(-10).reverse();
-  const em24 = trades.filter(t=> agora - t.saidaT < 86400000);
-  const soma24 = em24.reduce((a,t)=>a+t.pct,0), brl24 = em24.reduce((a,t)=>a+t.brl,0);
-  $("ult24").innerHTML = `Últimas 24h: <b>${em24.length}</b> operação(ões) encerrada(s)` + (em24.length ? ` · resultado <b class="${soma24>=0?"pos":"neg"}">${fPct(soma24)} (R$ ${fR(brl24)})</b>` : "") + ` · marcadas com a barra azul.`;
-  let html = "";
-  if(aberta){
-    const atualP = velas[velas.length-1].c, pct = (atualP-aberta.entrada)/aberta.entrada*100 - taxaRT();
-    html += `<tr class="aberta h24"><td>${fHora(aberta.T)}</td><td class="mono">${fP(aberta.entrada)}</td><td class="mono">${fP(atualP)}</td><td>Em aberto</td><td class="mono ${pct>=0?"pos":"neg"}">${fPct(pct)}</td></tr>`;
-  }
-  html += ult.map(t=>`<tr class="${agora - t.saidaT < 86400000 ? "h24" : ""}"><td>${fHora(t.T)}</td><td class="mono">${fP(t.entrada)}</td><td class="mono">${fP(t.saida)}</td><td>${t.motivo}</td><td class="mono ${t.pct>=0?"pos":"neg"}">${fPct(t.pct)}</td></tr>`).join("");
-  $("ultimas").innerHTML = html || `<tr><td colspan="5" style="text-align:left;color:var(--muted)">Nenhuma operação no período.</td></tr>`;
-}
-/* Mostra se as condições estão aparecendo no candle que ainda não fechou (pode sumir até o fechamento). */
-function sinalFormando(){
-  const n = velas.length; if(n < 205) return false;
-  const u = velas[n-1]; if(u.closed) return false;
-  const Q = preparar(velas.slice(-600));
-  const V = velas.slice(-600), i = V.length-1;
-  const cond = Q.e9[i-1] <= Q.e21[i-1] && Q.e9[i] > Q.e21[i] && Q.rsi[i] > 50 && Q.rsi[i] < 70 && (!cfg.filtro200 || u.c > P.e200[n-2]);
+  if(!carregado || !velas.length) return;
+  const agora = Date.now(), n = velas.length, ult = velas[n-1];
+  const r = simular(regras({incluiAberta:true, usaCtx:true}));
+  const tdAgora = cfg.td || tdAuto(n-1);
   const ok = contextoOK();
-  return cond && ok.mvrv && ok.fg;
-}
-/* Últimas 10 horas, a partir de candles de 1 hora baixados à parte (não depende do tempo do candle escolhido). */
-let horasV = [];
-async function carregarHoras(){
-  try{
-    const r = await getJSON(REST.map(b=>b+"/api/v3/klines?symbol="+cfg.ativo+"&interval=1h&limit=10"));
-    horasV = r.map(paraVela);
-  }catch(e){ horasV = []; }
-  atualizarHoras();
-}
-function atualizarHoras(){
-  if(!horasV.length){ $("horas").innerHTML = `<tr><td colspan="5" style="text-align:left;color:var(--muted)">Carregando…</td></tr>`; return; }
-  const agora = Date.now();
-  const ultP = velas.length ? velas[velas.length-1].c : NaN;
-  const {trades, aberta, pendente} = carregado ? simular(cfg.rr,true,true) : {trades:[], aberta:null, pendente:null};
-  const todas = trades.concat(aberta ? [aberta] : []).concat(pendente ? [pendente] : []);
-  const hhmm = ms => { try{ return new Date(ms).toLocaleTimeString("pt-BR",{timeZone:"America/Sao_Paulo",hour:"2-digit",minute:"2-digit"}); }catch(e){ return new Date(ms).toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"}); } };
-  $("horas").innerHTML = horasV.slice().reverse().map(k=>{
-    const fim = k.T+1, emCurso = agora < fim;
-    const fech = emCurso && isFinite(ultP) ? ultP : k.c;
-    const varr = (fech - k.o)/k.o*100;
-    const sinais = todas.filter(t=> t.T >= k.t && t.T < fim).length;
-    const saidas = trades.filter(t=> t.saidaT > k.t && t.saidaT <= fim).map(t=>t.motivo);
-    return `<tr class="${emCurso?"agora":""}${naJanela(k.t)?"":" fora"}"><td>${hhmm(k.t)}–${hhmm(fim)}${emCurso?" · agora":""}</td><td class="mono">${fP(fech)}</td><td class="mono ${varr>=0?"pos":"neg"}">${(varr>=0?"+":"") + varr.toLocaleString("pt-BR",{minimumFractionDigits:2,maximumFractionDigits:2})}%</td><td>${sinais? "Compra" + (sinais>1?" ×"+sinais:"") : "—"}</td><td>${saidas.length? saidas.join(", ") : "—"}</td></tr>`;
-  }).join("");
+  let chave = null;
+  $("boxEntrei").hidden = !!pos; $("boxEncerrar").hidden = !pos;
+
+  if(pos){
+    const a = acompanhar(pos, pos.t);
+    const det = linhasPosicao(pos, a.topo, a.nivel, a.preco);
+    if(a.motivo === "trailing"){
+      quadro("warn","TRAILING DEVE TER VENDIDO","O preço chegou a " + fP(a.nivel) + ". Confira no app se a venda executou e toque em \"Encerrei a operação\".", det);
+      chave = "pt"+pos.t;
+    } else if(a.motivo === "fim"){
+      quadro("sell","FIM DO SEU HORÁRIO: VENDA","Passou das " + cfg.horaFim + "h. Para não dormir comprado, saia agora.", det + passosSair(pos.qtdVenda));
+      chave = "pf"+pos.t;
+    } else if(a.motivo){
+      quadro("sell","SAIA AGORA", a.motivo + " A alta perdeu força: realize o resultado.", det + passosSair(pos.qtdVenda));
+      chave = "ps"+pos.t;
+    } else {
+      quadro("info","EM OPERAÇÃO","O trailing stop protege você na Binance. O painel avisa se aparecer um sinal de saída antes.", det);
+    }
+  } else if(r.pendente){
+    quadro("buy","COMPRE NO REPIQUE","Saiu sinal às " + fHM(r.pendente.T) + ". Coloque a ordem do passo 1: ela só compra se o preço repicar " + fTd(cfg.repique) + " do fundo.", linhasRepique(r.pendente));
+    chave = "r"+r.pendente.T;
+  } else if(r.aberta && agora - r.aberta.fillT < TF_MS){
+    const a = r.aberta;
+    quadro("buy","COMPRE AGORA","Sinal às " + fHM(a.T) + " a cerca de " + fP(a.entrada) + ". Faça os 2 passos e depois toque em \"Entrei\".", linhasCompra(ult.c, a.td));
+    if(!$("pago").value){ $("pago").value = Math.round(ult.c); $("qtdPaga").value = quantias(ult.c, a.td).qtd; }
+    chave = "c"+a.T;
+  } else if(r.aberta){
+    const a = r.aberta, ac = acompanhar(a, a.fillT);
+    quadro("info","SINAL EM ANDAMENTO","Houve sinal às " + fHM(a.T) + " a " + fP(a.entrada) + ". Se você entrou, toque em \"Entrei\" para acompanhar a sua operação.", linhasPosicao(a, ac.topo, ac.nivel, ac.preco, "Operação do sinal"));
+  } else {
+    const u = r.trades[r.trades.length-1];
+    if(u && agora - u.saidaT < 30*60000){
+      quadro(u.pct >= 0 ? "info" : "warn", "SAÍDA DO SINAL DAS " + fHM(u.T), u.motivo + " a " + fP(u.saida) + " (" + fPct(u.pct) + "). Se você ainda está comprado, saia também.", "");
+      chave = "s"+u.T;
+    } else if(r.ultimaExp && agora - r.ultimaExp.expT < 30*60000){
+      quadro("warn","REPIQUE NÃO ACONTECEU","O preço não repicou a tempo. Cancele a ordem de compra em Ordens abertas.", "");
+      chave = "e"+r.ultimaExp.T;
+    } else if(!naJanela(agora)){
+      quadro("info","FORA DO SEU HORÁRIO","A análise continua, mas sinais só valem das " + cfg.horaIni + "h às " + cfg.horaFim + "h.", linhasCompra(ult.c, tdAgora), true);
+    } else if(!(ok.mvrv && ok.fg)){
+      quadro("warn","BLOQUEADO PELO CONTEXTO", (!ok.mvrv ? "MVRV acima do limite. " : "") + (!ok.fg ? "Medo e Ganância acima do limite. " : "") + "Sem compras até melhorar.", linhasCompra(ult.c, tdAgora), true);
+    } else if(sinalFormando()){
+      quadro("warn","SINAL SE FORMANDO","As condições de compra estão aparecendo no candle atual. Ainda não entre: o sinal só vale se continuar assim no fechamento (" + tempoTexto(ult.T+1-agora) + ").", linhasCompra(ult.c, tdAgora), true);
+    } else {
+      quadro("info","AGUARDANDO SINAL","Nenhum sinal agora. O próximo candle fecha em " + tempoTexto(ult.T+1-agora) + ".", linhasCompra(ult.c, tdAgora), true);
+    }
+  }
+  if(chave && chave !== ultimoAviso){ if(ultimoAviso !== null) avisar($("estado").textContent, $("instr").textContent); ultimoAviso = chave; }
+  if(ultimoAviso === null) ultimoAviso = "inicio";
 }
 
-function relogio(){
-  try{ $("relogio").textContent = new Date().toLocaleTimeString("pt-BR",{timeZone:"America/Sao_Paulo", hour:"2-digit", minute:"2-digit", second:"2-digit"}); }
-  catch(e){ $("relogio").textContent = new Date().toLocaleTimeString("pt-BR"); }
+function sinalFormando(){
+  const n = velas.length; if(n < 205 || velas[n-1].closed) return false;
+  const V = velas.slice(-600), Q = preparar(V);
+  return condCompra(V, Q, V.length-1);
+}
+
+$("btnEntrei").addEventListener("click", ()=>{
+  const p = parseFloat(String($("pago").value).replace(",", ".")), q = parseFloat(String($("qtdPaga").value).replace(",", "."));
+  if(!(p > 0) || !(q > 0)){ $("instr").textContent = "Preencha o preço pago e a quantia comprada para o painel acompanhar a sua operação."; return; }
+  const td = cfg.td || tdAuto(velas.length-1);
+  pos = {entrada:p, qtd:q, qtdVenda: ajusta(q*0.999, INFO.passo, "baixo"), td, t: Date.now()};
+  salvarPos(); ultimoAviso = null; atualizarSinal(); desenharLinhas();
+});
+$("btnEncerrei").addEventListener("click", ()=>{ pos = null; salvarPos(); $("pago").value = ""; $("qtdPaga").value = ""; ultimoAviso = null; atualizarSinal(); desenharLinhas(); });
+
+/* ---------- histórico, últimas operações e backtest ---------- */
+function atualizarHistorico(){
+  const fechadas = velas.filter(k=>k.closed);
+  if(fechadas.length < 260) return [];
+  const iniT = fechadas[201].t;
+  const periodo = fD(iniT) + " a " + fD(fechadas[fechadas.length-1].T+1);
+  $("periodo").textContent = "Período: " + periodo + " (" + Math.round((fechadas[fechadas.length-1].T - iniT)/86400000) + " dias). Entrada: " + (cfg.entrada === "mercado" ? "a mercado" : "no repique") + ".";
+
+  const atual = simular(regras({desdeT:iniT}));
+  const R = resumo(atual.trades);
+  const veredito = R.n < 10 ? "poucos dados ainda" : R.total > 0 ? "positivo no período" : "negativo no período";
+  $("historico").innerHTML = R.n
+    ? `Histórico com seus ajustes: <b>${R.n}</b> operações · acerto <b>${Math.round(R.acerto*100)}%</b> · ganho médio <b class="pos">${fPct(R.ganhoMed,2)}</b> · perda média <b class="neg">${fPct(R.perdaMed,2)}</b> · total <b class="${R.total>=0?"pos":"neg"}">${fPct(R.total)}</b> (${veredito}).`
+    : `Histórico com seus ajustes: nenhuma operação no período.`;
+
+  let melhor = -Infinity, melhorK = "";
+  const dados = TDS.map(td => {
+    const a = resumo(simular(regras({td, saida:"trailing", desdeT:iniT})).trades);
+    const b = resumo(simular(regras({td, saida:"sinais", desdeT:iniT})).trades);
+    if(a.n && a.total > melhor){ melhor = a.total; melhorK = td+"a"; }
+    if(b.n && b.total > melhor){ melhor = b.total; melhorK = td+"b"; }
+    return {td, a, b};
+  });
+  $("bt").innerHTML = dados.map(d => {
+    const cel = (x, k) => `<td class="mono ${x.n ? (x.total>=0?"pos":"neg") : ""} ${melhorK===k?"melhor":""}">${x.n ? fPct(x.total) : "—"}</td>`;
+    const ref = cfg.saida === "sinais" ? d.b : d.a;
+    return `<tr class="${d.td===cfg.td?"atual":""}"><td>${d.td ? fTd(d.td) : "Automático"}</td><td class="mono">${ref.n}</td><td class="mono">${ref.n ? Math.round(ref.acerto*100)+"%" : "—"}</td>${cel(d.a, d.td+"a")}${cel(d.b, d.td+"b")}</tr>`;
+  }).join("");
+  const m = resumo(simular(regras({entrada:"mercado", desdeT:iniT})).trades), rp = resumo(simular(regras({entrada:"repique", desdeT:iniT})).trades);
+  $("btEntrada").innerHTML = `Com o T/D e a saída dos seus Ajustes: entrando <b>a mercado</b>, ${m.n} ops e total <span class="${m.total>=0?"pos":"neg"}">${m.n?fPct(m.total):"—"}</span> · entrando <b>no repique</b>, ${rp.n} ops e total <span class="${rp.total>=0?"pos":"neg"}">${rp.n?fPct(rp.total):"—"}</span>.`;
+
+  const ult = atual.trades.slice(-10).reverse();
+  const viva = simular(regras({incluiAberta:true, desdeT:iniT})).aberta;
+  let html = "";
+  if(viva){
+    const pr = velas[velas.length-1].c, pct = (pr - viva.entrada)/viva.entrada*100 - TAXA;
+    html += `<tr class="aberta"><td>${fDH(viva.fillT)}</td><td class="mono">${fP(viva.entrada)}</td><td class="mono">${fP(pr)}</td><td>Em aberto</td><td class="mono ${pct>=0?"pos":"neg"}">${fPct(pct)}</td></tr>`;
+  }
+  html += ult.map(t=>`<tr><td>${fDH(t.fillT)}</td><td class="mono">${fP(t.entrada)}</td><td class="mono">${fP(t.saida)}</td><td>${t.motivo}</td><td class="mono ${t.pct>=0?"pos":"neg"}">${fPct(t.pct)}</td></tr>`).join("");
+  $("ultimas").innerHTML = html || `<tr><td colspan="5" style="text-align:left;color:var(--muted)">Nenhuma operação no período.</td></tr>`;
+  return atual.trades;
 }
 
 function atualizarContexto(){
-  const m=mvrvAtual(), f=fgAtual(), ok=contextoOK();
-  $("mvrvVal").textContent = isFinite(m) ? m.toLocaleString("pt-BR",{minimumFractionDigits:2,maximumFractionDigits:2}) : "—";
-  $("mvrvVal").className = "val" + (ok.mvrv?"":" bloq");
-  $("mvrvZona").textContent = !isFinite(m) ? "indisponível: digite em Ajustes" : m<1 ? "abaixo do custo (barato)" : m<2.4 ? "neutro" : m<3.5 ? "aquecido" : "euforia";
-  $("mvrvFonte").textContent = cfg.mvrvMan>0 ? "valor digitado" : (ctx.mvrvFonte || "");
-  $("fgVal").textContent = isFinite(f) ? String(Math.round(f)) : "—";
-  $("fgVal").className = "val" + (ok.fg?"":" bloq");
-  $("fgZona").textContent = !isFinite(f) ? "indisponível: digite em Ajustes" : f<25 ? "medo extremo" : f<45 ? "medo" : f<55 ? "neutro" : f<75 ? "ganância" : "ganância extrema";
-  $("fgFonte").textContent = cfg.fgMan>0 ? "valor digitado" : (ctx.fgFonte || "");
+  const ok = contextoOK();
+  const z1 = m => !isFinite(m) ? "indisponível" : m<1 ? "barato" : m<2.4 ? "neutro" : m<3.5 ? "aquecido" : "euforia";
+  const z2 = f => !isFinite(f) ? "indisponível" : f<25 ? "medo extremo" : f<45 ? "medo" : f<55 ? "neutro" : f<75 ? "ganância" : "ganância extrema";
+  $("contexto").innerHTML = `Contexto: <a href="https://charts.checkonchain.com/btconchain/pricing/pricing_mvrv_bands/pricing_mvrv_bands_light.html" target="_blank" rel="noopener">MVRV</a> <b class="${ok.mvrv?"":"neg"}">${isFinite(ctx.mvrv)?ctx.mvrv.toLocaleString("pt-BR",{minimumFractionDigits:2,maximumFractionDigits:2}):"—"}</b> ${z1(ctx.mvrv)} · <a href="https://coinmarketcap.com/pt-br/charts/fear-and-greed-index/" target="_blank" rel="noopener">Medo e Ganância</a> <b class="${ok.fg?"":"neg"}">${isFinite(ctx.fg)?Math.round(ctx.fg):"—"}</b> ${z2(ctx.fg)}`;
 }
 
 /* ---------- gráfico ---------- */
 let chart=null, sC=null, s9=null, s21=null, s200=null, linhasPreco=[];
-const tz = -new Date().getTimezoneOffset()*60;
-const tsec = ms => Math.floor(ms/1000)+tz;
+const tzs = -new Date().getTimezoneOffset()*60;
+const tsec = ms => Math.floor(ms/1000)+tzs;
 function criarGrafico(){
   if(!window.LightweightCharts){ $("semGrafico").hidden=false; $("grafico").hidden=true; return; }
   chart = LightweightCharts.createChart($("grafico"), {
@@ -789,39 +529,33 @@ function criarGrafico(){
     rightPriceScale:{borderColor:"#232b33"}, timeScale:{borderColor:"#232b33", timeVisible:true, secondsVisible:false},
     crosshair:{mode:0}, localization:{priceFormatter: p => fP(p)}
   });
-  sC = chart.addCandlestickSeries({upColor:"#2ebd85",downColor:"#ef5d6a",wickUpColor:"#2ebd85",wickDownColor:"#ef5d6a",borderVisible:false});
+  sC = chart.addCandlestickSeries({upColor:"#2ebd85",downColor:"#ef5d6a",wickUpColor:"#2ebd85",wickDownColor:"#ef5d6a",borderVisible:false, priceFormat:{type:"price",precision:0,minMove:1}});
   const lo = c => ({color:c,lineWidth:1,priceLineVisible:false,lastValueVisible:false,crosshairMarkerVisible:false});
   s9=chart.addLineSeries(lo("#5aa9e6")); s21=chart.addLineSeries(lo("#e8a33d")); s200=chart.addLineSeries(Object.assign(lo("#8b96a1"),{lineWidth:2}));
 }
 function desenharGrafico(trades){
   if(!chart || !P) return;
-  sC.applyOptions({priceFormat:{type:"price", precision:decs(INFO.tick), minMove:INFO.tick}});
-  const ini = Math.max(0, velas.length-288);
-  const v = velas.slice(ini);
+  const ini = Math.max(0, velas.length-288), v = velas.slice(ini);
   sC.setData(v.map(k=>({time:tsec(k.t),open:k.o,high:k.h,low:k.l,close:k.c})));
   const linha = arr => v.map((k,j)=>({time:tsec(k.t), value:arr[ini+j]})).filter(p=>isFinite(p.value));
   s9.setData(linha(P.e9)); s21.setData(linha(P.e21)); s200.setData(linha(P.e200));
-  const t0 = v.length ? v[0].t : 0;
-  const mk = [];
-  const {aberta, pendente} = simular(cfg.rr,true,true);
-  trades.concat(aberta?[aberta]:[]).forEach(t=>{
-    const ve = velas[t.i]; if(!ve || ve.t < t0) return;
-    mk.push({time:tsec(ve.t), position:"belowBar", color:"#2ebd85", shape:"arrowUp", text:"C"});
-  });
+  const t0 = v.length ? v[0].t : 0, mk = [];
   trades.forEach(t=>{
-    if(t.saidaT - TF_MS < t0) return;
-    const ve = velas.find(k=> k.T+1 >= t.saidaT - 1000 && k.t <= t.saidaT); if(!ve) return;
-    mk.push({time:tsec(ve.t), position:"aboveBar", color: t.motivo==="TP"?"#2ebd85":t.motivo==="SL"?"#ef5d6a":"#e8a33d", shape:"circle", text:t.motivo==="Tempo"?"T":t.motivo});
+    const ve = velas[t.i]; if(ve && ve.t >= t0) mk.push({time:tsec(ve.t), position:"belowBar", color:"#2ebd85", shape:"arrowUp", text:"C"});
+    const vs = velas.find(k=> k.t < t.saidaT && k.T+1 >= t.saidaT);
+    if(vs && vs.t >= t0) mk.push({time:tsec(vs.t), position:"aboveBar", color: t.pct>=0?"#2ebd85":"#ef5d6a", shape:"circle", text:"V"});
   });
   mk.sort((a,b)=>a.time-b.time);
   try{ sC.setMarkers(mk); }catch(e){}
+  desenharLinhas();
+}
+function desenharLinhas(){
+  if(!sC || !velas.length) return;
   linhasPreco.forEach(l=>sC.removePriceLine(l)); linhasPreco=[];
-  if(aberta){
-    linhasPreco.push(sC.createPriceLine({price:aberta.tp,color:"#2ebd85",lineWidth:1,lineStyle:2,axisLabelVisible:true,title:"TP"}));
-    linhasPreco.push(sC.createPriceLine({price:aberta.sl,color:"#ef5d6a",lineWidth:1,lineStyle:2,axisLabelVisible:true,title:"SL"}));
-  } else if(pendente){
-    linhasPreco.push(sC.createPriceLine({price:pendente.L,color:"#5aa9e6",lineWidth:1,lineStyle:2,axisLabelVisible:true,title:"Recuo"}));
-    linhasPreco.push(sC.createPriceLine({price:pendente.B,color:"#5aa9e6",lineWidth:1,lineStyle:2,axisLabelVisible:true,title:"Rompimento"}));
+  if(pos){
+    const a = acompanhar(pos, pos.t);
+    linhasPreco.push(sC.createPriceLine({price:pos.entrada,color:"#5aa9e6",lineWidth:1,lineStyle:2,axisLabelVisible:true,title:"Entrada"}));
+    linhasPreco.push(sC.createPriceLine({price:a.nivel,color:"#ef5d6a",lineWidth:1,lineStyle:2,axisLabelVisible:true,title:"Trailing"}));
   }
 }
 
@@ -829,7 +563,7 @@ function recalcular(completo){
   if(!carregado) return;
   if(completo) calcIndicadores();
   atualizarContexto();
-  const trades = atualizarBacktest();
+  const trades = atualizarHistorico();
   atualizarSinal();
   desenharGrafico(trades);
 }
@@ -840,24 +574,22 @@ async function getJSON(urls){
   for(const u of urls){ try{ const r = await fetch(u,{cache:"no-store"}); if(r.ok) return await r.json(); erro=new Error("HTTP "+r.status); }catch(e){ erro=e; } }
   throw erro || new Error("falhou");
 }
-function paraVela(r){ return {t:+r[0], o:+r[1], h:+r[2], l:+r[3], c:+r[4], T:+r[6], closed: +r[6] < Date.now()}; }
-async function baixarVelas(simb, tf, paginas){
+const paraVela = r => ({t:+r[0], o:+r[1], h:+r[2], l:+r[3], c:+r[4], T:+r[6], closed: +r[6] < Date.now()});
+async function carregarHistorico(){
   let todas=[], fim=null;
-  for(let p=0;p<paginas;p++){
-    const q = "/api/v3/klines?symbol="+simb+"&interval="+tf+"&limit=1000" + (fim?("&endTime="+fim):"");
+  for(let p=0;p<PAGINAS;p++){
+    const q = "/api/v3/klines?symbol="+SIMB+"&interval="+TF+"&limit=1000" + (fim?("&endTime="+fim):"");
     const r = await getJSON(REST.map(b=>b+q));
     if(!r.length) break;
     todas = r.map(paraVela).concat(todas);
     fim = +r[0][0]-1;
     if(r.length < 1000) break;
   }
-  const vistos = new Set();
-  return todas.filter(k=> !vistos.has(k.t) && vistos.add(k.t)).sort((a,b)=>a.t-b.t);
+  const vistos = new Set(); velas = todas.filter(k=> !vistos.has(k.t) && vistos.add(k.t)).sort((a,b)=>a.t-b.t);
 }
 async function carregarInfo(){
-  INFO = Object.assign({minimo:10}, ATIVOS[cfg.ativo]);
   try{
-    const j = await getJSON(REST.map(b=>b+"/api/v3/exchangeInfo?symbol="+cfg.ativo));
+    const j = await getJSON(REST.map(b=>b+"/api/v3/exchangeInfo?symbol="+SIMB));
     const f = j.symbols[0].filters;
     const pf = f.find(x=>x.filterType==="PRICE_FILTER"), ls = f.find(x=>x.filterType==="LOT_SIZE"), mn = f.find(x=>x.filterType==="NOTIONAL"||x.filterType==="MIN_NOTIONAL");
     if(pf && +pf.tickSize>0) INFO.tick = +pf.tickSize;
@@ -865,25 +597,19 @@ async function carregarInfo(){
     if(mn && +mn.minNotional>0) INFO.minimo = +mn.minNotional;
   }catch(e){}
 }
-
 async function carregarContexto(){
-  try{
-    const j = await getJSON(["https://api.alternative.me/fng/?limit=1"]);
-    ctx.fg = parseFloat(j.data[0].value); ctx.fgFonte = "alternative.me · automático";
-  }catch(e){ ctx.fg = NaN; ctx.fgFonte = "não carregou"; }
+  try{ const j = await getJSON(["https://api.alternative.me/fng/?limit=1"]); ctx.fg = parseFloat(j.data[0].value); }catch(e){ ctx.fg = NaN; }
   try{
     const j = await getJSON(["https://community-api.coinmetrics.io/v4/timeseries/asset-metrics?assets=btc&metrics=CapMVRVCur&frequency=1d&page_size=1&paging_from=end"]);
-    const d = j.data[j.data.length-1]; ctx.mvrv = parseFloat(d.CapMVRVCur); ctx.mvrvFonte = "Coin Metrics · " + new Date(d.time).toLocaleDateString("pt-BR");
-  }catch(e){ ctx.mvrv = NaN; ctx.mvrvFonte = "não carregou"; }
+    ctx.mvrv = parseFloat(j.data[j.data.length-1].CapMVRVCur);
+  }catch(e){ ctx.mvrv = NaN; }
   recalcular(false);
 }
 
 let ws=null, wsIdx=0, espera=1000;
 function conectar(){
-  const s = cfg.ativo.toLowerCase();
-  const WS = ["wss://data-stream.binance.vision/ws/"+s+"@kline_"+cfg.tf, "wss://stream.binance.com:9443/ws/"+s+"@kline_"+cfg.tf];
-  const url = WS[wsIdx % WS.length];
-  try{ ws = new WebSocket(url); }catch(e){ return reconectar(); }
+  const WS = ["wss://data-stream.binance.vision/ws/btcbrl@kline_15m","wss://stream.binance.com:9443/ws/btcbrl@kline_15m"];
+  try{ ws = new WebSocket(WS[wsIdx % WS.length]); }catch(e){ return reconectar(); }
   ws.onopen = () => { espera=1000; $("dot").className="dot ok"; $("connTxt").textContent="Ao vivo"; };
   ws.onmessage = ev => {
     let m; try{ m = JSON.parse(ev.data); }catch(e){ return; }
@@ -894,88 +620,14 @@ function conectar(){
     if(u && u.t===v.t){ velas[velas.length-1]=v; novaFechada = v.closed && !u.closed; }
     else if(!u || v.t>u.t){ if(u && !u.closed){ u.closed=true; novaFechada=true; } velas.push(v); if(velas.length>13000) velas.shift(); novaFechada = novaFechada || v.closed; }
     $("preco").textContent = fP(v.c);
-    if(novaFechada){ recalcular(true); }
-    else { atualizarSinal(); if(sC) sC.update({time:tsec(v.t),open:v.o,high:v.h,low:v.l,close:v.c}); }
+    if(novaFechada) recalcular(true);
+    else if(sC) sC.update({time:tsec(v.t),open:v.o,high:v.h,low:v.l,close:v.c});
   };
   ws.onerror = () => {};
   ws.onclose = () => reconectar();
 }
-function reconectar(){
-  $("dot").className="dot"; $("connTxt").textContent="Reconectando…";
-  wsIdx++; setTimeout(conectar, espera); espera=Math.min(espera*2, 30000);
-}
-function fecharWS(){ if(ws){ ws.onclose=null; ws.onmessage=null; try{ ws.close(); }catch(e){} ws=null; } }
+function reconectar(){ $("dot").className="dot"; $("connTxt").textContent="Reconectando…"; wsIdx++; setTimeout(conectar, espera); espera=Math.min(espera*2, 30000); }
 document.addEventListener("visibilitychange", ()=>{ if(!document.hidden && ws && ws.readyState>1) conectar(); });
-
-/* ---------- explorador de ajustes ---------- */
-function simPuro(V, Pr, prm, deT, ateT, taxa){
-  const barsMax = Math.max(1, Math.round(TFS[prm.tf].tempo*60000/TFS[prm.tf].ms));
-  let n=0, w=0, soma=0, ab=null;
-  for(let i=201;i<V.length;i++){
-    const k=V[i]; if(!k.closed) break;
-    if(ab){
-      if(i>ab.i){
-        const bSL=k.l<=ab.sl, bTP=k.h>=ab.tp, bT=(i-ab.i)>=barsMax;
-        if(bSL||bTP||bT){ const s = bSL?ab.sl:bTP?ab.tp:k.c; const r=(s-ab.e)/ab.e*100 - taxa; n++; if(r>0) w++; soma+=r; ab=null; }
-      }
-      continue;
-    }
-    if(k.t>=deT && k.t<ateT && temSinal(V,Pr,i,prm.filtro)){
-      const sd = Math.max((Pr.atr[i]||0)*prm.atrMult, k.c*prm.minStop/100);
-      ab = {i, e:k.c, sl:k.c-sd, tp:k.c+sd*prm.rr};
-    }
-  }
-  return {n, w, soma};
-}
-async function explorar(){
-  const btn = $("btnExplorar"); btn.disabled = true; btn.textContent = "Testando…";
-  $("expProg").hidden=false; $("expResumo").hidden=true; $("expTabela").hidden=true;
-  const agora = Date.now();
-  const taxa = taxaRT(), res = [];
-  let total = 0, falhas = [];
-  const grupos = [];
-  for(const a of Object.keys(ATIVOS)) for(const tf of ["15m","1h","4h","1d"]) grupos.push([a,tf]);
-  for(let g=0; g<grupos.length; g++){
-    const [a, tf] = grupos[g];
-    $("expProg").textContent = "Baixando e testando " + ATIVOS[a].nome + " · " + TFS[tf].nome + " (" + (g+1) + " de " + grupos.length + ")…";
-    await new Promise(r=>setTimeout(r,0));
-    let V;
-    try{ V = await baixarVelas(a, tf, TFS[tf].paginas); }catch(e){ falhas.push(ATIVOS[a].nome+" "+TFS[tf].nome); continue; }
-    if(V.length < 260) continue;
-    const Pr = preparar(V);
-    const ini = Math.max(V[201].t, agora - 365*86400000), corte = ini + (agora - ini)*2/3;
-    for(const rr of [1,1.5,2]) for(const minStop of [0.5,1,2,4]) for(const atrMult of [1,1.5,2]) for(const filtro of [true,false]){
-      const prm = {ativo:a, tf, rr, minStop, atrMult, filtro};
-      const A = simPuro(V,Pr,prm,ini,corte,taxa), B = simPuro(V,Pr,prm,corte,agora+1,taxa);
-      total++;
-      res.push(Object.assign(prm,{A,B}));
-    }
-  }
-  const validos = res.filter(r=>r.A.n>=5 && r.B.n>=2);
-  const passaram = validos.filter(r=>r.A.soma>0 && r.B.soma>0);
-  validos.sort((x,y)=> y.A.soma - x.A.soma);
-  const lista = validos.slice(0,12);
-  $("expProg").hidden = true;
-  $("expResumo").hidden = false;
-  $("expResumo").innerHTML = passaram.length
-    ? `<b>${passaram.length}</b> de ${total} combinações ficaram positivas nas duas partes. A tabela mostra as 12 melhores da parte de comparação. Prefira as que também ficaram <span class="pos">verdes na prova</span> e com mais operações.`
-    : `<span class="aviso"><b>Nenhuma</b> das ${total} combinações ficou positiva nas duas partes.</span> Neste período, a estratégia não mostrou vantagem em nenhum ativo. A decisão mais segura é <b>não operar</b> e testar de novo daqui a algumas semanas.`;
-  if(falhas.length) $("expResumo").innerHTML += `<br><span class="nota">Não consegui baixar: ${falhas.join(", ")}.</span>`;
-  $("expCorpo").innerHTML = lista.map((r,idx)=>{
-    const ajuste = String(r.rr).replace(".",",")+"× · stop "+String(r.minStop).replace(".",",")+"% · ATR "+String(r.atrMult).replace(".",",")+(r.filtro?" · média 200":"");
-    const cA = r.A.soma>=0?"pos":"neg", cB = r.B.soma>=0?"pos":"neg";
-    return `<tr><td>${ATIVOS[r.ativo].nome}</td><td>${TFS[r.tf].nome}</td><td style="text-align:left">${ajuste}</td><td class="mono">${r.A.n}</td><td class="mono ${cA}">${fPct(r.A.soma)}</td><td class="mono">${r.B.n}</td><td class="mono ${cB}">${fPct(r.B.soma)}</td><td><button type="button" data-i="${idx}">Usar</button></td></tr>`;
-  }).join("") || `<tr><td colspan="8" style="text-align:left;color:var(--muted)">Nenhuma combinação com operações suficientes.</td></tr>`;
-  $("expTabela").hidden = false;
-  $("expCorpo").querySelectorAll("button[data-i]").forEach(b=> b.addEventListener("click", ()=>{
-    const r = lista[+b.dataset.i];
-    Object.assign(cfg, {ativo:r.ativo, tf:r.tf, rr:r.rr, minStop:r.minStop, atrMult:r.atrMult, filtro200:r.filtro, tempo:TFS[r.tf].tempo});
-    salvar(); preencherCampos(); reiniciar();
-    b.textContent = "Aplicado";
-  }));
-  btn.disabled = false; btn.textContent = "Testar de novo";
-}
-$("btnExplorar").addEventListener("click", explorar);
 
 /* ---------- avisos ---------- */
 function bip(){
@@ -985,9 +637,9 @@ function bip(){
 }
 function avisar(titulo, corpo){
   bip();
-  try{ if("Notification" in window && Notification.permission==="granted") new Notification(INFO.nome+": "+titulo,{body:corpo}); }catch(e){}
-  document.title = "● " + titulo + " · Sinais OCO";
-  setTimeout(()=>{ document.title="Sinais OCO"; }, 60000);
+  try{ if("Notification" in window && Notification.permission==="granted") new Notification("BTC/BRL: "+titulo,{body:corpo}); }catch(e){}
+  document.title = "● " + titulo + " · Sinais BTC";
+  setTimeout(()=>{ document.title="Sinais BTC"; }, 60000);
 }
 $("btnSom").addEventListener("click", ()=>{
   try{ audio = audio || new (window.AudioContext||window.webkitAudioContext)(); audio.resume(); somOn=true; bip(); $("btnSom").textContent="Som ativado"; }
@@ -999,44 +651,25 @@ $("btnNotif").addEventListener("click", async ()=>{
   catch(e){ $("btnNotif").textContent="Notificações indisponíveis aqui"; }
 });
 
-setInterval(()=>{ relogio(); if(carregado){ atualizarSinal(); atualizarUltimas(); atualizarHoras(); } }, 1000);
-setInterval(carregarHoras, 60000);
-relogio();
+function relogio(){ try{ $("relogio").textContent = new Date().toLocaleTimeString("pt-BR",{timeZone:tz}) + " Brasília"; }catch(e){ $("relogio").textContent = new Date().toLocaleTimeString("pt-BR"); } }
+setInterval(()=>{ relogio(); if(carregado){ atualizarSinal(); if(pos) desenharLinhas(); } }, 1000);
 setInterval(carregarContexto, 30*60000);
+relogio();
 
-/* ---------- início ---------- */
-let geracao = 0;
-async function iniciarDados(){
-  const minha = ++geracao;
-  TF_MS = TFS[cfg.tf].ms;
-  $("parLbl").textContent = ATIVOS[cfg.ativo].nome;
-  $("tfLbl").textContent = "Binance · " + TFS[cfg.tf].nome;
-  document.querySelectorAll(".base").forEach(e=> e.textContent = ATIVOS[cfg.ativo].base);
-  $("dot").className="dot"; $("connTxt").textContent="Carregando…";
-  mostrar("info","CARREGANDO","Baixando o histórico de candles da Binance.", null);
-  try{
-    await carregarInfo();
-    const V = await baixarVelas(cfg.ativo, cfg.tf, TFS[cfg.tf].paginas);
-    if(minha !== geracao) return;
-    velas = V;
-  }catch(e){
-    if(minha !== geracao) return;
+(async function(){
+  criarGrafico();
+  try{ await carregarInfo(); await carregarHistorico(); }
+  catch(e){
     $("dot").className="dot err"; $("connTxt").textContent="Sem conexão";
-    mostrar("sell","SEM DADOS DA BINANCE","Não consegui baixar os candles. Confira a internet e recarregue a página.", null);
+    quadro("sell","SEM DADOS DA BINANCE","Não consegui baixar os candles. Confira a internet e recarregue a página.", "");
     return;
   }
-  carregado = true; ultimoAviso = null; opAtual = null;
-  carregarHoras();
+  carregado = true;
   if(velas.length) $("preco").textContent = fP(velas[velas.length-1].c);
   recalcular(true);
   if(chart) chart.timeScale().fitContent();
-  conectar();
-}
-function reiniciar(){ fecharWS(); carregado=false; velas=[]; wsIdx=0; espera=1000; iniciarDados(); }
-(async function(){
-  criarGrafico();
-  await iniciarDados();
   carregarContexto();
+  conectar();
 })();
 })();
 </script>
