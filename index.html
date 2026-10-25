@@ -11,86 +11,132 @@
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
 <script src="https://unpkg.com/lightweight-charts@4.1.3/dist/lightweight-charts.standalone.production.js"></script>
 <style>
-/* Layout: uma coluna estreita para ficar ao lado do app da Binance. Visual de terminal escuro. */
+/* Coluna de celular, visual inspirado na tela Spot da Binance. */
 :root{
-  --bg:#0e1215; --panel:#151a1f; --line:#232b33; --fg:#e7eaed; --muted:#8b96a1;
-  --buy:#2ebd85; --sell:#ef5d6a; --warn:#e8a33d; --info:#5aa9e6;
+  --bg:#0e1215; --panel:#161b21; --panel2:#1d232a; --line:#262e37; --fg:#e7eaed; --muted:#8b96a1;
+  --buy:#2ebd85; --sell:#ef5d6a; --warn:#e8a33d; --info:#5aa9e6; --gold:#f0b90b;
   --sans:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
-  --mono:"IBM Plex Mono",ui-monospace,"SFMono-Regular",Menlo,Consolas,monospace;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
   color-scheme:dark;
 }
 *{box-sizing:border-box}
 html,body{margin:0;background:var(--bg);color:var(--fg);font-family:var(--sans);font-size:15px}
-.wrap{max-width:540px;margin:0 auto;padding-top:max(14px,env(safe-area-inset-top,0px));padding-bottom:40px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:14px}
-header{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
-.par{font-weight:700;font-size:1.15rem;letter-spacing:.01em}
-.par small{color:var(--muted);font-weight:500;font-size:.8rem;margin-left:6px}
-.dir{text-align:right}
-.preco{font-family:var(--mono);font-size:1.35rem;font-weight:600;font-variant-numeric:tabular-nums}
-.relogio-br{font-family:var(--mono);font-size:.85rem;color:var(--muted);font-variant-numeric:tabular-nums}
-.conn{display:flex;align-items:center;gap:6px;color:var(--muted);font-size:.78rem}
-.dot{width:8px;height:8px;border-radius:50%;background:var(--warn)}
-.dot.ok{background:var(--buy)} .dot.err{background:var(--sell)}
-.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px}
-.sinal{border-left:4px solid var(--muted)}
-.sinal[data-tone="buy"]{border-left:8px solid var(--buy);box-shadow:0 0 0 1px var(--buy) inset}
-.sinal[data-tone="sell"]{border-left:8px solid var(--sell);box-shadow:0 0 0 1px var(--sell) inset}
-.sinal[data-tone="warn"]{border-left-color:var(--warn)}
-.sinal[data-tone="info"]{border-left-color:var(--info)}
-.estado{font-size:1.5rem;font-weight:700;letter-spacing:.02em;line-height:1.15;text-wrap:balance}
-.sinal[data-tone="buy"] .estado,.sinal[data-tone="sell"] .estado{font-size:2.1rem}
-.sinal[data-tone="buy"] .estado{color:var(--buy)}
-.sinal[data-tone="sell"] .estado{color:var(--sell)}
-.sinal[data-tone="warn"] .estado{color:var(--warn)}
-.sinal[data-tone="info"] .estado{color:var(--info)}
-.instr{color:var(--muted);margin:6px 0 0;line-height:1.45}
-.linha{margin-top:10px;font-size:.82rem;color:var(--muted);line-height:1.5}
-.linha b{color:var(--fg);font-family:var(--mono);font-weight:600}
-.linha b.pos{color:var(--buy)} .linha b.neg{color:var(--sell)}
-.linha a{color:var(--info)}
-.campo-ent{margin-top:12px;display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end}
-.campo-ent label{max-width:170px}
-.refAviso{margin:14px 0 0;padding:8px 10px;border:1px dashed var(--warn);border-radius:6px;color:var(--warn);font-size:.82rem;line-height:1.4}
-.refAviso b{color:var(--fg)}
-.passo{margin-top:14px;padding-top:10px;border-top:1px dashed var(--line)}
-.rot{font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:600}
-.passo .rot{color:var(--fg)}
-.grade{display:grid;grid-template-columns:1fr auto;gap:6px 12px;margin:10px 0 0;align-items:baseline}
-.grade dt{color:var(--muted);font-size:.86rem}
-.grade dd{margin:0;font-family:var(--mono);font-variant-numeric:tabular-nums;text-align:right;font-size:1.02rem}
-.tp{color:var(--buy)} .sl{color:var(--sell)}
+.wrap{max-width:460px;margin:0 auto;padding-top:max(12px,env(safe-area-inset-top,0px));padding-bottom:40px;padding-left:max(14px,env(safe-area-inset-left,0px));padding-right:max(14px,env(safe-area-inset-right,0px));display:flex;flex-direction:column;gap:12px}
+header{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.marca{font-weight:700;font-size:1.05rem}
+.marca small{display:block;color:var(--muted);font-weight:500;font-size:.75rem}
+.vivo{display:flex;align-items:center;gap:6px;font-family:var(--mono);font-size:.82rem;color:var(--muted);font-variant-numeric:tabular-nums}
+.vivo i{width:8px;height:8px;border-radius:50%;background:var(--warn);display:inline-block}
+.vivo i.ok{background:var(--buy)} .vivo i.err{background:var(--sell)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px}
+.rot{font-size:.7rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:600}
+.mono{font-family:var(--mono);font-variant-numeric:tabular-nums}
 .pos{color:var(--buy)} .neg{color:var(--sell)}
-.posbox{margin-top:14px;padding-top:10px;border-top:1px dashed var(--line)}
-.posbox .campos{margin-top:8px}
-#grafico{height:300px;width:100%}
-table{width:100%;border-collapse:collapse;font-variant-numeric:tabular-nums}
-th,td{padding:7px 6px;text-align:right;border-bottom:1px solid var(--line);font-size:.86rem}
-th:first-child,td:first-child{text-align:left}
-th{color:var(--muted);font-weight:500;font-size:.72rem;text-transform:uppercase;letter-spacing:.05em}
-tr.atual td{background:rgba(90,169,230,.10)}
-tr.aberta td{background:rgba(46,189,133,.08)}
-td.melhor{font-weight:700;text-decoration:underline;text-underline-offset:3px}
-.mono{font-family:var(--mono)}
-.nota{color:var(--muted);font-size:.8rem;line-height:1.45;margin:8px 0 0}
+.nota{color:var(--muted);font-size:.76rem;line-height:1.42;margin:8px 0 0}
 .nota b{color:var(--fg)}
-details summary{cursor:pointer;font-weight:600;list-style:none}
-details summary::-webkit-details-marker{display:none}
-details summary::after{content:"+";float:right;color:var(--muted)}
-details[open] summary::after{content:"–"}
-.campos{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
-label{display:flex;flex-direction:column;gap:4px;font-size:.78rem;color:var(--muted)}
-label.check{flex-direction:row;align-items:center;gap:8px;grid-column:1/-1;font-size:.85rem}
+.esconde{display:none!important}
+
+/* mercados */
+.mkt{display:grid;grid-template-columns:auto 1fr auto auto;gap:4px 10px;align-items:center;padding:9px 6px;border-radius:8px}
+.mkt + .mkt{border-top:1px solid var(--line)}
+.mkt.sel{background:var(--panel2);box-shadow:inset 3px 0 0 var(--gold)}
+.ico{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;font-weight:700;font-size:.95rem;color:#fff}
+.ico.usdt{background:#26a17b} .ico.btc{background:#f7931a}
+.nome{min-width:0}
+.nome b{font-size:1rem} .nome span{color:var(--muted);font-size:.8rem}
+.nome small{display:block;color:var(--muted);font-size:.72rem}
+.px{text-align:right;font-family:var(--mono);font-weight:600;font-variant-numeric:tabular-nums}
+.px small{display:block;color:var(--muted);font-weight:400;font-size:.72rem}
+.pill{min-width:72px;text-align:center;border-radius:6px;padding:6px;font-family:var(--mono);font-weight:600;font-size:.85rem;color:#fff;background:#3a4652}
+.pill.up{background:var(--buy)} .pill.dn{background:var(--sell)}
+
+/* sinal */
+.trilha{display:grid;grid-template-columns:repeat(5,1fr);gap:4px;margin:2px 0 10px}
+.etapa{text-align:center;font-size:.64rem;color:var(--muted);line-height:1.2}
+.etapa::before{content:"";display:block;height:5px;border-radius:3px;background:var(--line);margin-bottom:5px}
+.etapa.feita::before{background:#3a4652}
+.etapa.atual{color:var(--fg);font-weight:700}
+.etapa.atual.t-info::before{background:var(--info)} .etapa.atual.t-warn::before{background:var(--warn)}
+.etapa.atual.t-buy::before{background:var(--buy)} .etapa.atual.t-sell::before{background:var(--sell)}
+.status{font-size:1.65rem;font-weight:700;letter-spacing:.02em;line-height:1.1;text-wrap:balance}
+.status.t-info{color:var(--info)} .status.t-warn{color:var(--warn)} .status.t-buy{color:var(--buy)} .status.t-sell{color:var(--sell)}
+.expl{color:var(--muted);margin:6px 0 0;line-height:1.45;font-size:.9rem}
+.sinal.t-buy{border-color:var(--buy);box-shadow:0 0 0 1px var(--buy) inset}
+.sinal.t-sell{border-color:var(--sell);box-shadow:0 0 0 1px var(--sell) inset}
+.cond{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:10px}
+.chip{display:flex;gap:8px;align-items:flex-start;background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:7px 8px;font-size:.78rem;line-height:1.3;min-width:0}
+.chip b{display:block;font-size:.8rem}
+.chip span.d{color:var(--muted);font-family:var(--mono);font-size:.72rem}
+.chip .ok,.chip .no{flex:none;width:18px;height:18px;border-radius:50%;display:grid;place-items:center;font-size:.72rem;font-weight:700}
+.chip .ok{background:var(--buy);color:#06140e} .chip .no{background:#3a4652;color:var(--muted)}
+.chip.larga{grid-column:1/-1}
+.barra{height:6px;border-radius:3px;background:var(--line);margin-top:8px;overflow:hidden}
+.barra i{display:block;height:100%;background:var(--info);transition:width .3s}
+.cont{display:flex;justify-content:space-between;gap:8px;font-size:.75rem;color:var(--muted);margin-top:4px}
+.res{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-top:10px}
+.res .big{font-family:var(--mono);font-size:1.5rem;font-weight:700}
+.trilho{position:relative;height:10px;border-radius:5px;background:linear-gradient(90deg,var(--sell),#3a4652 45%,var(--buy));margin:14px 0 4px}
+.trilho i{position:absolute;top:-4px;width:4px;height:18px;background:#fff;border-radius:2px;transform:translateX(-50%);transition:left .3s}
+.trilho-leg{display:grid;grid-template-columns:1fr 1fr 1fr;font-size:.68rem;color:var(--muted);font-family:var(--mono);line-height:1.3}
+.trilho-leg span:nth-child(2){text-align:center} .trilho-leg span:nth-child(3){text-align:right}
+.posbox{margin-top:12px;padding-top:10px;border-top:1px dashed var(--line)}
+.campos{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+label{display:flex;flex-direction:column;gap:4px;font-size:.74rem;color:var(--muted)}
+label.check{flex-direction:row;align-items:center;gap:8px;grid-column:1/-1;font-size:.84rem}
 label.check input{width:auto}
 input,select{background:var(--bg);color:var(--fg);border:1px solid var(--line);border-radius:6px;padding:8px;font-family:var(--mono);font-size:16px;width:100%}
 input:focus,select:focus,button:focus-visible{outline:2px solid var(--info);outline-offset:1px}
 .botoes{display:flex;gap:8px;flex-wrap:wrap}
 button{background:#1d242b;color:var(--fg);border:1px solid var(--line);border-radius:6px;padding:9px 12px;font-family:var(--sans);font-size:.85rem;cursor:pointer}
-button:hover{border-color:var(--muted)}
 button.prim{background:var(--buy);border-color:var(--buy);color:#06140e;font-weight:700}
 button.perigo{border-color:var(--sell);color:var(--sell)}
+.linhaCtx{margin-top:10px;font-size:.74rem;color:var(--muted)}
+.linhaCtx a{color:var(--info)}
+
+/* bilhete + régua */
+.spot{display:grid;grid-template-columns:1.25fr 1fr;gap:10px}
+.abas{display:grid;grid-template-columns:1fr 1fr;background:var(--panel2);border-radius:8px;padding:3px;margin-bottom:8px}
+.abas button{border:0;background:transparent;color:var(--muted);font-weight:600;padding:8px 0;border-radius:6px;font-size:.88rem}
+.abas button.on.c{background:var(--buy);color:#06140e} .abas button.on.v{background:var(--sell);color:#fff}
+.campo{background:var(--panel2);border-radius:8px;padding:7px 9px;margin-top:6px;display:flex;justify-content:space-between;align-items:center;gap:6px}
+.campo .lb{display:block;color:var(--muted);font-size:.68rem}
+.campo .v{font-family:var(--mono);font-weight:600;font-size:.95rem;font-variant-numeric:tabular-nums}
+.campo input{padding:4px 6px;font-size:16px;max-width:100px;text-align:right}
+.copiar{flex:none;border:1px solid var(--line);background:transparent;color:var(--muted);border-radius:6px;font-size:.68rem;padding:4px 6px}
+.copiar.ok{color:var(--buy);border-color:var(--buy)}
+.caixinha{display:flex;align-items:center;gap:6px;font-size:.76rem;color:var(--muted);margin-top:8px}
+.caixinha i{width:14px;height:14px;border:1.5px solid var(--muted);border-radius:3px;display:inline-block;flex:none}
+.btnfake{margin-top:8px;text-align:center;border-radius:8px;padding:9px;font-weight:700;font-size:.9rem}
+.btnfake.c{background:var(--buy);color:#06140e} .btnfake.v{background:var(--sell);color:#fff}
+.passoAntes{background:rgba(239,93,106,.12);border:1px solid var(--sell);border-radius:8px;padding:7px 9px;font-size:.78rem;margin-top:6px;line-height:1.35}
+.regua{position:relative;background:var(--panel2);border-radius:8px;min-height:310px;padding:8px;overflow:hidden}
+.regua .tit{font-size:.66rem;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-weight:600}
+.nivel{position:absolute;left:8px;right:8px;font-size:.66rem;line-height:1.15;transition:top .3s}
+.nivel .ln{border-top:1px dashed currentColor;opacity:.85;margin-bottom:2px}
+.nivel b{font-family:var(--mono);font-size:.8rem;display:block;font-variant-numeric:tabular-nums}
+.nivel.atual{color:var(--fg)} .nivel.atual .ln{border-top:2px solid var(--fg);opacity:1}
+.nivel.atual b{font-size:.98rem}
+.nivel.lucro{color:var(--buy)} .nivel.stop{color:var(--sell)} .nivel.ent{color:var(--info)} .nivel.topo{color:var(--muted)}
+.faixa{position:absolute;left:8px;right:8px;border-radius:4px;transition:all .3s}
+.faixa.g{background:rgba(46,189,133,.10)} .faixa.r{background:rgba(239,93,106,.10)}
+
+#grafico{height:280px;width:100%}
+details{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:12px}
+details summary{list-style:none;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:8px}
+details summary::-webkit-details-marker{display:none}
+details summary::after{content:"+";color:var(--muted);font-size:1.1rem}
+details[open] summary::after{content:"–"}
+.sum{font-family:var(--mono);font-size:.76rem;color:var(--muted);text-align:right;flex:1}
+table{width:100%;border-collapse:collapse;margin-top:8px;font-variant-numeric:tabular-nums}
+td,th{padding:6px 4px;border-bottom:1px solid var(--line);font-size:.8rem;text-align:right}
+td:first-child,th:first-child{text-align:left}
+th{color:var(--muted);font-weight:500;font-size:.68rem;text-transform:uppercase}
+tr.atual td{background:rgba(90,169,230,.10)}
+tr.aberta td{background:rgba(46,189,133,.08)}
+td.melhor{font-weight:700;text-decoration:underline;text-underline-offset:3px}
 .scroll{overflow-x:auto}
-footer{color:var(--muted);font-size:.75rem;line-height:1.5}
-@media (max-width:380px){.campos{grid-template-columns:1fr}}
+footer{color:var(--muted);font-size:.72rem;line-height:1.5}
+@media (max-width:370px){.spot{grid-template-columns:1fr}.regua{min-height:250px}.campos{grid-template-columns:1fr}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 </style>
 </head>
@@ -98,28 +144,62 @@ footer{color:var(--muted);font-size:.75rem;line-height:1.5}
 <div class="wrap">
 
 <header>
-  <div>
-    <div class="par">BTC/BRL <small>Binance · candle de 15 min</small></div>
-    <div class="conn"><span class="dot" id="dot"></span><span id="connTxt">Conectando…</span></div>
-  </div>
-  <div class="dir">
-    <div class="preco" id="preco">—</div>
-    <div class="relogio-br" id="relogio">--:--:--</div>
-  </div>
+  <div class="marca">Sinais BTC <small>BTC/BRL · candle de 15 min</small></div>
+  <div class="vivo"><i id="dot"></i><span id="relogio">--:--:--</span></div>
 </header>
 
-<section class="card sinal" id="sinal" data-tone="info" aria-live="polite">
-  <div class="estado" id="estado">CARREGANDO</div>
-  <p class="instr" id="instr">Baixando o histórico de candles da Binance.</p>
-  <div class="campo-ent">
-    <label for="valorEntrada">Valor da entrada (R$)<input id="valorEntrada" type="number" step="1" min="10" inputmode="decimal"></label>
+<!-- Mercados -->
+<section class="card">
+  <div class="rot" style="margin-bottom:4px">Mercados</div>
+  <div class="mkt" id="mUSDTBRL">
+    <div class="ico usdt">₮</div>
+    <div class="nome"><b>USDT</b> <span>/ BRL</span><small>Dólar digital · <span class="vol">—</span></small></div>
+    <div class="px"><span class="p">—</span><small class="eq">—</small></div>
+    <div class="pill">—</div>
   </div>
-  <p class="refAviso" id="refAviso" hidden>Sem sinal agora. Estes são os valores <b>se você entrasse no preço atual</b>, só como referência.</p>
-  <div id="passos"></div>
+  <div class="mkt sel" id="mBTCBRL">
+    <div class="ico btc">₿</div>
+    <div class="nome"><b>BTC</b> <span>/ BRL</span><small>Você opera este · <span class="vol">—</span></small></div>
+    <div class="px"><span class="p">—</span><small class="eq">—</small></div>
+    <div class="pill">—</div>
+  </div>
+  <div class="mkt" id="mBTCUSDT">
+    <div class="ico btc">₿</div>
+    <div class="nome"><b>BTC</b> <span>/ USDT</span><small>Bitcoin em dólar · <span class="vol">—</span></small></div>
+    <div class="px"><span class="p">—</span><small class="eq">—</small></div>
+    <div class="pill">—</div>
+  </div>
+  <p class="nota" id="mktNota" style="margin-top:6px">—</p>
+</section>
+
+<!-- Sinal -->
+<section class="card sinal" id="sinal" aria-live="polite">
+  <div class="trilha">
+    <div class="etapa" data-k="aguardando">Aguardando</div>
+    <div class="etapa" data-k="formando">Se formando</div>
+    <div class="etapa" data-k="compre">Compre</div>
+    <div class="etapa" data-k="operacao">Em operação</div>
+    <div class="etapa" data-k="saia">Saia</div>
+  </div>
+  <div class="status t-info" id="status">CARREGANDO</div>
+  <p class="expl" id="expl">Baixando o histórico de candles da Binance.</p>
+
+  <div id="blocoCond">
+    <div class="cond" id="cond"></div>
+    <div class="barra"><i id="barra" style="width:0%"></i></div>
+    <div class="cont"><span id="contTxt">—</span><span id="fechaTxt">—</span></div>
+  </div>
+
+  <div id="blocoRes" class="esconde">
+    <div class="res"><span class="rot" id="resTit">Resultado agora</span><span class="big" id="resBig">—</span></div>
+    <div class="res" style="margin-top:2px"><span class="nota" style="margin:0" id="resSub">—</span><span class="mono" id="resR">—</span></div>
+    <div class="trilho"><i id="marca" style="left:50%"></i></div>
+    <div class="trilho-leg"><span id="legStop">—</span><span id="legPreco">—</span><span id="legLucro">—</span></div>
+  </div>
 
   <div class="posbox" id="boxEntrei">
     <div class="rot">Já comprei</div>
-    <p class="nota" style="margin-top:4px">Informe o que executou no app. O painel passa a acompanhar a sua operação: o topo desde a sua compra, onde está o seu trailing e a hora de sair.</p>
+    <p class="nota" style="margin-top:4px">Informe o que executou no app (Ordens → Histórico) e o painel acompanha a sua operação.</p>
     <div class="campos">
       <label for="pago">Preço pago (BRL)<input id="pago" type="number" step="1" inputmode="decimal"></label>
       <label for="qtdPaga">Quantia comprada (BTC)<input id="qtdPaga" type="number" step="any" inputmode="decimal"></label>
@@ -130,42 +210,57 @@ footer{color:var(--muted);font-size:.75rem;line-height:1.5}
     <div class="botoes"><button class="perigo" id="btnEncerrei" type="button">Encerrei a operação</button></div>
     <p class="nota">Toque quando a venda tiver executado no app (pelo trailing ou a mercado).</p>
   </div>
-
-  <div class="linha" id="contexto">—</div>
-  <div class="linha" id="historico">—</div>
+  <div class="linhaCtx" id="contexto">—</div>
 </section>
 
+<!-- Bilhete + régua -->
+<section class="spot">
+  <div class="card">
+    <div class="abas"><button class="c on" id="abaC" type="button">Comprar</button><button class="v" id="abaV" type="button">Vender</button></div>
+    <div id="formC">
+      <div id="formCDin"></div>
+      <div class="campo"><div><span class="lb">Valor da entrada (R$)</span></div><input id="valorEntrada" type="number" step="1" min="10" inputmode="decimal" aria-label="Valor da entrada em reais"></div>
+    </div>
+    <div id="formV" class="esconde"></div>
+  </div>
+  <div class="regua" id="regua">
+    <div class="tit">Régua de preço</div>
+    <div class="faixa g" id="fG"></div>
+    <div class="faixa r" id="fR"></div>
+    <div id="niveis"></div>
+  </div>
+</section>
+
+<!-- Gráfico -->
 <section class="card">
-  <div class="rot" style="margin-bottom:8px">Gráfico · médias 9, 21 e 200 · C = compra, V = venda</div>
+  <div class="rot" style="margin-bottom:6px">Gráfico 15 min · médias 9, 21 e 200 · C = compra, V = venda</div>
   <div id="grafico"></div>
   <p class="nota" id="semGrafico" hidden>O gráfico não carregou. Os sinais continuam funcionando.</p>
 </section>
 
-<section class="card">
-  <div class="rot">Últimas 10 operações (pelas regras atuais)</div>
-  <div class="scroll">
-    <table>
-      <thead><tr><th>Entrada</th><th>Preço</th><th>Saída</th><th>Motivo</th><th>Result.</th></tr></thead>
-      <tbody id="ultimas"></tbody>
-    </table>
-  </div>
-</section>
+<!-- Recolhidos -->
+<details id="caixaUltimas">
+  <summary><span class="rot">Últimas 10 operações</span><span class="sum" id="sumUlt">—</span></summary>
+  <p class="nota" id="historico">—</p>
+  <div class="scroll"><table>
+    <thead><tr><th>Entrada</th><th>Preço</th><th>Saída</th><th>Motivo</th><th>Res.</th></tr></thead>
+    <tbody id="ultimas"></tbody>
+  </table></div>
+</details>
 
-<section class="card">
-  <div class="rot">Backtest · qual T/D funcionou melhor</div>
+<details id="caixaBt">
+  <summary><span class="rot">Backtest</span><span class="sum" id="sumBt">—</span></summary>
   <p class="nota" id="periodo">—</p>
-  <div class="scroll">
-    <table>
-      <thead><tr><th>T/D</th><th>Ops</th><th>Acerto</th><th>Só trailing</th><th>Com sinais de saída</th></tr></thead>
-      <tbody id="bt"></tbody>
-    </table>
-  </div>
+  <div class="scroll"><table>
+    <thead><tr><th>T/D</th><th>Ops</th><th>Acerto</th><th>Só trailing</th><th>Com sinais</th></tr></thead>
+    <tbody id="bt"></tbody>
+  </table></div>
   <p class="nota" id="btEntrada">—</p>
-  <p class="nota">Resultado somado em %, já com 0,2% de taxa por operação, só com entradas dentro do seu horário e saída no fim dele. A linha destacada é a dos seus Ajustes; o valor sublinhado é o melhor da tabela. Resultado passado não garante o futuro.</p>
-</section>
+  <p class="nota">Resultado somado em %, com 0,2% de taxa por operação, só entradas no seu horário e saída no fim dele. Linha destacada = seus Ajustes; sublinhado = melhor da tabela. Resultado passado não garante o futuro.</p>
+</details>
 
-<details class="card" id="ajustes">
-  <summary>Ajustes</summary>
+<details id="ajustes">
+  <summary><span class="rot">Ajustes</span><span class="sum" id="sumAj">—</span></summary>
   <div class="campos">
     <label for="td">Trailing (T/D)<select id="td"><option value="0">Automático (pela volatilidade)</option><option value="0.5">0,5%</option><option value="1">1%</option><option value="1.5">1,5%</option><option value="2">2%</option></select></label>
     <label for="saida">Como sair<select id="saida"><option value="sinais">Trailing + sinais de saída</option><option value="trailing">Só o trailing</option></select></label>
@@ -186,7 +281,7 @@ footer{color:var(--muted);font-size:.75rem;line-height:1.5}
 </div>
 
 <footer>
-  Sinal de compra: média 9 cruza a 21 para cima e RSI entre 50 e 70, com o preço acima da média 200, em candle de 15 min fechado, dentro do seu horário. Saída: trailing stop na Binance; média 9 cruzando a 21 para baixo; RSI voltando abaixo de 70 depois de passar dele; ou fim do seu horário.
+  Sinal de compra: no fechamento do candle de 15 min em que a média 9 cruza a 21 para cima, com RSI entre 50 e 70, preço acima da média 200, contexto ok e dentro do seu horário. Saída: trailing stop na Binance; média 9 cruzando a 21 para baixo; RSI voltando abaixo de 70; ou fim do seu horário.
   Ferramenta de estudo, não é recomendação de investimento. Você pode perder dinheiro. Confira os preços no app antes de enviar a ordem.
 </footer>
 </div>
@@ -201,7 +296,7 @@ const TAXA = 0.2;                       // 0,1% na compra + 0,1% na venda
 const TDS = [0.5, 1, 1.5, 2, 0];        // 0 = automático
 let INFO = {tick:1, passo:0.00001, minimo:10};
 
-/* ---------- ajustes ---------- */
+/* ---------- ajustes (mesma chave de antes: nada se perde ao atualizar) ---------- */
 const PADRAO = {valorEntrada:20, td:0, saida:"sinais", entrada:"mercado", repique:0.3, validade:4, horaIni:7, horaFim:22, mvrvMax:3, fgMax:80, filtro200:true};
 const TEXTO = ["saida","entrada"];
 let cfg = Object.assign({}, PADRAO);
@@ -217,18 +312,18 @@ Object.keys(PADRAO).forEach(k => {
     salvar(); ultimoAviso = null; recalcular(true);
   });
 });
-
-/* posição informada pelo usuário (fica só neste aparelho) */
 let pos = null;
 try{ pos = JSON.parse(localStorage.getItem("sinaisTS.pos")||"null"); }catch(e){}
 function salvarPos(){ try{ pos ? localStorage.setItem("sinaisTS.pos", JSON.stringify(pos)) : localStorage.removeItem("sinaisTS.pos"); }catch(e){} }
 
 /* ---------- formatação ---------- */
 const decs = x => { const s = String(x); return s.includes("e-") ? parseInt(s.split("e-")[1]) : (s.split(".")[1]||"").length; };
-const fP = x => isFinite(x) ? x.toLocaleString("pt-BR",{minimumFractionDigits:decs(INFO.tick),maximumFractionDigits:decs(INFO.tick)}) : "—";
-const fR = x => isFinite(x) ? x.toLocaleString("pt-BR",{minimumFractionDigits:2,maximumFractionDigits:2}) : "—";
-const fQ = x => isFinite(x) ? x.toLocaleString("pt-BR",{minimumFractionDigits:5,maximumFractionDigits:5}) : "—";
+const fN = (x, d) => isFinite(x) ? x.toLocaleString("pt-BR",{minimumFractionDigits:d,maximumFractionDigits:d}) : "—";
+const fP = x => fN(x, decs(INFO.tick));
+const fR = x => fN(x, 2);
+const fQ = x => fN(x, 5);
 const fPct = (x, d) => isFinite(x) ? (x>=0?"+":"−") + Math.abs(x).toLocaleString("pt-BR",{minimumFractionDigits:d??1,maximumFractionDigits:d??1}) + "%" : "—";
+const fRs = x => isFinite(x) ? (x>=0?"+":"−") + "R$ " + fR(Math.abs(x)) : "—";
 const fTd = x => x.toLocaleString("pt-BR",{maximumFractionDigits:1}) + "%";
 const tz = "America/Sao_Paulo";
 const fHM = ms => { try{ return new Date(ms).toLocaleTimeString("pt-BR",{timeZone:tz,hour:"2-digit",minute:"2-digit"}); }catch(e){ return new Date(ms).toLocaleTimeString("pt-BR",{hour:"2-digit",minute:"2-digit"}); } };
@@ -242,6 +337,7 @@ function tempoTexto(ms){
   if(ms < 3600000) return Math.floor(ms/60000) + " min " + String(Math.floor(ms/1000)%60).padStart(2,"0") + " s";
   return Math.floor(ms/3600000) + " h " + (Math.floor(ms/60000)%60) + " min";
 }
+const fVol = v => !isFinite(v) ? "—" : v >= 1e9 ? "Vol " + fN(v/1e9,2) + " bi" : v >= 1e6 ? "Vol " + fN(v/1e6,2) + " mi" : "Vol " + fN(v/1e3,1) + " mil";
 
 /* ---------- indicadores ---------- */
 function ema(v,n){ const o=new Array(v.length).fill(NaN); if(v.length<n) return o;
@@ -264,23 +360,23 @@ const saidaRsi = i => P.rsi[i-1] > 70 && P.rsi[i] <= 70;
 /* ---------- estado ---------- */
 let velas = [], P = null, sig = [];
 let ctx = {mvrv:NaN, fg:NaN};
-let ultimoAviso = null, carregado = false, somOn = false, audio = null;
+let mkt = {};
+let ultimoAviso = null, carregado = false, somOn = false, audio = null, abaManual = 0, ultimaChaveAba = "";
 
 function calcIndicadores(){ P = preparar(velas); sig = velas.map((k,i)=> i>200 && k.closed && condCompra(velas,P,i)); }
 function contextoOK(){ return { mvrv: !(isFinite(ctx.mvrv) && ctx.mvrv >= cfg.mvrvMax), fg: !(isFinite(ctx.fg) && ctx.fg >= cfg.fgMax) }; }
-/* T/D automático: 2 vezes a variação média de um candle (ATR), entre 0,3% e 5%. */
-const tdAuto = i => { const a = P.atr[i], c = velas[i].c; return isFinite(a) ? Math.min(5, Math.max(0.3, Math.round(2*a/c*1000)/10)) : 1; };
+const tdAuto = i => { const a = P && P.atr[i], c = velas[i].c; return isFinite(a) ? Math.min(5, Math.max(0.3, Math.round(2*a/c*1000)/10)) : 1; };
 
-/* Quantia de compra perto do valor escolhido, grande o bastante para a venda
-   (já sem a taxa de 0,1%, que sai do BTC comprado) passar do mínimo da Binance no preço do stop. */
 function quantias(preco, td){
   const stop = preco*(1 - td/100);
   let qtd = Math.max(INFO.passo, ajusta(cfg.valorEntrada/preco, INFO.passo)), g = 0;
   while(ajusta(qtd*0.999, INFO.passo, "baixo")*stop < INFO.minimo*1.02 && g++ < 1000) qtd = ajusta(qtd + INFO.passo, INFO.passo);
   return {qtd, qtdVenda: ajusta(qtd*0.999, INFO.passo, "baixo")};
 }
+/* Preço a partir do qual o trailing já vende no lucro (cobrindo as taxas). */
+const lucroDe = (entrada, td) => entrada*(1+TAXA/100)/(1-td/100);
 
-/* Simulação candle a candle (premissas conservadoras quando a ordem dos preços dentro do candle é desconhecida). */
+/* Simulação candle a candle (conservadora quando a ordem dos preços dentro do candle é desconhecida). */
 function simular(o){
   const trades = []; let ab = null, pend = null, ultimaExp = null; const agora = Date.now();
   const ok = contextoOK(), ctxOK = !o.usaCtx || (ok.mvrv && ok.fg);
@@ -335,47 +431,6 @@ function resumo(trades){
     ganhoMed: w.length ? w.reduce((a,t)=>a+t.pct,0)/w.length : NaN, perdaMed: l.length ? l.reduce((a,t)=>a+t.pct,0)/l.length : NaN};
 }
 
-/* ---------- quadro do sinal ---------- */
-function linhasCompra(preco, td){
-  const q = quantias(preco, td), stop = preco*(1-td/100);
-  const perda = q.qtd*preco*(td/100 + TAXA/100);
-  return `<div class="passo"><div class="rot">1 · Aba Comprar → Market</div><dl class="grade">
-      <dt>Quantia (BTC)</dt><dd>${fQ(q.qtd)}</dd><dt>Total aproximado</dt><dd>R$ ${fR(q.qtd*preco)}</dd></dl></div>
-    <div class="passo"><div class="rot">2 · Logo depois: aba Vender → Trailing Stop</div><dl class="grade">
-      <dt>T/D (%)</dt><dd class="tp">${fTd(td)}</dd><dt>Limite / Mercado</dt><dd>Mercado</dd>
-      <dt>Quantia (BTC)</dt><dd>${fQ(q.qtdVenda)}</dd><dt>Preço de Ativação</dt><dd>desmarcado</dd>
-      <dt>Vende sozinho se cair até</dt><dd class="sl">${fP(stop)}</dd><dt>Perda máxima</dt><dd class="sl">−R$ ${fR(perda)}</dd>
-      <dt>Lucro começa se subir mais de</dt><dd>${fTd(td + TAXA)}</dd></dl>
-      <p class="nota">Se o preço subir, o stop sobe junto e vende quando cair ${fTd(td)} do ponto mais alto.</p></div>`;
-}
-function linhasRepique(p){
-  const gat = p.fundo*(1+cfg.repique/100), q = quantias(gat, p.td);
-  return `<div class="passo"><div class="rot">1 · Aba Comprar → Trailing Stop (compra no repique)</div><dl class="grade">
-      <dt>T/D (%)</dt><dd>${fTd(cfg.repique)}</dd><dt>Limite / Mercado</dt><dd>Mercado</dd>
-      <dt>Quantia (BTC)</dt><dd>${fQ(q.qtd)}</dd><dt>Preço de Ativação</dt><dd>desmarcado</dd>
-      <dt>Compra se repicar até cerca de</dt><dd>${fP(gat)}</dd><dt>Cancele se não comprar até</dt><dd>${fHM(p.expira)}</dd></dl></div>
-    <div class="passo"><div class="rot">2 · Depois que comprar: aba Vender → Trailing Stop</div><dl class="grade">
-      <dt>T/D (%)</dt><dd class="tp">${fTd(p.td)}</dd><dt>Limite / Mercado</dt><dd>Mercado</dd>
-      <dt>Quantia (BTC)</dt><dd>${fQ(q.qtdVenda)}</dd><dt>Preço de Ativação</dt><dd>desmarcado</dd></dl></div>`;
-}
-function linhasPosicao(p, topo, nivel, preco, titulo){
-  const res = (preco - p.entrada)/p.entrada*100 - TAXA;
-  const resR = p.qtd*(preco - p.entrada) - p.qtd*p.entrada*TAXA/100;
-  return `<div class="passo"><div class="rot">${titulo || "Sua operação"}</div><dl class="grade">
-      <dt>Comprou a</dt><dd>${fP(p.entrada)}</dd><dt>Quantia</dt><dd>${fQ(p.qtd)} BTC</dd>
-      <dt>Trailing (T/D)</dt><dd>${fTd(p.td)}</dd>
-      <dt>Topo desde a compra</dt><dd>${fP(topo)}</dd><dt>Trailing vende em</dt><dd class="sl">${fP(nivel)}</dd>
-      <dt>Resultado agora (com taxas)</dt><dd class="${res>=0?"pos":"neg"}">${fPct(res,2)} · ${resR>=0?"+":"−"}R$ ${fR(Math.abs(resR))}</dd>
-      <dt>Fim do seu horário</dt><dd>${String(cfg.horaFim).padStart(2,"0")}:00</dd></dl></div>`;
-}
-const passosSair = qtd => `<div class="passo"><div class="rot">Como sair</div><dl class="grade">
-    <dt>1 · Ordens abertas</dt><dd>cancele o Trailing Stop</dd><dt>2 · Aba Vender → Market</dt><dd>${fQ(qtd)} BTC</dd></dl></div>`;
-
-function quadro(tone, estado, instr, html, ehRef){
-  $("sinal").dataset.tone = tone; $("estado").textContent = estado; $("instr").textContent = instr;
-  $("passos").innerHTML = html || ""; $("refAviso").hidden = !ehRef;
-}
-
 /* Acompanha uma posição desde a compra: topo, nível do trailing e sinais de saída. */
 function acompanhar(p, desdeT){
   const n = velas.length, preco = velas[n-1].c;
@@ -394,77 +449,232 @@ function acompanhar(p, desdeT){
   return {topo, nivel, preco, motivo};
 }
 
+/* ---------- condições ao vivo (candle atual) ---------- */
+let Qviva = null, Vviva = null, QvivaT = 0;
+function condicoesAgora(){
+  const agora = Date.now();
+  if(!Qviva || agora - QvivaT > 900){ Vviva = velas.slice(-600); Qviva = preparar(Vviva); QvivaT = agora; }
+  const j = Vviva.length-1, k = Vviva[j], ok = contextoOK();
+  return [
+    {t:"Média 9 acima da 21", d:"9: " + fP(Qviva.e9[j]) + " · 21: " + fP(Qviva.e21[j]), ok: Qviva.e9[j] > Qviva.e21[j]},
+    {t:"RSI entre 50 e 70", d:"RSI agora: " + fN(Qviva.rsi[j],0), ok: Qviva.rsi[j] > 50 && Qviva.rsi[j] < 70},
+    {t:"Preço acima da média 200", d: cfg.filtro200 ? "200: " + fP(Qviva.e200[j]) : "filtro desligado", ok: !cfg.filtro200 || k.c > Qviva.e200[j]},
+    {t:"Contexto ok", d:"MVRV " + (isFinite(ctx.mvrv)?fN(ctx.mvrv,2):"—") + " · Medo " + (isFinite(ctx.fg)?Math.round(ctx.fg):"—"), ok: ok.mvrv && ok.fg},
+    {t:"Seu horário (" + cfg.horaIni + "h–" + cfg.horaFim + "h)", d:"agora " + fHM(agora), ok: naJanela(agora), larga:true}
+  ];
+}
+function sinalFormando(){
+  if(velas.length < 205 || velas[velas.length-1].closed) return false;
+  condicoesAgora();
+  return condCompra(Vviva, Qviva, Vviva.length-1);
+}
+
+/* ---------- tela: sinal, bilhete e régua ---------- */
+const ORDEM = ["aguardando","formando","compre","operacao","saia"];
+function quadro(etapa, tom, titulo, expl){
+  document.querySelectorAll(".etapa").forEach(d=>{
+    const i = ORDEM.indexOf(d.dataset.k), a = ORDEM.indexOf(etapa);
+    d.className = "etapa" + (i<a ? " feita" : "") + (i===a ? " atual t-"+tom : "");
+  });
+  $("status").className = "status t-"+tom; $("status").textContent = titulo; $("expl").textContent = expl;
+  $("sinal").className = "card sinal t-"+tom;
+}
+function mostrarCondicoes(cor){
+  $("blocoCond").classList.remove("esconde"); $("blocoRes").classList.add("esconde");
+  const cs = condicoesAgora(), n = cs.filter(c=>c.ok).length;
+  $("cond").innerHTML = cs.map(c=>`<div class="chip ${c.larga?"larga":""}"><span class="${c.ok?"ok":"no"}">${c.ok?"✓":"·"}</span><div><b>${c.t}</b><span class="d">${c.d}</span></div></div>`).join("");
+  $("barra").style.width = (n/cs.length*100) + "%"; $("barra").style.background = cor || "var(--info)";
+  $("contTxt").textContent = n + " de " + cs.length + " condições";
+  const u = velas[velas.length-1];
+  $("fechaTxt").textContent = u && !u.closed ? "candle fecha em " + tempoTexto(u.T+1-Date.now()) : "";
+}
+function mostrarResultado(p, a, titulo, sub){
+  $("blocoCond").classList.add("esconde"); $("blocoRes").classList.remove("esconde");
+  const res = (a.preco - p.entrada)/p.entrada*100 - TAXA;
+  const resR = p.qtd*(a.preco - p.entrada) - p.qtd*p.entrada*TAXA/100;
+  const lucro = lucroDe(p.entrada, p.td);
+  $("resTit").textContent = titulo || "Resultado agora";
+  $("resBig").textContent = fPct(res,2); $("resBig").className = "big " + (res>=0?"pos":"neg");
+  $("resSub").textContent = sub || ("Comprou a " + fP(p.entrada) + " · " + fQ(p.qtd) + " BTC");
+  $("resR").textContent = fRs(resR); $("resR").className = "mono " + (resR>=0?"pos":"neg");
+  const lado = Math.max(lucro, a.preco*1.0001), base = Math.min(a.nivel, a.preco*0.9999);
+  const x = Math.min(100, Math.max(0, (a.preco - base)/(lado - base)*100));
+  $("marca").style.left = x + "%";
+  $("legStop").innerHTML = "Trailing vende<br>" + fP(a.nivel);
+  $("legPreco").innerHTML = "Preço<br>" + fP(a.preco);
+  $("legLucro").innerHTML = (a.nivel >= p.entrada*(1+TAXA/100) ? "Lucro garantido<br>" : "Lucro a partir de<br>") + fP(lucro);
+}
+const campo = (rot, val, copia) => `<div class="campo"><div><span class="lb">${rot}</span><div class="v">${val}</div></div>${copia!==undefined ? `<button class="copiar" type="button" data-c="${copia}">Copiar</button>` : ""}</div>`;
+function bilheteCompra(modo, preco, td, pend){
+  if(modo === "repique" && pend){
+    const gat = pend.fundo*(1+cfg.repique/100), q = quantias(gat, pend.td);
+    return campo("Tipo de ordem","Trailing Stop") + campo("T/D (%)", fN(cfg.repique,1), fN(cfg.repique,1)) + campo("Limite","Mercado")
+      + campo("Quantia (BTC)", fQ(q.qtd), fQ(q.qtd)) + `<div class="caixinha"><i></i>Preço de Ativação (desmarcado)</div>`
+      + `<div class="btnfake c">Comprar BTC</div><p class="nota">Compra se repicar até cerca de <b>${fP(gat)}</b>. Cancele se não comprar até <b>${fHM(pend.expira)}</b>.</p>`;
+  }
+  const q = quantias(preco, td);
+  return campo("Tipo de ordem","Market") + campo("Valor (BTC)", fQ(q.qtd), fQ(q.qtd)) + campo("Total aproximado","R$ " + fR(q.qtd*preco))
+    + `<div class="caixinha"><i></i>Slippage Tolerance (deixe assim)</div><div class="btnfake c">Comprar BTC</div>`;
+}
+function bilheteVenda(qtdVenda, td, sair){
+  if(sair){
+    return `<div class="passoAntes"><b>1.</b> Em Ordens abertas, toque em <b>Cancelar</b> no Trailing Stop.</div>`
+      + campo("Tipo de ordem","Market") + campo("Quantia (BTC)", fQ(qtdVenda), fQ(qtdVenda)) + `<div class="btnfake v">Vender BTC</div>`
+      + `<p class="nota"><b>2.</b> Depois venda a mercado e toque em "Encerrei a operação".</p>`;
+  }
+  return campo("Tipo de ordem","Trailing Stop") + campo("T/D (%)", fN(td,1), fN(td,1)) + campo("Limite","Mercado")
+    + campo("Quantia (BTC)", fQ(qtdVenda), fQ(qtdVenda)) + `<div class="caixinha"><i></i>Preço de Ativação (desmarcado)</div>`
+    + `<div class="btnfake v">Vender BTC</div><p class="nota">Logo depois da compra. Se subir, o stop sobe junto e vende quando cair ${fTd(td)} do topo.</p>`;
+}
+function aba(qual, auto){
+  if(auto && Date.now() - abaManual < 60000) return;
+  const c = qual === "c";
+  $("abaC").classList.toggle("on", c); $("abaV").classList.toggle("on", !c);
+  $("formC").classList.toggle("esconde", !c); $("formV").classList.toggle("esconde", c);
+}
+$("abaC").addEventListener("click", ()=>{ abaManual = Date.now(); aba("c"); });
+$("abaV").addEventListener("click", ()=>{ abaManual = Date.now(); aba("v"); });
+document.addEventListener("click", ev => {
+  const b = ev.target.closest(".copiar"); if(!b) return;
+  const ok = () => { b.textContent = "Copiado"; b.classList.add("ok"); setTimeout(()=>{ b.textContent="Copiar"; b.classList.remove("ok"); }, 1500); };
+  try{ navigator.clipboard.writeText(b.dataset.c).then(ok, ok); }catch(e){ ok(); }
+});
+let htmlC = "", htmlV = "";
+function setBilhete(c, v){
+  if(c !== htmlC){ $("formCDin").innerHTML = c; htmlC = c; }
+  if(v !== htmlV){ $("formV").innerHTML = v; htmlV = v; }
+}
+/* Régua: níveis em escala, do maior (em cima) para o menor (embaixo), sem sobreposição. */
+function regua(niveis){
+  const ps = niveis.map(n=>n.p), max = Math.max(...ps), min = Math.min(...ps), amp = (max-min) || max*0.01;
+  const topo = 14, base = 92;
+  let lista = niveis.map(n=>Object.assign({}, n, {y: topo + (max - n.p)/amp*(base-topo)})).sort((a,b)=>a.y-b.y);
+  for(let i=1;i<lista.length;i++) if(lista[i].y - lista[i-1].y < 13) lista[i].y = lista[i-1].y + 13;
+  const exc = lista[lista.length-1].y - 94; if(exc > 0) lista.forEach(n=> n.y -= exc*(n.y-topo)/(lista[lista.length-1].y-topo));
+  $("niveis").innerHTML = lista.map(n=>`<div class="nivel ${n.c}" style="top:${n.y}%"><div class="ln"></div>${n.t}<b>${fP(n.p)}</b></div>`).join("");
+  const yA = (lista.find(n=>n.c==="atual")||{y:50}).y, yL = (lista.find(n=>n.c==="lucro")||{y:topo}).y, yS = (lista.find(n=>n.c==="stop")||{y:base}).y;
+  $("fG").style.top = yL + "%"; $("fG").style.height = Math.max(0, yA - yL) + "%";
+  $("fR").style.top = yA + "%"; $("fR").style.height = Math.max(0, yS - yA + 6) + "%";
+}
+
 function atualizarSinal(){
   if(!carregado || !velas.length) return;
-  const agora = Date.now(), n = velas.length, ult = velas[n-1];
+  const agora = Date.now(), n = velas.length, ult = velas[n-1], preco = ult.c;
   const r = simular(regras({incluiAberta:true, usaCtx:true}));
   const tdAgora = cfg.td || tdAuto(n-1);
   const ok = contextoOK();
   let chave = null;
   $("boxEntrei").hidden = !!pos; $("boxEncerrar").hidden = !pos;
+  const refRegua = () => regua([
+    {t:"Lucro começa", p:lucroDe(preco, tdAgora), c:"lucro"},
+    {t:"Preço agora", p:preco, c:"atual"},
+    {t:"Trailing vende", p:preco*(1-tdAgora/100), c:"stop"}]);
+  const posRegua = (p, a) => { const l = [
+    {t:"Lucro a partir de", p:lucroDe(p.entrada, p.td), c:"lucro"},
+    {t:"Preço agora", p:a.preco, c:"atual"},
+    {t:"Entrada", p:p.entrada, c:"ent"},
+    {t:"Trailing vende", p:a.nivel, c:"stop"}];
+    if(a.topo > a.preco*1.0005 && a.topo > p.entrada*1.0005) l.push({t:"Topo", p:a.topo, c:"topo"});
+    regua(l); };
+  const refBilhete = () => { const q = quantias(preco, tdAgora); setBilhete(bilheteCompra("mercado", preco, tdAgora), bilheteVenda(q.qtdVenda, tdAgora)); };
 
   if(pos){
     const a = acompanhar(pos, pos.t);
-    const det = linhasPosicao(pos, a.topo, a.nivel, a.preco);
     if(a.motivo === "trailing"){
-      quadro("warn","TRAILING DEVE TER VENDIDO","O preço chegou a " + fP(a.nivel) + ". Confira no app se a venda executou e toque em \"Encerrei a operação\".", det);
+      quadro("saia","warn","TRAILING DEVE TER VENDIDO","O preço chegou a " + fP(a.nivel) + ". Confira no app se a venda executou e toque em \"Encerrei a operação\".");
       chave = "pt"+pos.t;
+      setBilhete(bilheteCompra("mercado", preco, tdAgora), bilheteVenda(pos.qtdVenda, pos.td));
     } else if(a.motivo === "fim"){
-      quadro("sell","FIM DO SEU HORÁRIO: VENDA","Passou das " + cfg.horaFim + "h. Para não dormir comprado, saia agora.", det + passosSair(pos.qtdVenda));
-      chave = "pf"+pos.t;
+      quadro("saia","sell","FIM DO HORÁRIO: VENDA","Passou das " + cfg.horaFim + "h. Para não dormir comprado, saia agora (aba Vender).");
+      chave = "pf"+pos.t; setBilhete(bilheteCompra("mercado", preco, tdAgora), bilheteVenda(pos.qtdVenda, pos.td, true));
     } else if(a.motivo){
-      quadro("sell","SAIA AGORA", a.motivo + " A alta perdeu força: realize o resultado.", det + passosSair(pos.qtdVenda));
-      chave = "ps"+pos.t;
+      quadro("saia","sell","SAIA AGORA", a.motivo + " A alta perdeu força: realize o resultado (aba Vender).");
+      chave = "ps"+pos.t; setBilhete(bilheteCompra("mercado", preco, tdAgora), bilheteVenda(pos.qtdVenda, pos.td, true));
     } else {
-      quadro("info","EM OPERAÇÃO","O trailing stop protege você na Binance. O painel avisa se aparecer um sinal de saída antes.", det);
+      quadro("operacao","info","EM OPERAÇÃO","O trailing stop protege você na Binance. O painel avisa se precisar sair antes.");
+      setBilhete(bilheteCompra("mercado", preco, tdAgora), bilheteVenda(pos.qtdVenda, pos.td));
     }
+    mostrarResultado(pos, a); posRegua(pos, a); aba("v", true);
   } else if(r.pendente){
-    quadro("buy","COMPRE NO REPIQUE","Saiu sinal às " + fHM(r.pendente.T) + ". Coloque a ordem do passo 1: ela só compra se o preço repicar " + fTd(cfg.repique) + " do fundo.", linhasRepique(r.pendente));
-    chave = "r"+r.pendente.T;
+    quadro("compre","buy","COMPRE NO REPIQUE","Sinal às " + fHM(r.pendente.T) + ". Coloque a ordem da aba Comprar: ela só compra se o preço repicar " + fTd(cfg.repique) + " do fundo.");
+    chave = "r"+r.pendente.T; mostrarCondicoes("var(--buy)");
+    const q = quantias(preco, r.pendente.td);
+    setBilhete(bilheteCompra("repique", preco, r.pendente.td, r.pendente), bilheteVenda(q.qtdVenda, r.pendente.td));
+    refRegua(); aba("c", true);
   } else if(r.aberta && agora - r.aberta.fillT < TF_MS){
     const a = r.aberta;
-    quadro("buy","COMPRE AGORA","Sinal às " + fHM(a.T) + " a cerca de " + fP(a.entrada) + ". Faça os 2 passos e depois toque em \"Entrei\".", linhasCompra(ult.c, a.td));
-    if(!$("pago").value){ $("pago").value = Math.round(ult.c); $("qtdPaga").value = quantias(ult.c, a.td).qtd; }
-    chave = "c"+a.T;
+    quadro("compre","buy","COMPRE AGORA","Sinal às " + fHM(a.T) + " a cerca de " + fP(a.entrada) + ". Faça a compra (aba Comprar), logo em seguida a proteção (aba Vender) e toque em \"Entrei\".");
+    chave = "c"+a.T; mostrarCondicoes("var(--buy)");
+    const q = quantias(preco, a.td);
+    setBilhete(bilheteCompra("mercado", preco, a.td), bilheteVenda(q.qtdVenda, a.td));
+    if(!$("pago").value){ $("pago").value = Math.round(preco); $("qtdPaga").value = q.qtd; }
+    refRegua(); aba("c", true);
   } else if(r.aberta){
     const a = r.aberta, ac = acompanhar(a, a.fillT);
-    quadro("info","SINAL EM ANDAMENTO","Houve sinal às " + fHM(a.T) + " a " + fP(a.entrada) + ". Se você entrou, toque em \"Entrei\" para acompanhar a sua operação.", linhasPosicao(a, ac.topo, ac.nivel, ac.preco, "Operação do sinal"));
+    quadro("operacao","info","SINAL EM ANDAMENTO","Houve sinal às " + fHM(a.T) + ". Se você entrou, preencha \"Já comprei\" e toque em \"Entrei\" para acompanhar a sua operação.");
+    mostrarResultado(a, ac, "Resultado do sinal", "Sinal a " + fP(a.entrada) + " · " + fQ(a.qtd) + " BTC");
+    setBilhete(bilheteCompra("mercado", preco, tdAgora), bilheteVenda(a.qtdVenda, a.td)); posRegua(a, ac);
   } else {
     const u = r.trades[r.trades.length-1];
     if(u && agora - u.saidaT < 30*60000){
-      quadro(u.pct >= 0 ? "info" : "warn", "SAÍDA DO SINAL DAS " + fHM(u.T), u.motivo + " a " + fP(u.saida) + " (" + fPct(u.pct) + "). Se você ainda está comprado, saia também.", "");
-      chave = "s"+u.T;
+      quadro("aguardando", u.pct>=0 ? "info" : "warn", "SAÍDA DO SINAL DAS " + fHM(u.T), u.motivo + " a " + fP(u.saida) + " (" + fPct(u.pct) + "). Se você ainda está comprado, saia também.");
+      chave = "s"+u.T; mostrarCondicoes();
     } else if(r.ultimaExp && agora - r.ultimaExp.expT < 30*60000){
-      quadro("warn","REPIQUE NÃO ACONTECEU","O preço não repicou a tempo. Cancele a ordem de compra em Ordens abertas.", "");
-      chave = "e"+r.ultimaExp.T;
+      quadro("aguardando","warn","REPIQUE NÃO ACONTECEU","O preço não repicou a tempo. Cancele a ordem de compra em Ordens abertas.");
+      chave = "e"+r.ultimaExp.T; mostrarCondicoes();
     } else if(!naJanela(agora)){
-      quadro("info","FORA DO SEU HORÁRIO","A análise continua, mas sinais só valem das " + cfg.horaIni + "h às " + cfg.horaFim + "h.", linhasCompra(ult.c, tdAgora), true);
+      quadro("aguardando","info","FORA DO SEU HORÁRIO","A análise continua, mas sinais só valem das " + cfg.horaIni + "h às " + cfg.horaFim + "h."); mostrarCondicoes();
     } else if(!(ok.mvrv && ok.fg)){
-      quadro("warn","BLOQUEADO PELO CONTEXTO", (!ok.mvrv ? "MVRV acima do limite. " : "") + (!ok.fg ? "Medo e Ganância acima do limite. " : "") + "Sem compras até melhorar.", linhasCompra(ult.c, tdAgora), true);
+      quadro("aguardando","warn","BLOQUEADO PELO CONTEXTO",(!ok.mvrv ? "MVRV acima do limite. " : "") + (!ok.fg ? "Medo e Ganância acima do limite. " : "") + "Sem compras até melhorar."); mostrarCondicoes();
     } else if(sinalFormando()){
-      quadro("warn","SINAL SE FORMANDO","As condições de compra estão aparecendo no candle atual. Ainda não entre: o sinal só vale se continuar assim no fechamento (" + tempoTexto(ult.T+1-agora) + ").", linhasCompra(ult.c, tdAgora), true);
+      quadro("formando","warn","SINAL SE FORMANDO","As condições estão aparecendo no candle atual. Prepare o app, mas só compre se continuar assim no fechamento.");
+      chave = "f"+ult.t; mostrarCondicoes("var(--warn)");
     } else {
-      quadro("info","AGUARDANDO SINAL","Nenhum sinal agora. O próximo candle fecha em " + tempoTexto(ult.T+1-agora) + ".", linhasCompra(ult.c, tdAgora), true);
+      quadro("aguardando","info","AGUARDANDO SINAL","O sinal acontece quando a média 9 cruza a 21 para cima com as outras condições ok. Veja abaixo o que já está pronto.");
+      mostrarCondicoes();
     }
+    refBilhete(); refRegua();
   }
-  if(chave && chave !== ultimoAviso){ if(ultimoAviso !== null) avisar($("estado").textContent, $("instr").textContent); ultimoAviso = chave; }
+  if(chave && chave !== ultimoAviso){ if(ultimoAviso !== null) avisar($("status").textContent, $("expl").textContent); ultimoAviso = chave; }
   if(ultimoAviso === null) ultimoAviso = "inicio";
-}
-
-function sinalFormando(){
-  const n = velas.length; if(n < 205 || velas[n-1].closed) return false;
-  const V = velas.slice(-600), Q = preparar(V);
-  return condCompra(V, Q, V.length-1);
 }
 
 $("btnEntrei").addEventListener("click", ()=>{
   const p = parseFloat(String($("pago").value).replace(",", ".")), q = parseFloat(String($("qtdPaga").value).replace(",", "."));
-  if(!(p > 0) || !(q > 0)){ $("instr").textContent = "Preencha o preço pago e a quantia comprada para o painel acompanhar a sua operação."; return; }
+  if(!(p > 0) || !(q > 0)){ $("expl").textContent = "Preencha o preço pago e a quantia comprada para o painel acompanhar a sua operação."; return; }
   const td = cfg.td || tdAuto(velas.length-1);
   pos = {entrada:p, qtd:q, qtdVenda: ajusta(q*0.999, INFO.passo, "baixo"), td, t: Date.now()};
-  salvarPos(); ultimoAviso = null; atualizarSinal(); desenharLinhas();
+  salvarPos(); ultimoAviso = null; abaManual = 0; atualizarSinal(); desenharLinhas();
 });
-$("btnEncerrei").addEventListener("click", ()=>{ pos = null; salvarPos(); $("pago").value = ""; $("qtdPaga").value = ""; ultimoAviso = null; atualizarSinal(); desenharLinhas(); });
+$("btnEncerrei").addEventListener("click", ()=>{ pos = null; salvarPos(); $("pago").value = ""; $("qtdPaga").value = ""; ultimoAviso = null; abaManual = 0; atualizarSinal(); desenharLinhas(); });
+
+/* ---------- mercados ---------- */
+const PARES = ["USDTBRL","BTCBRL","BTCUSDT"];
+async function atualizarMercados(){
+  try{
+    const q = "/api/v3/ticker/24hr?symbols=" + encodeURIComponent(JSON.stringify(PARES));
+    const arr = await getJSON(REST.map(b=>b+q));
+    arr.forEach(t => { mkt[t.symbol] = {p:+t.lastPrice, v:+t.priceChangePercent, vol:+t.quoteVolume}; });
+    pintarMercados();
+  }catch(e){}
+}
+function pintarMercados(){
+  const usd = mkt.USDTBRL ? mkt.USDTBRL.p : NaN;
+  PARES.forEach(s => {
+    const m = mkt[s]; if(!m) return; const el = $("m"+s);
+    el.querySelector(".p").textContent = s==="USDTBRL" ? fN(m.p,4) : s==="BTCBRL" ? fN(m.p,0) : fN(m.p,2);
+    el.querySelector(".eq").textContent = s==="BTCUSDT" ? (isFinite(usd) ? "R$ " + fN(m.p*usd,0) : "—") : "R$ " + (s==="USDTBRL" ? fN(m.p,2) : fN(m.p,0));
+    const pl = el.querySelector(".pill"); pl.textContent = fPct(m.v,2); pl.className = "pill " + (m.v>=0 ? "up" : "dn");
+    el.querySelector(".vol").textContent = fVol(s==="BTCUSDT" && isFinite(usd) ? m.vol*usd : m.vol);
+  });
+  if(mkt.USDTBRL && mkt.BTCBRL && mkt.BTCUSDT){
+    const a = mkt.BTCUSDT.v, d = mkt.USDTBRL.v, b = mkt.BTCBRL.v;
+    let t = `Em 24h: BTC em dólar ${fPct(a,2)} e dólar ${fPct(d,2)} → BTC em reais ${fPct(b,2)}.`;
+    if(a > 0 && b < 0) t += " O BTC sobe lá fora, mas cai em reais porque o real se valorizou.";
+    else if(a < 0 && b > 0) t += " O BTC cai lá fora, mas sobe em reais porque o dólar subiu.";
+    $("mktNota").textContent = t;
+  }
+}
 
 /* ---------- histórico, últimas operações e backtest ---------- */
 function atualizarHistorico(){
@@ -473,29 +683,30 @@ function atualizarHistorico(){
   const iniT = fechadas[201].t;
   const periodo = fD(iniT) + " a " + fD(fechadas[fechadas.length-1].T+1);
   $("periodo").textContent = "Período: " + periodo + " (" + Math.round((fechadas[fechadas.length-1].T - iniT)/86400000) + " dias). Entrada: " + (cfg.entrada === "mercado" ? "a mercado" : "no repique") + ".";
-
   const atual = simular(regras({desdeT:iniT}));
   const R = resumo(atual.trades);
-  const veredito = R.n < 10 ? "poucos dados ainda" : R.total > 0 ? "positivo no período" : "negativo no período";
+  $("sumUlt").textContent = R.n ? "acerto " + Math.round(R.acerto*100) + "% · total " + fPct(R.total) : "sem operações";
   $("historico").innerHTML = R.n
-    ? `Histórico com seus ajustes: <b>${R.n}</b> operações · acerto <b>${Math.round(R.acerto*100)}%</b> · ganho médio <b class="pos">${fPct(R.ganhoMed,2)}</b> · perda média <b class="neg">${fPct(R.perdaMed,2)}</b> · total <b class="${R.total>=0?"pos":"neg"}">${fPct(R.total)}</b> (${veredito}).`
-    : `Histórico com seus ajustes: nenhuma operação no período.`;
-
-  let melhor = -Infinity, melhorK = "";
+    ? `Com seus ajustes, ${periodo}: <b>${R.n}</b> operações · ganho médio <b class="pos">${fPct(R.ganhoMed,2)}</b> · perda média <b class="neg">${fPct(R.perdaMed,2)}</b>${R.n < 10 ? " · poucos dados ainda" : ""}.`
+    : "Nenhuma operação no período com os seus ajustes.";
+  let melhor = -Infinity, melhorK = "", melhorTxt = "";
   const dados = TDS.map(td => {
     const a = resumo(simular(regras({td, saida:"trailing", desdeT:iniT})).trades);
     const b = resumo(simular(regras({td, saida:"sinais", desdeT:iniT})).trades);
-    if(a.n && a.total > melhor){ melhor = a.total; melhorK = td+"a"; }
-    if(b.n && b.total > melhor){ melhor = b.total; melhorK = td+"b"; }
+    const nome = td ? "T/D " + fTd(td) : "T/D automático";
+    if(a.n && a.total > melhor){ melhor = a.total; melhorK = td+"a"; melhorTxt = nome + " só trailing"; }
+    if(b.n && b.total > melhor){ melhor = b.total; melhorK = td+"b"; melhorTxt = nome + " com sinais"; }
     return {td, a, b};
   });
+  $("sumBt").textContent = melhorTxt ? "melhor: " + melhorTxt + " (" + fPct(melhor) + ")" : "sem operações";
   $("bt").innerHTML = dados.map(d => {
     const cel = (x, k) => `<td class="mono ${x.n ? (x.total>=0?"pos":"neg") : ""} ${melhorK===k?"melhor":""}">${x.n ? fPct(x.total) : "—"}</td>`;
     const ref = cfg.saida === "sinais" ? d.b : d.a;
-    return `<tr class="${d.td===cfg.td?"atual":""}"><td>${d.td ? fTd(d.td) : "Automático"}</td><td class="mono">${ref.n}</td><td class="mono">${ref.n ? Math.round(ref.acerto*100)+"%" : "—"}</td>${cel(d.a, d.td+"a")}${cel(d.b, d.td+"b")}</tr>`;
+    return `<tr class="${d.td===cfg.td?"atual":""}"><td>${d.td ? fTd(d.td) : "Auto"}</td><td class="mono">${ref.n}</td><td class="mono">${ref.n ? Math.round(ref.acerto*100)+"%" : "—"}</td>${cel(d.a, d.td+"a")}${cel(d.b, d.td+"b")}</tr>`;
   }).join("");
   const m = resumo(simular(regras({entrada:"mercado", desdeT:iniT})).trades), rp = resumo(simular(regras({entrada:"repique", desdeT:iniT})).trades);
-  $("btEntrada").innerHTML = `Com o T/D e a saída dos seus Ajustes: entrando <b>a mercado</b>, ${m.n} ops e total <span class="${m.total>=0?"pos":"neg"}">${m.n?fPct(m.total):"—"}</span> · entrando <b>no repique</b>, ${rp.n} ops e total <span class="${rp.total>=0?"pos":"neg"}">${rp.n?fPct(rp.total):"—"}</span>.`;
+  $("btEntrada").innerHTML = `Com o T/D e a saída dos seus Ajustes: entrando <b>a mercado</b>, ${m.n} ops e total <span class="${m.total>=0?"pos":"neg"}">${m.n?fPct(m.total):"—"}</span> · <b>no repique</b>, ${rp.n} ops e total <span class="${rp.total>=0?"pos":"neg"}">${rp.n?fPct(rp.total):"—"}</span>.`;
+  $("sumAj").textContent = "T/D " + (cfg.td ? fTd(cfg.td) : "auto") + " · " + cfg.horaIni + "h–" + cfg.horaFim + "h";
 
   const ult = atual.trades.slice(-10).reverse();
   const viva = simular(regras({incluiAberta:true, desdeT:iniT})).aberta;
@@ -508,12 +719,8 @@ function atualizarHistorico(){
   $("ultimas").innerHTML = html || `<tr><td colspan="5" style="text-align:left;color:var(--muted)">Nenhuma operação no período.</td></tr>`;
   return atual.trades;
 }
-
 function atualizarContexto(){
-  const ok = contextoOK();
-  const z1 = m => !isFinite(m) ? "indisponível" : m<1 ? "barato" : m<2.4 ? "neutro" : m<3.5 ? "aquecido" : "euforia";
-  const z2 = f => !isFinite(f) ? "indisponível" : f<25 ? "medo extremo" : f<45 ? "medo" : f<55 ? "neutro" : f<75 ? "ganância" : "ganância extrema";
-  $("contexto").innerHTML = `Contexto: <a href="https://charts.checkonchain.com/btconchain/pricing/pricing_mvrv_bands/pricing_mvrv_bands_light.html" target="_blank" rel="noopener">MVRV</a> <b class="${ok.mvrv?"":"neg"}">${isFinite(ctx.mvrv)?ctx.mvrv.toLocaleString("pt-BR",{minimumFractionDigits:2,maximumFractionDigits:2}):"—"}</b> ${z1(ctx.mvrv)} · <a href="https://coinmarketcap.com/pt-br/charts/fear-and-greed-index/" target="_blank" rel="noopener">Medo e Ganância</a> <b class="${ok.fg?"":"neg"}">${isFinite(ctx.fg)?Math.round(ctx.fg):"—"}</b> ${z2(ctx.fg)}`;
+  $("contexto").innerHTML = `Ver fontes: <a href="https://charts.checkonchain.com/btconchain/pricing/pricing_mvrv_bands/pricing_mvrv_bands_light.html" target="_blank" rel="noopener">MVRV (checkonchain)</a> · <a href="https://coinmarketcap.com/pt-br/charts/fear-and-greed-index/" target="_blank" rel="noopener">Medo e Ganância (CoinMarketCap)</a>`;
 }
 
 /* ---------- gráfico ---------- */
@@ -524,9 +731,9 @@ function criarGrafico(){
   if(!window.LightweightCharts){ $("semGrafico").hidden=false; $("grafico").hidden=true; return; }
   chart = LightweightCharts.createChart($("grafico"), {
     autoSize:true,
-    layout:{background:{type:"solid",color:"#151a1f"}, textColor:"#8b96a1", fontFamily:"IBM Plex Mono, monospace"},
+    layout:{background:{type:"solid",color:"#161b21"}, textColor:"#8b96a1", fontFamily:"IBM Plex Mono, monospace"},
     grid:{vertLines:{color:"rgba(255,255,255,0.04)"}, horzLines:{color:"rgba(255,255,255,0.04)"}},
-    rightPriceScale:{borderColor:"#232b33"}, timeScale:{borderColor:"#232b33", timeVisible:true, secondsVisible:false},
+    rightPriceScale:{borderColor:"#262e37"}, timeScale:{borderColor:"#262e37", timeVisible:true, secondsVisible:false},
     crosshair:{mode:0}, localization:{priceFormatter: p => fP(p)}
   });
   sC = chart.addCandlestickSeries({upColor:"#2ebd85",downColor:"#ef5d6a",wickUpColor:"#2ebd85",wickDownColor:"#ef5d6a",borderVisible:false, priceFormat:{type:"price",precision:0,minMove:1}});
@@ -558,10 +765,9 @@ function desenharLinhas(){
     linhasPreco.push(sC.createPriceLine({price:a.nivel,color:"#ef5d6a",lineWidth:1,lineStyle:2,axisLabelVisible:true,title:"Trailing"}));
   }
 }
-
 function recalcular(completo){
   if(!carregado) return;
-  if(completo) calcIndicadores();
+  if(completo){ calcIndicadores(); Qviva = null; }
   atualizarContexto();
   const trades = atualizarHistorico();
   atualizarSinal();
@@ -605,12 +811,11 @@ async function carregarContexto(){
   }catch(e){ ctx.mvrv = NaN; }
   recalcular(false);
 }
-
 let ws=null, wsIdx=0, espera=1000;
 function conectar(){
   const WS = ["wss://data-stream.binance.vision/ws/btcbrl@kline_15m","wss://stream.binance.com:9443/ws/btcbrl@kline_15m"];
   try{ ws = new WebSocket(WS[wsIdx % WS.length]); }catch(e){ return reconectar(); }
-  ws.onopen = () => { espera=1000; $("dot").className="dot ok"; $("connTxt").textContent="Ao vivo"; };
+  ws.onopen = () => { espera=1000; $("dot").className="ok"; };
   ws.onmessage = ev => {
     let m; try{ m = JSON.parse(ev.data); }catch(e){ return; }
     const k = m.k; if(!k) return;
@@ -619,15 +824,15 @@ function conectar(){
     let novaFechada = false;
     if(u && u.t===v.t){ velas[velas.length-1]=v; novaFechada = v.closed && !u.closed; }
     else if(!u || v.t>u.t){ if(u && !u.closed){ u.closed=true; novaFechada=true; } velas.push(v); if(velas.length>13000) velas.shift(); novaFechada = novaFechada || v.closed; }
-    $("preco").textContent = fP(v.c);
+    if(mkt.BTCBRL){ mkt.BTCBRL.p = v.c; pintarMercados(); }
     if(novaFechada) recalcular(true);
     else if(sC) sC.update({time:tsec(v.t),open:v.o,high:v.h,low:v.l,close:v.c});
   };
   ws.onerror = () => {};
   ws.onclose = () => reconectar();
 }
-function reconectar(){ $("dot").className="dot"; $("connTxt").textContent="Reconectando…"; wsIdx++; setTimeout(conectar, espera); espera=Math.min(espera*2, 30000); }
-document.addEventListener("visibilitychange", ()=>{ if(!document.hidden && ws && ws.readyState>1) conectar(); });
+function reconectar(){ $("dot").className=""; wsIdx++; setTimeout(conectar, espera); espera=Math.min(espera*2, 30000); }
+document.addEventListener("visibilitychange", ()=>{ if(!document.hidden){ atualizarMercados(); if(ws && ws.readyState>1) conectar(); } });
 
 /* ---------- avisos ---------- */
 function bip(){
@@ -651,21 +856,28 @@ $("btnNotif").addEventListener("click", async ()=>{
   catch(e){ $("btnNotif").textContent="Notificações indisponíveis aqui"; }
 });
 
+/* caixas recolhíveis: lembra o que você deixou aberto */
+["caixaUltimas","caixaBt","ajustes"].forEach(id => {
+  const el = $(id);
+  try{ if(localStorage.getItem("sinaisTS.aberto."+id) === "1") el.open = true; }catch(e){}
+  el.addEventListener("toggle", () => { try{ localStorage.setItem("sinaisTS.aberto."+id, el.open ? "1" : "0"); }catch(e){} });
+});
+
 function relogio(){ try{ $("relogio").textContent = new Date().toLocaleTimeString("pt-BR",{timeZone:tz}) + " Brasília"; }catch(e){ $("relogio").textContent = new Date().toLocaleTimeString("pt-BR"); } }
 setInterval(()=>{ relogio(); if(carregado){ atualizarSinal(); if(pos) desenharLinhas(); } }, 1000);
+setInterval(atualizarMercados, 5000);
 setInterval(carregarContexto, 30*60000);
-relogio();
+relogio(); atualizarMercados();
 
 (async function(){
   criarGrafico();
   try{ await carregarInfo(); await carregarHistorico(); }
   catch(e){
-    $("dot").className="dot err"; $("connTxt").textContent="Sem conexão";
-    quadro("sell","SEM DADOS DA BINANCE","Não consegui baixar os candles. Confira a internet e recarregue a página.", "");
+    $("dot").className="err";
+    quadro("aguardando","sell","SEM DADOS DA BINANCE","Não consegui baixar os candles. Confira a internet e recarregue a página.");
     return;
   }
   carregado = true;
-  if(velas.length) $("preco").textContent = fP(velas[velas.length-1].c);
   recalcular(true);
   if(chart) chart.timeScale().fitContent();
   carregarContexto();
