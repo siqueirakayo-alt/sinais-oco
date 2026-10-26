@@ -248,13 +248,22 @@ details.mao>summary{font-weight:400;font-size:.74rem;color:var(--muted);text-ali
 details.mao>summary::after{content:none}
 details.mao>summary u{color:var(--info);text-decoration:none}
 .notaCampo{margin-top:10px}
+.cmpTf table td small{display:block;color:var(--muted);font-size:.64rem}
+.cmpTf tr.melhorTf td:first-child{border-left:3px solid var(--buy);padding-left:6px}
+.selo{display:inline-block;font-size:.58rem;font-weight:700;padding:1px 5px;border-radius:4px;background:rgba(46,189,133,.18);color:var(--buy);margin-left:4px;vertical-align:middle}
+.selo.az{background:rgba(90,169,230,.18);color:var(--info)}
+.barrasTf{margin-top:10px;display:flex;flex-direction:column;gap:6px}
+.barrasTf .l{display:grid;grid-template-columns:52px 1fr 64px;gap:8px;align-items:center;font-size:.76rem}
+.barrasTf .b{height:12px;border-radius:3px;background:var(--panel2);position:relative;overflow:hidden}
+.barrasTf .b i{position:absolute;top:0;bottom:0;border-radius:2px}
+.barrasTf .b .zero{position:absolute;top:-2px;bottom:-2px;width:1px;background:var(--muted);left:50%}
 </style>
 </head>
 <body>
 <div class="wrap">
 
 <header>
-  <div class="marca">Sinais BTC <small>BTC/BRL · candle de 15 min</small></div>
+  <div class="marca">Sinais BTC <small>BTC/BRL · candle de <b id="tfTopo" style="color:var(--gold)">15 min</b></small></div>
   <div class="vivo"><i id="dot"></i><span id="relogio">--:--:--</span></div>
 </header>
 
@@ -388,7 +397,7 @@ details.mao>summary u{color:var(--info);text-decoration:none}
 
 <!-- Gráfico -->
 <section class="card">
-  <div class="rot" style="margin-bottom:6px">Gráfico 15 min · médias 9, 21 e 200 · C = compra, V = venda</div>
+  <div class="rot" style="margin-bottom:6px"><span id="tfGraf">Gráfico 15 min</span> · médias 9, 21 e 200 · C = compra, V = venda</div>
   <div id="grafico"></div>
   <p class="nota" id="semGrafico" hidden>O gráfico não carregou. Os sinais continuam funcionando.</p>
 </section>
@@ -461,13 +470,21 @@ details.mao>summary u{color:var(--info);text-decoration:none}
   <p class="nota" id="btEntrada">—</p>
   <p class="nota" id="btDolar">—</p>
   <p class="nota">Resultado somado em %, com 0,2% de taxa por operação, só entradas no seu horário e saída no fim dele. Linha destacada = seus Ajustes; sublinhado = melhor da tabela. Resultado passado não garante o futuro.</p>
+  <div class="cmpTf">
+    <div class="rot" style="margin-top:14px">Qual tempo de candle funciona melhor?</div>
+    <p class="nota" id="cmpInfo">Compara 15 min, 30 min e 1 h no mesmo período, com as mesmas taxas, horário, entrada, saída e filtro do dólar dos seus Ajustes. Cada linha usa o melhor T/D daquele tempo. Baixa uns 40 mil candles da Binance (alguns segundos).</p>
+    <button type="button" id="btnCmp" class="largo">Comparar 15 min · 30 min · 1 h</button>
+    <div id="cmpRes"></div>
+  </div>
 </details>
 
 <details id="ajustes">
   <summary><span class="rot">Ajustes</span><span class="sum" id="sumAj">—</span></summary>
   <div class="campos">
+    <label for="tf" style="grid-column:1/-1">Tempo do candle<select id="tf"><option value="15m">15 min (mais sinais)</option><option value="30m">30 min (meio-termo)</option><option value="1h">1 h (menos sinais, mais firmes)</option></select>
+      <span style="font-size:.7rem;line-height:1.35">Muda a análise inteira (sinal, médias, gráfico, backtest) e recarrega o painel. Seu diário e a operação aberta não mudam. Compare os três no Backtest.</span></label>
     <label for="valorEntrada">Valor da entrada (R$)<input id="valorEntrada" type="number" step="1" min="10" inputmode="decimal"></label>
-    <label for="td">Trailing (T/D)<select id="td"><option value="0">Automático (pela volatilidade)</option><option value="0.5">0,5%</option><option value="1">1%</option><option value="1.5">1,5%</option><option value="2">2%</option></select></label>
+    <label for="td">Trailing (T/D)<select id="td"><option value="0">Automático (pela volatilidade)</option><option value="0.5">0,5%</option><option value="1">1%</option><option value="1.5">1,5%</option><option value="2">2%</option><option value="2.5">2,5%</option><option value="3">3%</option><option value="4">4%</option></select></label>
     <label for="saida">Como sair<select id="saida"><option value="sinais">Trailing + sinais de saída</option><option value="trailing">Só o trailing</option></select></label>
     <label for="entrada">Como entrar<select id="entrada"><option value="mercado">A mercado, no sinal</option><option value="repique">No repique (trailing de compra)</option></select></label>
     <label for="repique">Repique para comprar (%)<input id="repique" type="number" step="0.1" min="0.1"></label>
@@ -488,7 +505,7 @@ details.mao>summary u{color:var(--info);text-decoration:none}
 </div>
 
 <footer>
-  Sinal de compra: no fechamento do candle de 15 min em que a média 9 cruza a 21 para cima, com RSI entre 50 e 70, preço acima da média 200, dólar sem queda, contexto ok e dentro do seu horário. Saída: trailing stop na Binance; média 9 cruzando a 21 para baixo; RSI voltando abaixo de 70; ou fim do seu horário.
+  Sinal de compra: no fechamento do candle (15 min, 30 min ou 1 h, conforme os Ajustes) em que a média 9 cruza a 21 para cima, com RSI entre 50 e 70, preço acima da média 200, dólar sem queda, contexto ok e dentro do seu horário. Saída: trailing stop na Binance; média 9 cruzando a 21 para baixo; RSI voltando abaixo de 70; ou fim do seu horário.
   Ferramenta de estudo, não é recomendação de investimento. Você pode perder dinheiro. Confira os preços no app antes de enviar a ordem.
 </footer>
 </div>
@@ -497,15 +514,18 @@ details.mao>summary u{color:var(--info);text-decoration:none}
 (function(){
 "use strict";
 const $ = id => document.getElementById(id);
-const SIMB = "BTCBRL", TF = "15m", TF_MS = 15*60000, PAGINAS = 12;
+const TEMPOS = {"15m":{ms:15*60000, nome:"15 min"}, "30m":{ms:30*60000, nome:"30 min"}, "1h":{ms:60*60000, nome:"1 h"}};
+const TF = (() => { try{ const t = (JSON.parse(localStorage.getItem("sinaisTS.v1")||"{}")||{}).tf; return TEMPOS[t] ? t : "15m"; }catch(e){ return "15m"; } })();
+let TF_MS = TEMPOS[TF].ms;
+const SIMB = "BTCBRL", PAGINAS = 12;
 const REST = ["https://data-api.binance.vision","https://api.binance.com","https://api1.binance.com"];
 const TAXA = 0.2;                       // 0,1% na compra + 0,1% na venda
-const TDS = [0.5, 1, 1.5, 2, 0];        // 0 = automático
+const TDS = [0.5, 1, 1.5, 2, 2.5, 3, 0];        // 0 = automático
 let INFO = {tick:1, passo:0.00001, minimo:10};
 
 /* ---------- ajustes (mesma chave de antes: nada se perde ao atualizar) ---------- */
-const PADRAO = {valorEntrada:20, td:0, saida:"sinais", entrada:"mercado", repique:0.3, validade:4, janela:60, horaIni:7, horaFim:22, mvrvMax:3, fgMax:80, filtro200:true, filtroDolar:true};
-const TEXTO = ["saida","entrada"];
+const PADRAO = {valorEntrada:20, td:0, saida:"sinais", entrada:"mercado", repique:0.3, validade:4, janela:60, tf:"15m", horaIni:7, horaFim:22, mvrvMax:3, fgMax:80, filtro200:true, filtroDolar:true};
+const TEXTO = ["saida","entrada","tf"];
 let cfg = Object.assign({}, PADRAO);
 try{ const s = JSON.parse(localStorage.getItem("sinaisTS.v1")||"null"); if(s) Object.assign(cfg, s); }catch(e){}
 function salvar(){ try{ localStorage.setItem("sinaisTS.v1", JSON.stringify(cfg)); }catch(e){} }
@@ -519,6 +539,8 @@ Object.keys(PADRAO).forEach(k => {
     salvar(); ultimoAviso = null; recalcular(true);
   });
 });
+$("tf").addEventListener("change", () => setTimeout(() => location.reload(), 50));
+$("tfTopo").textContent = TEMPOS[TF].nome; $("tfGraf").textContent = "Gráfico " + TEMPOS[TF].nome;
 let pos = null;
 try{ pos = JSON.parse(localStorage.getItem("sinaisTS.pos")||"null"); }catch(e){}
 if(pos){ if(pos.sobraIni === undefined) pos.sobraIni = 0; if(pos.btcTotal === undefined) pos.btcTotal = pos.qtd*0.999; if(pos.sinal === undefined) pos.sinal = false; }
@@ -571,11 +593,14 @@ let ctx = {mvrv:NaN, fg:NaN};
 let mkt = {};
 let ultimoAviso = null, carregado = false, somOn = false, audio = null, abaManual = 0, ultimaChaveAba = "";
 
-/* Dólar (USDT/BRL) no mesmo candle de 15 min: filtro contra a queda do dólar puxando o BTC/BRL para baixo. */
+/* Dólar (USDT/BRL) no mesmo tempo de candle: filtro contra a queda do dólar puxando o BTC/BRL para baixo. */
 let velasUsd = [], Pd = null, usdMap = new Map(), sigBase = [];
 function prepUsd(){ Pd = preparar(velasUsd); usdMap = new Map(velasUsd.map((k,i)=>[k.t,i])); }
 const dolarBruto = t => { if(!Pd) return true; const i = usdMap.get(t); if(i === undefined || !isFinite(Pd.e21[i])) return true; return Pd.e9[i] >= Pd.e21[i]; };
-const dolarOK = t => !cfg.filtroDolar || dolarBruto(t);
+// sem o histórico do dólar o filtro NÃO libera: o sinal espera o dólar carregar
+let usdEstado = "carregando";
+const dolarOK = t => !cfg.filtroDolar || (!!Pd && dolarBruto(t));
+const dolarPendente = () => cfg.filtroDolar && !Pd;
 function calcIndicadores(){
   P = preparar(velas);
   sigBase = velas.map((k,i)=> i>200 && k.closed && condCompra(velas,P,i));
@@ -699,7 +724,7 @@ function condicoesAgora(){
     {t:"RSI entre 50 e 70", d:"RSI agora: " + fN(Qviva.rsi[j],0), ok: Qviva.rsi[j] > 50 && Qviva.rsi[j] < 70},
     {t:"Preço acima da média 200", d: cfg.filtro200 ? "200: " + fP(Qviva.e200[j]) : "filtro desligado", ok: !cfg.filtro200 || k.c > Qviva.e200[j]},
     {t:"Contexto ok", d:"MVRV " + (isFinite(ctx.mvrv)?fN(ctx.mvrv,2):"—") + " · Medo " + (isFinite(ctx.fg)?Math.round(ctx.fg):"—"), ok: ok.mvrv && ok.fg},
-    (()=>{ const n = velasUsd.length; if(!Pd || !n) return {t:"Dólar sem queda", d:"carregando…", ok:true};
+    (()=>{ const n = velasUsd.length; if(!Pd || !n) return {t:"Dólar sem queda", d: !cfg.filtroDolar ? "filtro desligado" : usdEstado === "erro" ? "não carregou · tentando de novo" : "carregando…", ok: !cfg.filtroDolar};
       const j2 = n-1; return {t:"Dólar sem queda", d: cfg.filtroDolar ? "9: " + fN(Pd.e9[j2],4) + " · 21: " + fN(Pd.e21[j2],4) : "filtro desligado", ok: !cfg.filtroDolar || Pd.e9[j2] >= Pd.e21[j2]}; })(),
     {t:"Seu horário (" + cfg.horaIni + "h–" + cfg.horaFim + "h)", d:"agora " + fHM(agora), ok: naJanela(agora)}
   ];
@@ -816,7 +841,7 @@ function reguaEm(ids, niveis, fmt){
   $(ids.g).style.top = yL + "%"; $(ids.g).style.height = Math.max(0, yA - yL) + "%";
   $(ids.r).style.top = yA + "%"; $(ids.r).style.height = Math.max(0, yS - yA + 6) + "%";
 }
-/* Dólar: agora (mercados ao vivo) e no momento da compra (histórico de 15 min do USDT/BRL). */
+/* Dólar: agora (mercados ao vivo) e no momento da compra (histórico do USDT/BRL no mesmo tempo de candle). */
 const usdAgora = () => (mkt.USDTBRL && mkt.USDTBRL.p) || (velasUsd.length ? velasUsd[velasUsd.length-1].c : NaN);
 function usdEm(t){
   for(let i=velasUsd.length-1;i>=0;i--){ const k = velasUsd[i]; if(k.t <= t) return (t <= k.T+1) ? k.c : NaN; }
@@ -868,6 +893,10 @@ function entrouNoSinal(tr){
 function mostrarUltimoSinal(r, preco){
   const el = $("ultSinal");
   if(pos || etapaAtual === "compre"){ el.hidden = true; return; }
+  if(dolarPendente()){
+    el.innerHTML = `<div class="topo"><div class="rot">Último sinal</div></div><p class="nota">${usdEstado === "erro" ? "O dólar não carregou: sem ele não dá para saber quais sinais valeram. Tentando de novo…" : "Carregando o dólar para conferir quais sinais valeram…"}</p>`;
+    el.hidden = false; return;
+  }
   const agora = Date.now(), lista = sinaisRecentes(r, agora - 24*3600000);
   const u = r.aberta || r.trades[r.trades.length-1];
   if(!u){
@@ -1011,6 +1040,11 @@ function atualizarSinal(){
     } else if(r.ultimaExp && agora - r.ultimaExp.expT < 30*60000){
       quadro("aguardando","warn","REPIQUE NÃO ACONTECEU","O preço não repicou a tempo. Cancele a ordem de compra em Ordens abertas.");
       chave = "e"+r.ultimaExp.T; mostrarCondicoes();
+    } else if(dolarPendente()){
+      quadro("aguardando","warn", usdEstado === "erro" ? "DÓLAR NÃO CARREGOU" : "CARREGANDO O DÓLAR", usdEstado === "erro"
+        ? "Não consegui baixar o USDT/BRL. Sem ele o filtro do dólar não libera sinal. Tentando de novo a cada 30 s (ou desligue o filtro em Ajustes)."
+        : "Baixando o histórico do USDT/BRL. Os sinais aparecem assim que ele chegar, com o filtro do dólar aplicado.");
+      mostrarCondicoes();
     } else if(!naJanela(agora)){
       quadro("aguardando","info","FORA DO SEU HORÁRIO","A análise continua, mas sinais só valem das " + cfg.horaIni + "h às " + cfg.horaFim + "h."); mostrarCondicoes();
     } else if(!(ok.mvrv && ok.fg)){
@@ -1595,6 +1629,82 @@ function atualizarHistorico(){
   $("ultimas").innerHTML = html || `<tr><td colspan="5" style="text-align:left;color:var(--muted)">Nenhuma operação no período.</td></tr>`;
   return atual.trades;
 }
+/* ---------- comparação de tempos de candle (sob demanda) ---------- */
+const CMP_DIAS = 120;
+let cmpCache = {};
+async function baixarVelas(simb, tf, desdeT){
+  let todas = [], fim = null;
+  for(let p=0;p<16;p++){
+    const q = "/api/v3/klines?symbol="+simb+"&interval="+tf+"&limit=1000" + (fim?("&endTime="+fim):"");
+    const r = await getJSON(REST.map(b=>b+q)); if(!r.length) break;
+    todas = r.map(paraVela).concat(todas); fim = +r[0][0]-1;
+    if(r.length < 1000 || +r[0][0] <= desdeT) break;
+  }
+  const vistos = new Set(); return todas.filter(k=> !vistos.has(k.t) && vistos.add(k.t)).sort((a,b)=>a.t-b.t);
+}
+/* Roda a simulação com outro conjunto de candles trocando o estado global por um instante. */
+function simularCom(V, U, ms, desdeT){
+  const g = {velas, P, sig, sigBase, velasUsd, Pd, usdMap, TF_MS};
+  try{
+    velas = V; TF_MS = ms; P = preparar(velas);
+    velasUsd = U; Pd = U.length ? preparar(U) : null; usdMap = new Map(U.map((k,i)=>[k.t,i]));
+    sigBase = velas.map((k,i)=> i>200 && k.closed && condCompra(velas,P,i));
+    sig = sigBase.map((s,i)=> s && dolarOK(velas[i].t));
+    let melhor = null;
+    TDS.forEach(td => {
+      const tr = simular(regras({td, desdeT, sigArr:sig})).trades, R = resumo(tr);
+      R.td = td; R.dur = tr.length ? tr.reduce((a,t)=>a + (t.saidaT - t.fillT), 0)/tr.length : NaN;
+      if(R.n && (!melhor || R.total > melhor.total)) melhor = R;
+      if(td === cfg.td) R.seu = true;
+    });
+    const seu = (() => { const tr = simular(regras({desdeT, sigArr:sig})).trades, R = resumo(tr); return R; })();
+    return {melhor, seu};
+  } finally { velas = g.velas; P = g.P; sig = g.sig; sigBase = g.sigBase; velasUsd = g.velasUsd; Pd = g.Pd; usdMap = g.usdMap; TF_MS = g.TF_MS; }
+}
+async function compararTempos(){
+  const box = $("cmpRes"), btn = $("btnCmp");
+  btn.disabled = true; btn.textContent = "Baixando candles…";
+  const desdeT = Date.now() - CMP_DIAS*86400000, linhas = [];
+  try{
+    for(const tf of Object.keys(TEMPOS)){
+      const ms = TEMPOS[tf].ms, aquece = desdeT - 210*ms;
+      btn.textContent = "Baixando " + TEMPOS[tf].nome + "…";
+      if(!cmpCache[tf]){
+        const V = tf === TF && velas.length && velas[0].t <= aquece ? velas : await baixarVelas(SIMB, tf, aquece);
+        const U = tf === TF && velasUsd.length && velasUsd[0].t <= aquece ? velasUsd : (cfg.filtroDolar ? await baixarVelas("USDTBRL", tf, aquece) : []);
+        cmpCache[tf] = {V, U};
+      }
+      const {V, U} = cmpCache[tf];
+      if(V.length < 260 || V[0].t > aquece + ms*5){ linhas.push({tf, falta:true}); continue; }
+      linhas.push(Object.assign({tf}, simularCom(V, U, ms, desdeT)));
+    }
+  }catch(e){ box.innerHTML = `<p class="nota" style="color:var(--warn)">Não consegui baixar os candles da Binance. Tente de novo em instantes.</p>`; btn.disabled = false; btn.textContent = "Comparar 15 min · 30 min · 1 h"; return; }
+  const ok = linhas.filter(l => l.melhor);
+  const top = ok.reduce((a,l)=> !a || l.melhor.total > a.melhor.total ? l : a, null);
+  const maxAbs = Math.max(0.1, ...ok.map(l => Math.abs(l.melhor.total)));
+  const tdTxt = td => td ? fTd(td) : "auto";
+  let html = `<table><thead><tr><th>Candle</th><th>Ops</th><th>Acerto</th><th>Total</th><th>Melhor T/D</th></tr></thead><tbody>`;
+  linhas.forEach(l => {
+    const nome = TEMPOS[l.tf].nome + (l.tf === TF ? ` <span class="selo az">atual</span>` : "") + (top && l === top ? ` <span class="selo">melhor</span>` : "");
+    if(l.falta || !l.melhor){ html += `<tr><td>${nome}</td><td colspan="4" style="color:var(--muted)">${l.falta ? "histórico insuficiente" : "nenhuma operação"}</td></tr>`; return; }
+    const m = l.melhor;
+    html += `<tr class="${l===top?"melhorTf":""} ${l.tf===TF?"atual":""}"><td>${nome}<small>dura ~${haQuanto(m.dur)}</small></td><td class="mono">${m.n}</td><td class="mono">${Math.round(m.acerto*100)}%</td><td class="mono ${m.total>=0?"pos":"neg"}">${fPct(m.total)}<small>c/ seu T/D: ${l.seu.n ? fPct(l.seu.total) : "—"}</small></td><td class="mono">${tdTxt(m.td)}</td></tr>`;
+  });
+  html += `</tbody></table><div class="barrasTf">` + ok.map(l => {
+    const v = l.melhor.total, w = Math.abs(v)/maxAbs*50;
+    return `<div class="l"><span>${TEMPOS[l.tf].nome}</span><div class="b"><span class="zero"></span><i style="left:${v>=0?50:50-w}%;width:${w}%;background:${v>=0?"var(--buy)":"var(--sell)"}"></i></div><span class="mono ${v>=0?"pos":"neg"}" style="text-align:right">${fPct(v)}</span></div>`;
+  }).join("") + `</div>`;
+  const ini = fD(desdeT), fim = fD(Date.now());
+  html += `<p class="nota">Período: ${ini} a ${fim} (${CMP_DIAS} dias), igual para os três. Total = soma das operações em %, já sem as taxas. "c/ seu T/D" = resultado com o T/D dos seus Ajustes.</p>`;
+  if(top && top.melhor.n < 30) html += `<p class="nota"><b>Cuidado:</b> com menos de 30 operações, o resultado depende muito de 2 ou 3 operações boas ou ruins.</p>`;
+  if(top && (top.tf !== TF || top.melhor.td !== cfg.td)) html += `<button type="button" class="largo prim" id="btnUsarTf" data-tf="${top.tf}" data-td="${top.melhor.td}">Usar ${TEMPOS[top.tf].nome} (e T/D ${tdTxt(top.melhor.td)})</button>`;
+  box.innerHTML = html;
+  btn.disabled = false; btn.textContent = "Comparar de novo";
+  const u = $("btnUsarTf");
+  if(u) u.addEventListener("click", () => { cfg.tf = u.dataset.tf; cfg.td = +u.dataset.td; salvar(); location.reload(); });
+}
+$("btnCmp").addEventListener("click", compararTempos);
+
 function atualizarContexto(){
   $("contexto").innerHTML = `Ver fontes: <a href="https://charts.checkonchain.com/btconchain/pricing/pricing_mvrv_bands/pricing_mvrv_bands_light.html" target="_blank" rel="noopener">MVRV (checkonchain)</a> · <a href="https://coinmarketcap.com/pt-br/charts/fear-and-greed-index/" target="_blank" rel="noopener">Medo e Ganância (CoinMarketCap)</a>`;
 }
@@ -1688,8 +1798,9 @@ async function carregarUsd(){
       todas = r.map(paraVela).concat(todas); fim = +r[0][0]-1; if(r.length < 1000) break;
     }
     const vistos = new Set(); velasUsd = todas.filter(k=> !vistos.has(k.t) && vistos.add(k.t)).sort((a,b)=>a.t-b.t);
-    prepUsd(); recalcular(true);
-  }catch(e){}
+    if(!velasUsd.length) throw new Error("vazio");
+    usdEstado = "ok"; prepUsd(); recalcular(true);
+  }catch(e){ usdEstado = "erro"; recalcular(false); setTimeout(carregarUsd, 30000); }
 }
 async function atualizarUsd(){
   if(!velasUsd.length) return;
@@ -1710,7 +1821,7 @@ async function carregarContexto(){
 }
 let ws=null, wsIdx=0, espera=1000;
 function conectar(){
-  const WS = ["wss://data-stream.binance.vision/ws/btcbrl@kline_15m","wss://stream.binance.com:9443/ws/btcbrl@kline_15m"];
+  const WS = ["wss://data-stream.binance.vision/ws/btcbrl@kline_" + TF, "wss://stream.binance.com:9443/ws/btcbrl@kline_" + TF];
   try{ ws = new WebSocket(WS[wsIdx % WS.length]); }catch(e){ return reconectar(); }
   ws.onopen = () => { espera=1000; $("dot").className="ok"; };
   ws.onmessage = ev => {
