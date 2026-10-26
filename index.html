@@ -397,6 +397,7 @@ textarea{width:100%;min-height:90px;background:var(--bg);color:var(--fg);border:
     <label for="saida">Como sair<select id="saida"><option value="sinais">Trailing + sinais de saída</option><option value="trailing">Só o trailing</option></select></label>
     <label for="entrada">Como entrar<select id="entrada"><option value="mercado">A mercado, no sinal</option><option value="repique">No repique (trailing de compra)</option></select></label>
     <label for="repique">Repique para comprar (%)<input id="repique" type="number" step="0.1" min="0.1"></label>
+    <label for="janela">Janela para comprar (min)<input id="janela" type="number" step="15" min="15" max="240"></label>
     <label for="validade">Validade do repique (candles)<input id="validade" type="number" step="1" min="1"></label>
     <label for="horaIni">Meu horário: início (h)<input id="horaIni" type="number" step="1" min="0" max="23"></label>
     <label for="horaFim">Meu horário: fim (h)<input id="horaFim" type="number" step="1" min="1" max="24"></label>
@@ -429,7 +430,7 @@ const TDS = [0.5, 1, 1.5, 2, 0];        // 0 = automático
 let INFO = {tick:1, passo:0.00001, minimo:10};
 
 /* ---------- ajustes (mesma chave de antes: nada se perde ao atualizar) ---------- */
-const PADRAO = {valorEntrada:20, td:0, saida:"sinais", entrada:"mercado", repique:0.3, validade:4, horaIni:7, horaFim:22, mvrvMax:3, fgMax:80, filtro200:true, filtroDolar:true};
+const PADRAO = {valorEntrada:20, td:0, saida:"sinais", entrada:"mercado", repique:0.3, validade:4, janela:60, horaIni:7, horaFim:22, mvrvMax:3, fgMax:80, filtro200:true, filtroDolar:true};
 const TEXTO = ["saida","entrada"];
 let cfg = Object.assign({}, PADRAO);
 try{ const s = JSON.parse(localStorage.getItem("sinaisTS.v1")||"null"); if(s) Object.assign(cfg, s); }catch(e){}
@@ -831,9 +832,9 @@ function atualizarSinal(){
     const q = quantias(preco, r.pendente.td);
     setBilhete(bilheteCompra("repique", preco, r.pendente.td, r.pendente), bilheteVenda(qtdVendaReal(q.qtd), r.pendente.td));
     refRegua(); aba("c", true);
-  } else if(r.aberta && agora - r.aberta.fillT < TF_MS){
-    const a = r.aberta;
-    quadro("compre","buy","COMPRE AGORA","Sinal às " + fHM(a.T) + " a cerca de " + fP(a.entrada) + ". Faça os 2 passos abaixo na Binance e depois registre a entrada.");
+  } else if(r.aberta && agora - r.aberta.fillT < (cfg.janela||60)*60000){
+    const a = r.aberta, fimJ = a.fillT + (cfg.janela||60)*60000, falta = Math.max(0, Math.ceil((fimJ - agora)/60000)), dif = (preco/a.entrada - 1)*100;
+    quadro("compre","buy","COMPRE AGORA","Sinal às " + fHM(a.T) + " a " + fP(a.entrada) + ". Janela aberta até " + fHM(fimJ) + " (faltam " + falta + " min). Preço agora " + fP(preco) + " (" + fPct(dif,2) + " " + (dif>=0 ? "acima" : "abaixo") + " do sinal)." + (dif > 0.5 ? " Já subiu bastante: entrando agora, o trailing fica mais perto de vender no prejuízo." : "") + " Faça os 2 passos abaixo na Binance e depois registre a entrada.");
     chave = "c"+a.T; mostrarCondicoes("var(--buy)");
     const q = quantias(preco, a.td);
     setBilhete(bilheteCompra("mercado", preco, a.td), bilheteVenda(qtdVendaReal(q.qtd), a.td));
