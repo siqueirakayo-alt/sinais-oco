@@ -144,6 +144,9 @@ footer{color:var(--muted);font-size:.72rem;line-height:1.5}
 .seg2 button.on.g{background:var(--buy);color:#06140e} .seg2 button.on.r{background:var(--sell);color:#fff}
 .calc{background:var(--panel2);border-radius:8px;padding:10px;margin-top:10px}
 .calc .grade{margin:0}
+.grade{display:grid;grid-template-columns:1fr auto;gap:5px 12px;align-items:baseline}
+.grade dt{color:var(--muted);font-size:.8rem}
+.grade dd{margin:0;text-align:right;font-family:var(--mono);font-variant-numeric:tabular-nums;font-size:.88rem}
 .alerta{border:1px solid var(--warn);background:rgba(232,163,61,.10);color:var(--warn);border-radius:8px;padding:8px 10px;font-size:.8rem;line-height:1.4;margin-top:10px}
 .alerta b{color:var(--fg)}
 .chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
@@ -186,6 +189,65 @@ textarea{width:100%;min-height:90px;background:var(--bg);color:var(--fg);border:
 .ordem + .ordem{margin-top:8px}
 .ordem .passoAntes{margin-top:8px}
 @media (max-width:370px){.reguas{grid-template-columns:1fr}.reguas .regua{min-height:280px}.ordem .grid2{grid-template-columns:1fr}}
+/* último sinal */
+.ult{margin-top:12px;border-top:1px dashed var(--line);padding-top:12px}
+.ult .topo{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.ult .tag{font-size:.68rem;font-weight:700;padding:3px 8px;border-radius:20px;text-align:right}
+.ult .tag.perdido{background:rgba(232,163,61,.15);color:var(--warn)}
+.ult .tag.ainda{background:rgba(90,169,230,.15);color:var(--info)}
+.ult .tag.entrou{background:rgba(46,189,133,.15);color:var(--buy)}
+.ult .quando{font-size:1.02rem;font-weight:700;margin-top:6px}
+.ult .quando span{font-weight:500;color:var(--muted);font-size:.84rem}
+.fases{display:grid;grid-template-columns:auto 1fr auto;gap:6px 10px;margin-top:10px;font-size:.8rem;align-items:center}
+.fases .bola{width:10px;height:10px;border-radius:50%}
+.fases .h{font-family:var(--mono);font-size:.76rem;color:var(--muted);text-align:right}
+.fases .h b{color:var(--fg)}
+.fases small{display:block;color:var(--muted);font-size:.7rem}
+.dia{margin-top:12px}
+.dia .eixo{position:relative;height:28px;background:var(--panel2);border-radius:6px;margin-top:6px;overflow:hidden}
+.dia .mkr{position:absolute;top:5px;bottom:5px;border-radius:3px;min-width:3px}
+.dia .agora{position:absolute;top:0;bottom:0;width:2px;background:var(--fg)}
+.dia .esc{display:flex;justify-content:space-between;font-family:var(--mono);font-size:.62rem;color:var(--muted);margin-top:3px}
+.leg{display:flex;gap:10px;flex-wrap:wrap;font-size:.66rem;color:var(--muted);margin-top:6px}
+.leg i{display:inline-block;width:10px;height:8px;border-radius:2px;margin-right:4px;vertical-align:middle}
+table.sinais24 td small{display:block;color:var(--muted);font-size:.66rem}
+table.sinais24 td,table.sinais24 th{font-size:.78rem;padding:6px 4px}
+/* minha operação com prints */
+details.opbox{padding:0;margin-top:12px;background:var(--panel2);border:1px solid var(--line);border-radius:12px}
+details.opbox>summary{list-style:none;cursor:pointer;padding:11px 12px;display:flex;align-items:center;gap:10px}
+details.opbox>summary::-webkit-details-marker{display:none}
+details.opbox>summary::after{content:none}
+details.opbox>summary .t{flex:1;min-width:0}
+details.opbox>summary b{display:block;font-size:.93rem}
+details.opbox>summary small{color:var(--muted);font-size:.72rem;font-weight:400}
+details.opbox>summary .seta{color:var(--muted);font-size:1.1rem;transition:transform .2s}
+details.opbox[open]>summary .seta{transform:rotate(180deg)}
+.mini3{display:flex;gap:3px}
+.mini3 i{width:16px;height:6px;border-radius:3px;background:var(--line)}
+.mini3 i.ok{background:var(--buy)}
+.opbox .corpo{padding:0 12px 12px}
+.passo{display:grid;grid-template-columns:30px 1fr;gap:10px;padding:10px 0;border-top:1px solid var(--line)}
+.passo .num{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;font-weight:700;font-size:.8rem;background:var(--panel);color:var(--muted);border:1px solid var(--line)}
+.passo .num.ok{background:var(--buy);color:#06140e;border-color:var(--buy)}
+.passo .num.agora{border-color:var(--info);color:var(--info)}
+.passo h4{margin:3px 0 0;font-size:.9rem}
+.passo h4 span{font-weight:500;color:var(--muted);font-size:.74rem}
+.lido{margin:6px 0 0;display:grid;grid-template-columns:1fr auto;gap:3px 10px;font-size:.78rem}
+.lido dt{color:var(--muted)} .lido dd{margin:0;text-align:right;font-family:var(--mono)}
+.lido .warn{color:var(--warn)}
+.casos{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:8px}
+.casos div{background:var(--panel);border-radius:8px;padding:7px;font-size:.7rem;color:var(--muted);line-height:1.35}
+.casos b{color:var(--fg);display:block;font-size:.74rem}
+.btnPrint{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;margin-top:8px;padding:12px;border-radius:9px;border:1.5px dashed var(--info);background:rgba(90,169,230,.08);color:var(--info);font-weight:700;font-size:.9rem}
+.ocrMsg{margin-top:8px;font-size:.78rem;line-height:1.4;color:var(--muted);background:var(--panel);border-radius:8px;padding:8px 10px}
+.ocrMsg b{color:var(--fg)} .ocrMsg .warn{color:var(--warn)}
+button.largo{display:block;width:100%;margin-top:10px;padding:12px;font-size:.95rem}
+details.mao{margin-top:10px;padding:0;background:transparent;border:0}
+details.mao>summary{justify-content:center}
+details.mao>summary{font-weight:400;font-size:.74rem;color:var(--muted);text-align:center}
+details.mao>summary::after{content:none}
+details.mao>summary u{color:var(--info);text-decoration:none}
+.notaCampo{margin-top:10px}
 </style>
 </head>
 <body>
@@ -238,6 +300,8 @@ textarea{width:100%;min-height:90px;background:var(--bg);color:var(--fg);border:
     <div class="cont"><span id="contTxt">—</span><span id="fechaTxt">—</span></div>
   </div>
 
+  <div class="ult" id="ultSinal" hidden></div>
+
   <div id="blocoRes" class="esconde">
     <div class="res"><span class="rot" id="resTit">Resultado agora</span><span class="big" id="resBig">—</span></div>
     <div class="res" style="margin-top:2px"><span class="nota" style="margin:0" id="resSub">—</span><span class="mono" id="resR">—</span></div>
@@ -247,45 +311,55 @@ textarea{width:100%;min-height:90px;background:var(--bg);color:var(--fg);border:
 
   <div class="ordem" id="ordem" hidden></div>
 
-  <div class="posbox" id="boxEntrei">
-    <div class="rot">Minha operação</div>
-    <div class="subtit">Registrar entrada</div>
-    <p class="nota" style="margin-top:0">Copie de <b>Ordens → Histórico de ordens</b>. No sinal, os campos já vêm preenchidos; ajuste para o que executou.</p>
-    <div class="campos">
-      <label for="pago">Preço pago (BRL)<input id="pago" type="number" step="1" inputmode="decimal"></label>
-      <label for="qtdPaga">Quantia comprada (BTC)<input id="qtdPaga" type="number" step="any" inputmode="decimal"></label>
-      <label for="horaCompra">Hora da compra<input id="horaCompra" type="time"></label>
-      <label for="horaTrailNovo">Trailing colocado às<input id="horaTrailNovo" type="time"></label>
-      <label for="tdNovo">T/D usado no app (%)<input id="tdNovo" type="number" step="0.1" min="0.1" inputmode="decimal"></label>
-      <label for="sobraIni">BTC que já estava na conta<input id="sobraIni" type="number" step="any" min="0" inputmode="decimal"></label>
-      <div class="larga" style="grid-column:1/-1"><span class="rot" style="font-size:.64rem">Entrou num sinal do painel?</span>
-        <div class="seg2" id="segSinal" data-v="nao"><button class="g" data-v="sim" type="button">Sim</button><button class="r on" data-v="nao" type="button">Não (teste/manual)</button></div></div>
+  <details class="opbox" id="caixaOp">
+    <summary><div class="t"><div class="rot">Minha operação</div><b id="opTit">Nenhuma operação aberta</b><small id="opSub">toque para registrar com os prints da Binance</small></div><div class="mini3" id="opMini"><i></i><i></i><i></i></div><span class="seta">⌄</span></summary>
+    <div class="corpo">
+      <p class="nota" style="margin:0 0 4px">No app: <b>Ordens → Histórico de ordens</b> → toque na ordem → print da tela de detalhes. Pode mandar um por um ou vários de uma vez: o painel descobre qual é qual.</p>
+      <div id="passos"></div>
+      <input type="file" id="arqPrints" accept="image/*" multiple hidden>
+      <button class="btnPrint" id="btnPrints" type="button">📷 Adicionar prints da Binance</button>
+      <div class="ocrMsg" id="ocrMsg" hidden></div>
+
+      <div id="boxEntrei">
+        <div class="rot" style="margin-top:12px">Entrou num sinal do painel?</div>
+        <div class="seg2" id="segSinal" data-v="nao"><button class="g" data-v="sim" type="button">Sim</button><button class="r on" data-v="nao" type="button">Não (teste/manual)</button></div>
+        <p class="nota" id="notaSinal">O print não sabe disso; o painel marca "Sim" sozinho se a compra caiu na janela de um sinal.</p>
+        <div class="calc"><dl class="grade" id="calcEntrada"></dl></div>
+        <div class="alerta" id="alertaEntrada" hidden></div>
+        <button class="prim largo" id="btnEntrei" type="button">Entrei: acompanhar a operação</button>
+        <details class="mao"><summary>Algum número saiu errado? <u>corrigir à mão</u></summary>
+          <div class="campos">
+            <label for="pago">Preço pago (BRL)<input id="pago" type="number" step="1" inputmode="decimal"></label>
+            <label for="qtdPaga">Quantia comprada (BTC)<input id="qtdPaga" type="number" step="any" inputmode="decimal"></label>
+            <label for="horaCompra">Hora da compra<input id="horaCompra" type="time"></label>
+            <label for="horaTrailNovo">Trailing colocado às<input id="horaTrailNovo" type="time"></label>
+            <label for="tdNovo">T/D usado no app (%)<input id="tdNovo" type="number" step="0.1" min="0.1" inputmode="decimal"></label>
+            <label for="sobraIni">BTC que já estava na conta<input id="sobraIni" type="number" step="any" min="0" inputmode="decimal"></label>
+          </div>
+        </details>
+      </div>
+
+      <div id="boxEncerrar" hidden>
+        <div class="calc"><dl class="grade" id="calcSaida"></dl></div>
+        <label for="vendaNota" class="notaCampo">Anotação (opcional)<input id="vendaNota" type="text" style="font-family:var(--sans)"></label>
+        <button class="largo" id="btnEncerrei" type="button" style="background:var(--sell);color:#fff;font-weight:700;border:0">Encerrar e salvar no diário</button>
+        <button class="largo" id="btnEncerrarSem" type="button">Encerrar sem salvar</button>
+        <details class="mao"><summary>Algum número saiu errado? <u>corrigir à mão</u></summary>
+          <div class="campos">
+            <label for="horaTrail">Trailing colocado às<input id="horaTrail" type="time"></label>
+            <label for="tdPos">T/D usado no app (%)<input id="tdPos" type="number" step="0.1" min="0.1" inputmode="decimal"></label>
+            <label for="vendaPreco">Preço de venda (BRL)<input id="vendaPreco" type="number" step="1" inputmode="decimal"></label>
+            <label for="vendaQtd">Quantia vendida (BTC)<input id="vendaQtd" type="number" step="any" inputmode="decimal"></label>
+            <label for="vendaHora">Hora da venda<input id="vendaHora" type="time"></label>
+            <label for="sobraFim">Sobra de BTC (fica na conta)<input id="sobraFim" type="number" step="any" min="0" inputmode="decimal"></label>
+            <div style="grid-column:1/-1"><span class="rot" style="font-size:.64rem">Por que saiu?</span>
+              <div class="chips" id="chipsMotivo" data-v="Manual"><button data-v="Trailing (stop)" type="button">Trailing (stop)</button><button data-v="Trailing (gain)" type="button">Trailing (gain)</button><button data-v="Sinal de saída" type="button">Sinal de saída</button><button data-v="Fim do horário" type="button">Fim do horário</button><button data-v="Manual" type="button" class="on">Manual</button></div></div>
+          </div>
+          <p class="nota">Sem o print, o painel sugere a venda pelo gatilho estimado do trailing.</p>
+        </details>
+      </div>
     </div>
-    <div class="calc"><dl class="grade" id="calcEntrada"></dl></div>
-    <div class="alerta" id="alertaEntrada" hidden></div>
-    <div class="botoes" style="margin-top:10px"><button class="prim" id="btnEntrei" type="button">Entrei</button></div>
-  </div>
-  <div class="posbox" id="boxEncerrar" hidden>
-    <div class="campos" style="margin-top:0">
-      <label for="horaTrail">Trailing colocado às<input id="horaTrail" type="time"></label>
-      <label for="tdPos">T/D usado no app (%)<input id="tdPos" type="number" step="0.1" min="0.1" inputmode="decimal"></label>
-    </div>
-    <p class="nota">A hora do trailing está em Ordens abertas. O painel conta o topo a partir dela, minuto a minuto, como a Binance.</p>
-    <div class="rot" style="margin-top:12px">Minha operação</div>
-    <div class="subtit">Registrar saída</div>
-    <p class="nota" style="margin-top:0">Quando a venda executar, confira no Histórico de ordens. O painel sugere os valores pelo gatilho estimado.</p>
-    <div class="campos">
-      <label for="vendaPreco">Preço de venda (BRL)<input id="vendaPreco" type="number" step="1" inputmode="decimal"></label>
-      <label for="vendaQtd">Quantia vendida (BTC)<input id="vendaQtd" type="number" step="any" inputmode="decimal"></label>
-      <label for="vendaHora">Hora da venda<input id="vendaHora" type="time"></label>
-      <label for="sobraFim">Sobra de BTC (fica na conta)<input id="sobraFim" type="number" step="any" min="0" inputmode="decimal"></label>
-      <div style="grid-column:1/-1"><span class="rot" style="font-size:.64rem">Por que saiu?</span>
-        <div class="chips" id="chipsMotivo" data-v="Manual"><button data-v="Trailing (stop)" type="button">Trailing (stop)</button><button data-v="Trailing (gain)" type="button">Trailing (gain)</button><button data-v="Sinal de saída" type="button">Sinal de saída</button><button data-v="Fim do horário" type="button">Fim do horário</button><button data-v="Manual" type="button" class="on">Manual</button></div></div>
-      <label for="vendaNota" style="grid-column:1/-1">Anotação (opcional)<input id="vendaNota" type="text" style="font-family:var(--sans)"></label>
-    </div>
-    <div class="calc"><dl class="grade" id="calcSaida"></dl></div>
-    <div class="botoes" style="margin-top:10px"><button class="perigo" id="btnEncerrei" type="button" style="background:var(--sell);color:#fff;font-weight:700">Encerrar e salvar no diário</button><button id="btnEncerrarSem" type="button">Encerrar sem salvar</button></div>
-  </div>
+  </details>
   <div class="linhaCtx" id="contexto">—</div>
 </section>
 
@@ -690,7 +764,7 @@ function bilheteVenda(qtdVenda, td, sair){
   if(sair){
     return `<div class="passoAntes"><b>1.</b> Em Ordens abertas, toque em <b>Cancelar</b> no Trailing Stop.</div>`
       + campo("Tipo de ordem","Market") + campo("Quantia (BTC)", fQ(qtdVenda), fQ(qtdVenda)) + `<div class="btnfake v">Vender BTC</div>`
-      + `<p class="nota"><b>2.</b> Depois venda a mercado e toque em "Encerrei a operação".</p>`;
+      + `<p class="nota"><b>2.</b> Depois venda a mercado e mande o print da venda em <b>Minha operação</b>.</p>`;
   }
   return campo("Tipo de ordem","Trailing Stop") + campo("T/D (%)", fN(td,1), fN(td,1)) + campo("Limite","Mercado")
     + campo("Quantia (BTC)", fQ(qtdVenda), fQ(qtdVenda)) + `<div class="caixinha"><i></i>Preço de Ativação (desmarcado)</div>`
@@ -763,10 +837,94 @@ function decomp(a, d, t, titulo, nota){
   $("decNota").textContent = txt.trim();
 }
 
+/* ---------- último sinal (para conferir se perdeu algum) ---------- */
+const BR3 = 3*3600000;
+function diaTxt(ms){
+  const d = new Date(ms - BR3), h = new Date(Date.now() - BR3);
+  const dd = Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()), hh = Date.UTC(h.getUTCFullYear(), h.getUTCMonth(), h.getUTCDate());
+  const dif = Math.round((hh - dd)/86400000);
+  const sem = ["dom","seg","ter","qua","qui","sex","sáb"][d.getUTCDay()], dm = String(d.getUTCDate()).padStart(2,"0") + "/" + String(d.getUTCMonth()+1).padStart(2,"0");
+  return dif === 0 ? "Hoje, " + sem + " " + dm : dif === 1 ? "Ontem, " + sem + " " + dm : sem.charAt(0).toUpperCase() + sem.slice(1) + " " + dm;
+}
+const haQuanto = ms => ms >= 48*3600000 ? Math.floor(ms/86400000) + " dias" : tempoTexto(ms).replace(/ \d+ s$/,"").replace(/ 0 min$/,"");
+const janelaMs = () => (cfg.janela || 60)*60000;
+function sinaisRecentes(r, desde){
+  const out = [], ok = contextoOK();
+  for(let i = velas.length-1; i > 200; i--){
+    const k = velas[i], T = k.T+1;
+    if(T < desde) break;
+    if(!sigBase[i]) continue;
+    const tr = r.trades.find(x => x.T === T) || (r.aberta && r.aberta.T === T ? r.aberta : null);
+    let bloq = "";
+    if(!tr) bloq = !sig[i] ? "bloqueado: dólar em queda" : !naJanela(T) ? "fora do seu horário" : !(ok.mvrv && ok.fg) ? "bloqueado pelo contexto" : "já havia um sinal em andamento";
+    out.push({T, i, preco:k.c, tr, bloq});
+  }
+  return out;
+}
+function entrouNoSinal(tr){
+  const fim = tr.saidaT || Date.now();
+  return diario.some(d => d.tIn >= tr.T - 5*60000 && d.tIn <= fim) || (pos && pos.t >= tr.T - 5*60000 && pos.t <= fim);
+}
+function mostrarUltimoSinal(r, preco){
+  const el = $("ultSinal");
+  if(pos || etapaAtual === "compre"){ el.hidden = true; return; }
+  const agora = Date.now(), lista = sinaisRecentes(r, agora - 24*3600000);
+  const u = r.aberta || r.trades[r.trades.length-1];
+  if(!u){
+    const b = sinaisRecentes(r, 0)[0];
+    if(!b){ el.hidden = true; return; }
+    el.innerHTML = `<div class="topo"><div class="rot">Último sinal</div><span class="tag perdido">${b.bloq}</span></div><div class="quando">${diaTxt(b.T)} às ${fHM(b.T)} <span>· há ${haQuanto(agora - b.T)}</span></div><p class="nota">Esse cruzamento não valeu para entrar. Nenhum sinal válido no histórico carregado.</p>`;
+    el.hidden = false; return;
+  }
+  const aberto = u === r.aberta, J = janelaMs();
+  const fimJ = Math.min(u.T + J, u.saidaT || Infinity), fimA = u.saidaT || agora;
+  const pct = aberto ? (preco/u.entrada - 1)*100 - TAXA : u.pct, brl = pct/100*(cfg.valorEntrada || 20);
+  const entrou = entrouNoSinal(u);
+  const tag = entrou ? `<span class="tag entrou">Você entrou ✓</span>` : aberto ? `<span class="tag ainda">Ainda em andamento · dá para entrar atrasado</span>` : `<span class="tag perdido">Você não entrou · já encerrado</span>`;
+  let h = `<div class="topo"><div class="rot">Último sinal</div>${tag}</div>`
+    + `<div class="quando">${diaTxt(u.T)} às ${fHM(u.T)} <span>· há ${haQuanto(agora - u.T)}</span></div>`;
+  const cm = /^(\d+) de (\d+)/.exec($("contTxt").textContent || "");
+  if(etapaAtual === "aguardando" && cm && cm[1] === cm[2]) h += `<p class="nota" style="margin-top:4px">Mesmo com as condições ok, o sinal só vem com um <b>cruzamento novo</b> da média 9 sobre a 21${aberto ? "" : " — o último foi este"}.</p>`;
+  h += `<div class="fases">`
+    + `<span class="bola" style="background:var(--buy)"></span><div><b>Janela de compra</b><small>"COMPRE AGORA" na tela · preço do sinal ${fP(u.entrada)}</small></div><div class="h">${fHM(u.T)} → ${fHM(fimJ)}<br><b>${haQuanto(fimJ - u.T)}</b></div>`;
+  if(fimA > fimJ) h += `<span class="bola" style="background:var(--info)"></span><div><b>Sinal em andamento</b><small>quem entrou ficava dentro; dava para entrar atrasado</small></div><div class="h">${fHM(fimJ)} → ${aberto ? "agora" : fHM(fimA)}<br><b>${haQuanto(fimA - fimJ)}</b></div>`;
+  h += aberto ? `<span class="bola" style="background:var(--line)"></span><div><b>Saída do sinal</b><small>ainda não aconteceu</small></div><div class="h">—</div>`
+    : `<span class="bola" style="background:var(--sell)"></span><div><b>Saída do sinal</b><small>${u.motivo} · ${fP(u.saida)}</small></div><div class="h">${fHM(u.saidaT)}</div>`;
+  h += `</div><p class="nota">Se tivesse entrado às ${fHM(u.T)}: <b class="${pct>=0?"pos":"neg"}">${fPct(pct,2)}${aberto ? " agora" : ""} (${fRs(brl)} em R$ ${fN(cfg.valorEntrada||20,0)})</b>, já com as taxas.${aberto ? "" : " Operação de " + haQuanto(fimA - u.T) + "."}</p>`;
+  // linha do dia (horário de Brasília)
+  const hb = new Date(agora - BR3), base = Date.UTC(hb.getUTCFullYear(), hb.getUTCMonth(), hb.getUTCDate()) + BR3;
+  const ini = base + cfg.horaIni*3600000, fim = base + cfg.horaFim*3600000, x = t => Math.max(0, Math.min(100, (t - ini)/(fim - ini)*100));
+  if(fim > ini){
+    let mk = "";
+    sinaisRecentes(r, ini).forEach(s => {
+      if(s.T > fim) return;
+      if(s.bloq){ if(s.bloq !== "já havia um sinal em andamento") mk += `<div class="mkr" style="left:${x(s.T)}%;width:1%;background:var(--sell)" title="${fHM(s.T)} ${s.bloq}"></div>`; return; }
+      const a = s.T, b = Math.min(s.T + J, s.tr.saidaT || Infinity), c = s.tr.saidaT || agora;
+      mk += `<div class="mkr" style="left:${x(a)}%;width:${Math.max(.8, x(b)-x(a))}%;background:var(--buy)"></div>`;
+      if(c > b) mk += `<div class="mkr" style="left:${x(b)}%;width:${x(c)-x(b)}%;background:rgba(90,169,230,.55)"></div>`;
+    });
+    const passos = 5, esc = Array.from({length:passos+1}, (_,k) => Math.round(cfg.horaIni + (cfg.horaFim-cfg.horaIni)*k/passos) + "h");
+    h += `<div class="dia"><div class="rot">Sinais de hoje</div><div class="eixo">${mk}${agora > ini && agora < fim ? `<div class="agora" style="left:${x(agora)}%"></div>` : ""}</div>`
+      + `<div class="esc">${esc.map(s=>`<span>${s}</span>`).join("")}</div>`
+      + `<div class="leg"><span><i style="background:var(--buy)"></i>janela de compra</span><span><i style="background:rgba(90,169,230,.55)"></i>em andamento</span><span><i style="background:var(--sell)"></i>bloqueado</span></div></div>`;
+  }
+  if(lista.length){
+    h += `<table class="sinais24"><thead><tr><th>Sinal</th><th>Janela</th><th>Se tivesse entrado</th></tr></thead><tbody>`
+      + lista.slice(0, 6).map(s => {
+        if(s.bloq) return `<tr><td>${diaTxt(s.T).split(",")[0]} ${fHM(s.T)}<small>${s.bloq}</small></td><td>—</td><td>—</td></tr>`;
+        const t = s.tr, ab = t === r.aberta, p = ab ? (preco/t.entrada - 1)*100 - TAXA : t.pct;
+        const jan = Math.min(J, (t.saidaT || Infinity) - t.T);
+        return `<tr><td>${diaTxt(s.T).split(",")[0]} ${fHM(s.T)}<small>${fP(t.entrada)}</small></td><td>${haQuanto(jan)}</td><td class="${p>=0?"pos":"neg"}">${fPct(p,2)}<small>${ab ? "em andamento" : "saiu " + fHM(t.saidaT) + " · " + t.motivo}</small></td></tr>`;
+      }).join("") + `</tbody></table><p class="nota">Sinais das últimas 24 h. "Se tivesse entrado" usa a mesma conta do backtest (trailing do Ajustes, taxas de 0,2%).</p>`;
+  } else h += `<p class="nota">Nenhum sinal nas últimas 24 h.</p>`;
+  el.innerHTML = h; el.hidden = false;
+}
+
+let ultimoR = null;
 function atualizarSinal(){
   if(!carregado || !velas.length) return;
   const agora = Date.now(), n = velas.length, ult = velas[n-1], preco = ult.c;
-  const r = simular(regras({incluiAberta:true, usaCtx:true}));
+  const r = simular(regras({incluiAberta:true, usaCtx:true})); ultimoR = r;
   const tdAgora = cfg.td || tdAuto(n-1);
   const ok = contextoOK();
   let chave = null;
@@ -812,7 +970,7 @@ function atualizarSinal(){
   if(pos){
     const a = acompanhar(pos, pos.tTrail || pos.t, topoPos);
     if(a.motivo === "trailing"){
-      quadro("saia","warn","TRAILING PODE TER VENDIDO","O preço chegou ao gatilho estimado (" + fP(a.nivel) + " = topo " + fP(a.topo) + " − " + fTd(pos.td) + "). Confira em Ordens abertas: se a ordem sumiu, a venda executou e você toca em \"Encerrei a operação\".");
+      quadro("saia","warn","TRAILING PODE TER VENDIDO","O preço chegou ao gatilho estimado (" + fP(a.nivel) + " = topo " + fP(a.topo) + " − " + fTd(pos.td) + "). Confira em Ordens abertas: se a ordem sumiu, a venda executou: mande o print do trailing \"Executado\" em Minha operação.");
       chave = "pt"+pos.t;
       setBilhete(bilheteCompra("mercado", preco, tdAgora), bilheteVenda(pos.qtdVenda, pos.td));
     } else if(a.motivo === "fim"){
@@ -838,11 +996,11 @@ function atualizarSinal(){
     chave = "c"+a.T; mostrarCondicoes("var(--buy)");
     const q = quantias(preco, a.td);
     setBilhete(bilheteCompra("mercado", preco, a.td), bilheteVenda(qtdVendaReal(q.qtd), a.td));
-    if(!$("pago").value){ $("pago").value = Math.round(preco); $("qtdPaga").value = q.qtd; $("horaCompra").value = msParaHora(Date.now()); $("horaTrailNovo").value = msParaHora(Date.now()); $("tdNovo").value = a.td; setSeg("segSinal","sim"); calcEntrada(); }
+    if(!$("pago").value && !lidos.c){ $("pago").value = Math.round(preco); $("qtdPaga").value = q.qtd; $("horaCompra").value = msParaHora(Date.now()); $("horaTrailNovo").value = msParaHora(Date.now()); $("tdNovo").value = a.td; setSeg("segSinal","sim"); calcEntrada(); }
     refRegua(); aba("c", true);
   } else if(r.aberta){
     const a = r.aberta, ac = acompanhar(a, a.fillT);
-    quadro("operacao","info","SINAL EM ANDAMENTO","Houve sinal às " + fHM(a.T) + ". Se você entrou, preencha \"Já comprei\" e toque em \"Entrei\" para acompanhar a sua operação.");
+    quadro("operacao","info","SINAL EM ANDAMENTO","Houve sinal às " + fHM(a.T) + ". Se você entrou, mande os prints da compra e do trailing em Minha operação.");
     mostrarResultado(a, ac, "Resultado do sinal", "Sinal a " + fP(a.entrada) + " · " + fQ(a.qtd) + " BTC");
     setBilhete(bilheteCompra("mercado", preco, tdAgora), bilheteVenda(a.qtdVenda, a.td)); posRegua(a, ac);
   } else {
@@ -866,7 +1024,7 @@ function atualizarSinal(){
     }
     refBilhete(); refRegua();
   }
-  renderOrdem();
+  renderOrdem(); mostrarUltimoSinal(r, preco); resumoOp(preco);
   if(chave && chave !== ultimoAviso){ if(ultimoAviso !== null) avisar($("status").textContent, $("expl").textContent); ultimoAviso = chave; }
   if(ultimoAviso === null) ultimoAviso = "inicio";
 }
@@ -921,6 +1079,12 @@ $("btnEntrei").addEventListener("click", ()=>{
   const total = q*0.999 + s;
   const tIn = horaParaMs($("horaCompra").value) || Date.now();
   pos = {entrada:p, qtd:q, sobraIni:s, btcTotal:total, qtdVenda: ajusta(total, INFO.passo, "baixo"), td, t: tIn, tTrail: horaParaMs($("horaTrailNovo").value) || tIn, sinal: $("segSinal").dataset.v === "sim"};
+  const c = lidos.c, tl = lidos.t;
+  if(c && Math.abs(c.preco - p) < 2 && Math.abs(c.qtd - q) < 1e-9){
+    pos.t = c.t; pos.idCompra = c.id;
+    if(c.taxaA === "BTC" && isFinite(c.taxa)){ pos.taxaCompraBTC = c.taxa; pos.btcTotal = q - c.taxa + s; pos.qtdVenda = ajusta(pos.btcTotal, INFO.passo, "baixo"); }
+  }
+  if(tl){ pos.idTrail = tl.id; pos.tTrail = tl.tCria; if(tl.td > 0) pos.td = tl.td; if(tl.qtdTot > 0) pos.qtdVenda = tl.qtdTot; }
   salvarPos(); ultimoAviso = null; abaManual = 0; topoPos = null; prefillKey = ""; preencherPos(); atualizarSinal(); desenharLinhas(); atualizarTopoPos();
 });
 function preencherPos(){
@@ -933,9 +1097,165 @@ function preencherPos(){
 $("horaTrail").addEventListener("change", ()=>{ const t = horaParaMs($("horaTrail").value); if(pos && t){ pos.tTrail = t; salvarPos(); topoPos = null; ultimoAviso = null; atualizarTopoPos(); atualizarSinal(); desenharLinhas(); } });
 $("tdPos").addEventListener("change", ()=>{ const v = num("tdPos"); if(pos && v > 0){ pos.td = v; salvarPos(); ultimoAviso = null; atualizarSinal(); desenharLinhas(); } });
 
+/* ---------- prints da Binance: leitura no próprio aparelho ---------- */
+let lidos = {c:null, t:null, s:null, x:null};
+try{ lidos = Object.assign(lidos, JSON.parse(localStorage.getItem("sinaisTS.prints")||"{}")||{}); }catch(e){}
+function salvarLidos(){ try{ localStorage.setItem("sinaisTS.prints", JSON.stringify(lidos)); }catch(e){} }
+const nBR = s => {
+  s = String(s||"").replace(/[^\d.,]/g,""); if(!s) return NaN;
+  if(s.includes(",")) return parseFloat(s.replace(/\./g,"").replace(",", "."));
+  const m = s.split("."); if(m.length === 2 && m[1].length !== 3) return parseFloat(s);
+  return parseFloat(s.replace(/\./g,""));
+};
+const dataBR = s => { const m = /(\d{4})-(\d{2})-(\d{2})\s+(\d{2}):(\d{2}):(\d{2})/.exec(s||""); return m ? Date.UTC(+m[1], +m[2]-1, +m[3], +m[4], +m[5], +m[6]) + BR3 : 0; };
+/* Lê o texto da tela "detalhes da ordem" do app da Binance. */
+function lerPrint(txt){
+  const T = String(txt).normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[ \t]+/g, " ");
+  const low = T.toLowerCase(), D = "(\\d{4}-\\d{2}-\\d{2}\\s+\\d{2}:\\d{2}:\\d{2})";
+  const pega = (re) => { const m = new RegExp(re, "i").exec(T); return m ? m[1] : ""; };
+  const L = {};
+  L.id = pega("ordem\\D{0,8}(\\d{8,})");
+  const tipo = (/tipo\s+([^\n]+)/i.exec(T)||[])[1] || "";
+  L.trailing = /trailing/i.test(tipo);
+  L.lado = /vend|sell/i.test(tipo) ? "venda" : /compr|buy/i.test(tipo) ? "compra" : "";
+  L.tipoTxt = tipo.trim();
+  const pq = /preenchida\s*\/\s*quantia\s+([\d.,]+)\s*\/\s*([\d.,]+)/i.exec(T);
+  L.qtd = pq ? nBR(pq[1]) : NaN; L.qtdTot = pq ? nBR(pq[2]) : NaN;
+  L.preco = nBR(pega("m.dia\\s*\\/\\s*pre\\S*\\s+([\\d.,]+)"));
+  const tx = /taxa\s+([\d.,]+)\s*(btc|brl)/i.exec(T); L.taxa = tx ? nBR(tx[1]) : NaN; L.taxaA = tx ? tx[2].toUpperCase() : "";
+  L.td = nBR(pega("trailing\\s+(\\d+[.,]\\d+)\\s*%"));
+  L.tCria = dataBR(pega("cria\\S*\\s+" + D)); L.tAtu = dataBR(pega("atualiza\\S*\\s+" + D));
+  L.tCanc = dataBR(pega("cancelamento\\s+" + D)); L.tTrade = dataBR(pega("\\bdata\\s+" + D));
+  L.status = (L.tCanc || /cancelad/i.test(low)) && !(L.qtd > 0) ? "cancelada" : L.qtd > 0 ? "executada" : "aberta";
+  L.t = L.status === "executada" ? (L.tTrade || L.tAtu || L.tCria) : L.tCria;
+  L.ok = !!(L.id && L.lado && (L.status !== "executada" || (L.preco > 0 && L.qtd > 0)));
+  // números estranhos ficam marcados para conferir
+  const ref = velas.length ? velas[velas.length-1].c : NaN;
+  L.duvida = [];
+  if(L.status === "executada" && isFinite(ref) && !(L.preco > ref*0.6 && L.preco < ref*1.6)) L.duvida.push("preco");
+  if(L.qtd > 0.01) L.duvida.push("qtd");
+  if(L.trailing && !(L.td >= 0.1 && L.td <= 20)) L.duvida.push("td");
+  return L;
+}
+function guardarLido(L){
+  const msgs = [];
+  if(!L.ok){ return "<span class=warn>Não reconheci este print.</span> Use o da tela de detalhes da ordem (Histórico de ordens → toque na ordem)."; }
+  if(diario.some(d => d.chave && d.chave.split(">").includes(L.id))) return "A ordem nº " + L.id + " já está no diário (ignorada).";
+  if(L.trailing && L.lado === "venda"){
+    if(!lidos.t || lidos.t.id === L.id || L.tCria >= lidos.t.tCria) lidos.t = L;
+    if(L.status === "executada"){ lidos.s = L; msgs.push("<b>Saída</b>: o trailing vendeu a " + fP(L.preco) + "."); }
+    else if(L.status === "cancelada"){ lidos.x = L; msgs.push("<b>Trailing</b> cancelado às " + fHM(L.tCanc) + "."); }
+    else msgs.push("<b>Trailing</b> de " + fN(L.td,1) + "% colocado às " + fHM(L.tCria) + ".");
+  } else if(L.lado === "compra"){
+    if(L.status !== "executada") return "A compra nº " + L.id + " ainda não executou.";
+    if(pos && pos.idCompra && pos.idCompra !== L.id) return "<span class=warn>Esta compra (nº " + L.id + ") não é a da operação aberta.</span> Encerre a atual antes.";
+    lidos.c = L; msgs.push("<b>Entrada</b>: compra a " + fP(L.preco) + " às " + fHM(L.t) + ".");
+  } else if(L.lado === "venda"){
+    if(L.status !== "executada") return "A venda nº " + L.id + " ainda não executou.";
+    lidos.s = L; msgs.push("<b>Saída</b>: venda a mercado a " + fP(L.preco) + " às " + fHM(L.t) + ".");
+  }
+  const c = lidos.c || (pos ? {t:pos.t} : null);
+  if(c && lidos.s && lidos.s.t < c.t) msgs.push("<span class=warn>A venda é de antes da compra: confira se os prints são da mesma operação.</span>");
+  if(L.duvida.length) msgs.push("<span class=warn>Confira os números marcados em amarelo.</span>");
+  return msgs.join(" ");
+}
+/* Joga o que foi lido nos campos (que ficam em "corrigir à mão"). */
+function aplicarLidos(){
+  const {c, t, s, x} = lidos;
+  if(!pos){
+    if(c){ $("pago").value = Math.round(c.preco); $("qtdPaga").value = c.qtd; $("horaCompra").value = msParaHora(c.t);
+      const r = ultimoR, J = janelaMs(), ts = r ? r.trades.concat(r.aberta ? [r.aberta] : []) : [];
+      setSeg("segSinal", ts.some(z => c.t >= z.T - 60000 && c.t <= z.T + J) ? "sim" : "nao"); }
+    if(t){ $("horaTrailNovo").value = msParaHora(t.tCria); if(t.td > 0) $("tdNovo").value = t.td; }
+    calcEntrada();
+  } else {
+    let mudou = false;
+    if(c && !pos.idCompra && Math.abs(c.t - pos.t) < 20*60000){ Object.assign(pos, {idCompra:c.id, entrada:c.preco, qtd:c.qtd, t:c.t}); if(c.taxaA === "BTC") pos.taxaCompraBTC = c.taxa; mudou = true; }
+    if(t && pos.idTrail !== t.id){ pos.idTrail = t.id; pos.tTrail = t.tCria; if(t.td > 0) pos.td = t.td; if(t.qtdTot > 0) pos.qtdVenda = t.qtdTot; mudou = true; topoPos = null; }
+    if(mudou){ salvarPos(); preencherPos(); atualizarTopoPos(); }
+    if(s){
+      $("vendaPreco").value = Math.round(s.preco); $("vendaQtd").value = s.qtd; $("vendaHora").value = msParaHora(s.t);
+      setSeg("chipsMotivo", s.trailing ? (s.preco > pos.entrada*(1+TAXA/100) ? "Trailing (gain)" : "Trailing (stop)") : "Manual");
+      motivoTocado = true; calcSaida();
+    }
+  }
+}
+const marca = (L, k, v) => L && L.duvida && L.duvida.includes(k) ? `<span class="warn">${v} ?</span>` : v;
+function renderPassos(){
+  const {c, t, s, x} = lidos;
+  const ent = c || (pos ? {preco:pos.entrada, qtd:pos.qtd, t:pos.t, mao:true} : null);
+  const tr = t ? t : (pos ? {td:pos.td, tCria:pos.tTrail || pos.t, qtdTot:pos.qtdVenda, mao:true} : null);
+  const passo = (n, ok, agora, tit, sub, corpo) => `<div class="passo"><div class="num ${ok?"ok":agora?"agora":""}">${ok?"✓":n}</div><div><h4>${tit} <span>${sub}</span></h4>${corpo||""}</div></div>`;
+  let h = "";
+  h += passo(1, !!ent, !ent, "Entrada", ent ? (ent.mao ? "· registrada à mão" : "· " + (c.tipoTxt || "Mercado / Comprar")) : "· print da compra a mercado",
+    ent ? `<dl class="lido"><dt>Preço</dt><dd>${marca(c,"preco",fP(ent.preco))}</dd><dt>Quantia</dt><dd>${marca(c,"qtd",fQ(ent.qtd))}</dd>${c && isFinite(c.taxa) ? `<dt>Taxa</dt><dd>${f8(c.taxa)} ${c.taxaA}</dd>` : ""}<dt>Hora</dt><dd>${fDH(ent.t)}</dd></dl>` : "");
+  h += passo(2, !!tr, !!ent && !tr, "Trailing", tr ? (tr.mao ? "· registrado à mão" : "· Trailing Stop / Vender") : "· print do Trailing Stop de venda",
+    tr ? `<dl class="lido"><dt>T/D</dt><dd>${marca(t,"td",fN(tr.td,1) + "%")}</dd><dt>Quantia</dt><dd>${isFinite(tr.qtdTot) ? fQ(tr.qtdTot) : "—"}</dd><dt>Colocado às</dt><dd>${fDH(tr.tCria)}</dd>${x ? `<dt>Cancelado às</dt><dd>${fDH(x.tCanc)}</dd>` : ""}</dl>` : "");
+  const caso = s ? (s.trailing ? "· A · o trailing vendeu" : "· B · vendeu na mão") : "· quando a operação terminar";
+  h += passo(3, !!s, !!pos && !s, "Saída", caso,
+    s ? `<dl class="lido"><dt>Preço</dt><dd>${marca(s,"preco",fP(s.preco))}</dd><dt>Quantia</dt><dd>${marca(s,"qtd",fQ(s.qtd))}</dd>${isFinite(s.taxa) ? `<dt>Taxa</dt><dd>${s.taxaA === "BRL" ? "R$ " + fN(s.taxa,4) : f8(s.taxa) + " " + s.taxaA}</dd>` : ""}<dt>Hora</dt><dd>${fDH(s.t)}</dd></dl>`
+      : `<div class="casos"><div><b>A · Trailing vendeu</b>1 print: o Trailing Stop com "Executado"</div><div><b>B · Vendi na mão</b>print da venda a Mercado + (opcional) o trailing "Cancelado"</div></div>`);
+  $("passos").innerHTML = h;
+  $("opMini").innerHTML = [ent, tr, s].map(z => `<i class="${z?"ok":""}"></i>`).join("");
+  $("btnPrints").textContent = !ent || !tr ? "📷 Adicionar prints da compra e do trailing" : !pos ? "📷 Trocar ou adicionar prints" : !s ? "📷 Adicionar print(s) da saída" : "📷 Trocar algum print";
+}
+function resumoOp(preco){
+  renderPassos();
+  if(pos){
+    const pct = (preco/pos.entrada - 1)*100;
+    $("opTit").innerHTML = (lidos.s ? "Pronta para salvar" : "Comprado desde " + fHM(pos.t)) + (lidos.s ? "" : ` · <span class="${pct>=0?"pos":"neg"}">${fPct(pct,1)}</span>`);
+    $("opSub").textContent = lidos.s ? "3 de 3 prints · toque para encerrar" : (lidos.t || pos.idTrail ? "entrada e trailing ok · falta o print da saída" : "falta o print do trailing");
+  } else if(lidos.c){
+    $("opTit").textContent = "Compra lida: " + fP(lidos.c.preco) + " às " + fHM(lidos.c.t);
+    $("opSub").textContent = lidos.t ? "trailing ok · toque em \"Entrei\"" : "falta o print do trailing";
+  } else { $("opTit").textContent = "Nenhuma operação aberta"; $("opSub").textContent = "toque para registrar com os prints da Binance"; }
+}
+let ocrW = null;
+function carregarScript(src){ return new Promise((ok, erro) => { const s = document.createElement("script"); s.src = src; s.onload = ok; s.onerror = erro; document.head.appendChild(s); }); }
+async function leitor(msg){
+  if(ocrW) return ocrW;
+  msg("Baixando o leitor de texto (só na primeira vez, alguns MB)…");
+  if(!window.Tesseract) await carregarScript("https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js");
+  ocrW = await Tesseract.createWorker("eng");
+  return ocrW;
+}
+/* Clareia o print (texto claro em fundo escuro vira texto escuro em fundo claro) e aumenta se for pequeno. */
+function prepararImagem(file){
+  return new Promise((ok, erro) => {
+    const img = new Image(), url = URL.createObjectURL(file);
+    img.onload = () => {
+      const esc = img.width < 1000 ? 2 : 1, cv = document.createElement("canvas");
+      cv.width = img.width*esc; cv.height = img.height*esc;
+      const g = cv.getContext("2d", {willReadFrequently:true}); g.drawImage(img, 0, 0, cv.width, cv.height);
+      try{ const d = g.getImageData(0, 0, cv.width, cv.height), px = d.data;   // cinza + inverte (funciona também no Safari)
+        for(let q=0;q<px.length;q+=4){ const y = 255 - (px[q]*0.299 + px[q+1]*0.587 + px[q+2]*0.114); px[q] = px[q+1] = px[q+2] = y; }
+        g.putImageData(d, 0, 0); }catch(e){}
+      URL.revokeObjectURL(url); ok(cv);
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); erro(new Error("imagem")); };
+    img.src = url;
+  });
+}
+$("btnPrints").addEventListener("click", () => $("arqPrints").click());
+$("arqPrints").addEventListener("change", async () => {
+  const fs = Array.from($("arqPrints").files || []); $("arqPrints").value = ""; if(!fs.length) return;
+  const box = $("ocrMsg"), msg = t => { box.hidden = false; box.innerHTML = t; };
+  const res = [];
+  try{
+    const w = await leitor(msg);
+    for(let k=0;k<fs.length;k++){
+      msg("Lendo o print " + (k+1) + " de " + fs.length + "…");
+      try{ const cv = await prepararImagem(fs[k]); const out = await w.recognize(cv); res.push(guardarLido(lerPrint(out.data.text))); }
+      catch(e){ res.push("<span class=warn>Não consegui abrir o print " + (k+1) + ".</span>"); }
+    }
+  }catch(e){ msg("<span class=warn>Não consegui carregar o leitor de prints.</span> Confira a internet e tente de novo, ou use \"corrigir à mão\"."); return; }
+  salvarLidos(); aplicarLidos(); msg(res.map(t => "• " + t).join("<br>")); atualizarSinal();
+});
+
 /* saída: sugere valores pelo estado da operação, sem apagar o que você digitou */
 let prefillKey = "", motivoTocado = false;
 function prefillSaida(a){
+  if(lidos.s) return;   // a saída já veio do print
   const mot = a.motivo === "trailing" ? (a.nivel > pos.entrada*(1+TAXA/100) ? "Trailing (gain)" : "Trailing (stop)") : a.motivo === "fim" ? "Fim do horário" : a.motivo ? "Sinal de saída" : "Manual";
   const key = pos.t + ":" + mot;
   if(key === prefillKey) return;
@@ -953,20 +1273,25 @@ function calcSaida(){
   if(document.activeElement !== $("sobraFim")) $("sobraFim").value = isFinite(qv) ? Math.max(0, +(btcTotal - qv).toFixed(8)) : "";
   const sf = num("sobraFim") || 0;
   if(!(pv > 0) || !(qv > 0)){ $("calcSaida").innerHTML = "<dt>Preencha o preço e a quantia vendida</dt><dd>—</dd>"; return; }
-  const c = contaOp({entrada:pos.entrada, qtd:pos.qtd, sobraIni:pos.sobraIni||0, saida:pv, qtdV:qv, sobraFim:sf});
-  const dur = (horaParaMs($("vendaHora").value) || Date.now()) - pos.t;
+  const ls = lidos.s && Math.abs(lidos.s.preco - pv) < 2 ? lidos.s : null;
+  const c = contaOp({entrada:pos.entrada, qtd:pos.qtd, sobraIni:pos.sobraIni||0, saida:pv, qtdV:qv, sobraFim:sf, taxaCompraBTC:pos.taxaCompraBTC, taxaVendaBRL: ls && ls.taxaA === "BRL" ? ls.taxa : undefined});
+  const dur = (ls ? ls.t : horaParaMs($("vendaHora").value) || Date.now()) - pos.t;
   $("calcSaida").innerHTML = `<dt>Recebido na venda (já sem 0,1%)</dt><dd>R$ ${fR(c.recebido)}</dd><dt>Sobra a preço de mercado</dt><dd>R$ ${fR(sf*pv)}</dd>`
     + `<dt>Custo da compra${pos.sobraIni ? " + sobra anterior" : ""}</dt><dd>R$ ${fR(c.custo)}</dd>`
     + `<dt><b style="color:var(--fg)">Resultado</b></dt><dd class="${c.res>=0?"pos":"neg"}"><b>${fRs(c.res)} · ${fPct(c.pct)}</b></dd><dt>Duração</dt><dd>${tempoTexto(dur)}</dd>`;
 }
 ["vendaPreco","vendaQtd","vendaHora","sobraFim"].forEach(id => $(id).addEventListener("input", calcSaida));
-function fecharPos(){ pos = null; topoPos = null; prefillKey = ""; motivoTocado = false; salvarPos(); ["pago","qtdPaga","vendaPreco","vendaQtd","sobraFim","vendaNota"].forEach(id=>$(id).value=""); preencherPos(); ultimoAviso = null; abaManual = 0; atualizarSinal(); desenharLinhas(); }
+function fecharPos(){ lidos = {c:null, t:null, s:null, x:null}; salvarLidos(); $("ocrMsg").hidden = true; pos = null; topoPos = null; prefillKey = ""; motivoTocado = false; salvarPos(); ["pago","qtdPaga","vendaPreco","vendaQtd","sobraFim","vendaNota"].forEach(id=>$(id).value=""); preencherPos(); ultimoAviso = null; abaManual = 0; atualizarSinal(); desenharLinhas(); }
 $("btnEncerrei").addEventListener("click", ()=>{
   const pv = num("vendaPreco"), qv = num("vendaQtd");
   if(!(pv > 0) || !(qv > 0)){ $("expl").textContent = "Preencha o preço de venda e a quantia vendida para salvar no diário."; return; }
-  const sf = num("sobraFim") || 0, tOut = horaParaMs($("vendaHora").value) || Date.now();
+  const ls = lidos.s && Math.abs(lidos.s.preco - pv) < 2 ? lidos.s : null;
+  const sf = num("sobraFim") || 0, tOut = ls ? ls.t : horaParaMs($("vendaHora").value) || Date.now();
   const op = {id: Date.now(), tIn: pos.t, tOut, entrada: pos.entrada, qtd: pos.qtd, saida: pv, qtdV: qv, sobraIni: pos.sobraIni||0, sobraFim: sf,
     motivo: $("chipsMotivo").dataset.v, sinal: !!pos.sinal, nota: $("vendaNota").value.trim(), td: pos.td};
+  if(isFinite(pos.taxaCompraBTC)) op.taxaCompraBTC = pos.taxaCompraBTC;
+  if(ls && ls.taxaA === "BRL" && isFinite(ls.taxa)) op.taxaVendaBRL = ls.taxa;
+  if(pos.idCompra && ls) op.chave = pos.idCompra + ">" + ls.id;
   diario.push(op); sobraConta = sf; salvarDiario(); fecharPos(); renderDiario();
 });
 $("btnEncerrarSem").addEventListener("click", fecharPos);
@@ -1429,7 +1754,7 @@ $("btnNotif").addEventListener("click", async ()=>{
 });
 
 /* caixas recolhíveis: lembra o que você deixou aberto */
-["caixaDiario","caixaUltimas","caixaBt","ajustes"].forEach(id => {
+["caixaDiario","caixaUltimas","caixaBt","ajustes","caixaOp"].forEach(id => {
   const el = $(id);
   try{ const v = localStorage.getItem("sinaisTS.aberto."+id); if(v === "1") el.open = true; else if(v === "0") el.open = false; }catch(e){}
   el.addEventListener("toggle", () => { try{ localStorage.setItem("sinaisTS.aberto."+id, el.open ? "1" : "0"); }catch(e){} });
